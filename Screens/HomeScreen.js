@@ -7,6 +7,7 @@ import Entypo from '@expo/vector-icons/Entypo'
 import CreateWorkerAccountModal from '../Components/CreateWorkerAccountModal'
 import SalonCard from '../Components/SalonCard'
 import WorkerCard from '../Components/WorkerCard'
+import BeginSalonRegisterModal from '../Components/BeginSalonRegisterModal'
 
 
 
@@ -14,6 +15,7 @@ const HomeScreen = ({route}) => {
     const params = route.params || {}
     const [isWelcomeModalVisible, setWelcomeModalVisible] = useState(params?.newAccount || false)
     const [isCreateWorkerAccountModalVisible, setIsCreateWorkerAccountModalVisible] = useState(false)
+    const [isBeginSalonRegisterModalVisible, setIsBeginSalonRegisterModalVisible] = useState(false)
     const [haveWorkerAccount, setHaveWorkerAccount] = useState(false)
 
   return (
@@ -44,16 +46,22 @@ const HomeScreen = ({route}) => {
                                 <Text className="text-white font-bold">hdsa</Text>
                             </View> */}
                         </View>
-                        {/* <Text>dasjdjas</Text> */}
+                        <TouchableOpacity 
+                        onPress={()=>{setIsBeginSalonRegisterModalVisible(true)}}
+                        className="p-1 bg-bgPrimary rounded-full">
+                            <Entypo name="plus" size={32} color="black" />
+                        </TouchableOpacity>
                     </View>
 
                     <View className="flex flex-row flex-wrap justify-between mt-10">
                         <WorkerCard />
-                        <SalonCard />                     
+                        <SalonCard /> 
                     </View>
 
                     <View className="mt-6">
-                        <TouchableOpacity className="h-28 w-full bg-bgSecondary border-textSecondary rounded-3xl flex flex-row justify-between items-center px-4" style={{borderWidth: 0.5}}>
+                        <TouchableOpacity 
+                        onPress={()=>{setIsBeginSalonRegisterModalVisible(true)}}
+                        className="h-28 w-full bg-bgSecondary border-textSecondary rounded-3xl flex flex-row justify-between items-center px-4" style={{borderWidth: 0.5}}>
                             <View>
                                 <View className="bg-appColor h-3 w-3 rounded-full"></View>
                             </View>
@@ -100,6 +108,11 @@ const HomeScreen = ({route}) => {
         <CreateWorkerAccountModal 
             isModalVisible={isCreateWorkerAccountModalVisible}
             setIsModalVisible={setIsCreateWorkerAccountModalVisible}
+        />
+
+        <BeginSalonRegisterModal 
+            isModalVisible={isBeginSalonRegisterModalVisible}
+            setIsModalVisible={setIsBeginSalonRegisterModalVisible}
         />
     </SafeAreaView>
   )

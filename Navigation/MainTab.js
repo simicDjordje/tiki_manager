@@ -1,9 +1,10 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import { AccountScreen, HomeScreen } from '../Screens'
+import { AccountScreen, HomeScreen, StatisticsScreen } from '../Screens'
 import { View, Text } from "react-native"
 
 import Ionicons from '@expo/vector-icons/Ionicons'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
+import AntDesign from '@expo/vector-icons/AntDesign'
 
 const Tab = createBottomTabNavigator()
 
@@ -27,6 +28,16 @@ const MainTab = () => {
                 <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
                   <Ionicons stroke={focused ? 3 : 2} name="options" size={24} color={focused ? '#232323' : '#babbb6'} />
                   <Text style={{color: focused ? '#232323': '#babbb6', fontSize: 12}}>Početna</Text>
+                </View>
+            )
+        }}/>
+
+        <Tab.Screen name="StatisticsScreen" component={StatisticsScreen} options={{
+            tabBarLabelStyle: {display: 'none'},
+            tabBarIcon: ({focused}) => (
+                <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                  <AntDesign stroke={focused ? 3 : 2} name="areachart" size={24} color={focused ? '#232323' : '#babbb6'} />
+                  <Text style={{color: focused ? '#232323': '#babbb6', fontSize: 12}}>Rezultati</Text>
                 </View>
             )
         }}/>
