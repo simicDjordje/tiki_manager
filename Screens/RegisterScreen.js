@@ -13,7 +13,7 @@ const RegisterScreen = () => {
     }
 
     const handleConfirm = () => {
-        navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
+        navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newAccount: true}})
     }
 
   return (
