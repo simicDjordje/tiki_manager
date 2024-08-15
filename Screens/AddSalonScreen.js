@@ -46,7 +46,7 @@ const AddSalonScreen = () => {
 
   const handleFinish = () => {
     setIsSuccess(false)
-    navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newSalonAdded: true, salonId: 'djsahdasjdasjkdas'}})
+    navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newSalonCreated: true, salonId: 'djsahdasjdasjkdas'}})
     return
   }
 

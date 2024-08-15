@@ -13,25 +13,29 @@ import { StatusBar } from 'expo-status-bar'
 
 const HomeScreen = ({route}) => {
     const params = route.params || {}
+    console.log(params)
     const [isWelcomeModalVisible, setWelcomeModalVisible] = useState(params?.newAccount || false)
-    const [isNewSalonAdded, setIsNewSalonAdded] = useState(params?.newSalonAdded || true)
+    const [isNewSalonCreated, setIsNewSalonCreated] = useState(false)
     const [isCreateWorkerAccountModalVisible, setIsCreateWorkerAccountModalVisible] = useState(false)
     const [isBeginSalonRegisterModalVisible, setIsBeginSalonRegisterModalVisible] = useState(false)
     const [haveWorkerAccount, setHaveWorkerAccount] = useState(false)
 
-    // useFocusEffect(useCallback(()=>{
-    //     if(!isNewSalonAdded) return
-    // }, [isNewSalonAdded]))
+    useFocusEffect(useCallback(()=>{
+        if(!params?.newSalonCreated) return
+        setIsNewSalonCreated(true)
+
+        setTimeout(()=>{setIsNewSalonCreated(false)}, 3000)
+    }, [params]))
 
   return (
     <SafeAreaView className="bg-bgPrimary h-full relative">
-        <StatusBar style={isNewSalonAdded ? "light" : "dark"} />
-        {isNewSalonAdded && <View className="top-0 bottom-0 left-0 right-0 bg-black absolute opacity-90"></View>}
+        <StatusBar style={isNewSalonCreated ? "light" : "dark"} />
+        {isNewSalonCreated && <View className="top-0 bottom-0 left-0 right-0 bg-black absolute opacity-90"></View>}
         <ScrollView>
             <View className="min-h-screen flex flex-col justify-between items-center">
                 <View className="w-full flex flex-row justify-between items-center px-4 mt-4">
                     <View>
-                        <Text className={`${isNewSalonAdded ? 'text-textSecondary' : 'text-textPrimary'} text-3xl font-bold`}>tiki <Text className="text-textSecondary text-2xl font-bold">manager</Text></Text>
+                        <Text className={`${isNewSalonCreated ? 'text-textSecondary' : 'text-textPrimary'} text-3xl font-bold`}>tiki <Text className="text-textSecondary text-2xl font-bold">manager</Text></Text>
                     </View>
 
                     <View className="flex flex-row justify-between items-center">
@@ -46,7 +50,7 @@ const HomeScreen = ({route}) => {
 
 
                 <View className="bg-bgSecondary flex-1 w-full min-h-screen mt-8 px-4 relative" style={{borderTopLeftRadius: 50, borderTopRightRadius: 50}}>
-                    {isNewSalonAdded && <View className="top-0 bottom-0 left-0 right-0 bg-textPrimary absolute opacity-50 z-10"></View>}
+                    {isNewSalonCreated && <View className="top-0 bottom-0 left-0 right-0 bg-textPrimary absolute opacity-50 z-10"></View>}
                     <View className="flex flex-row justify-between items-center mt-10">
                         <View>
                             <Text className="text-textPrimary text-2xl font-bold">Natalija Lukic</Text>
@@ -63,7 +67,7 @@ const HomeScreen = ({route}) => {
 
                     <View className="flex flex-row flex-wrap justify-between mt-10">
                         <WorkerCard />
-                        <SalonCard /> 
+                        <SalonCard isJustCreated={isNewSalonCreated} /> 
                     </View>
 
                     <View className="mt-6">

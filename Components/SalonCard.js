@@ -2,17 +2,20 @@ import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { Image } from 'expo-image'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
+import Animated, {BounceInUp, BounceOut} from 'react-native-reanimated'
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
-const SalonCard = () => {
+const SalonCard = ({isJustCreated}) => {
   return (
     <TouchableOpacity className="bg-appColor h-44 w-[48%] rounded-2xl mb-4 flex flex-col justify-between z-20 relative">
-            <View className="bg-bgPrimary absolute -top-12 px-4 py-2 rounded-xl">
-                <Text className="text-textPrimary font-bold">Pogledaj svoj salon</Text>
-            </View>
+            {isJustCreated && 
+                <Animated.View entering={BounceInUp} exiting={BounceOut} className="bg-bgPrimary absolute -top-12 px-4 py-2 rounded-xl">
+                    <Text className="text-textPrimary font-bold">Pogledaj svoj salon</Text>
+                </Animated.View>
+            }
             <View>
                 <View className="flex flex-row justify-between items-center px-2 pt-2">
                     <Image
