@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import WelcomeModal from '../Components/WelcomeModal'
@@ -8,23 +8,30 @@ import CreateWorkerAccountModal from '../Components/CreateWorkerAccountModal'
 import SalonCard from '../Components/SalonCard'
 import WorkerCard from '../Components/WorkerCard'
 import BeginSalonRegisterModal from '../Components/BeginSalonRegisterModal'
-
-
+import { useFocusEffect } from '@react-navigation/native'
+import { StatusBar } from 'expo-status-bar'
 
 const HomeScreen = ({route}) => {
     const params = route.params || {}
     const [isWelcomeModalVisible, setWelcomeModalVisible] = useState(params?.newAccount || false)
+    const [isNewSalonAdded, setIsNewSalonAdded] = useState(params?.newSalonAdded || true)
     const [isCreateWorkerAccountModalVisible, setIsCreateWorkerAccountModalVisible] = useState(false)
     const [isBeginSalonRegisterModalVisible, setIsBeginSalonRegisterModalVisible] = useState(false)
     const [haveWorkerAccount, setHaveWorkerAccount] = useState(false)
 
+    // useFocusEffect(useCallback(()=>{
+    //     if(!isNewSalonAdded) return
+    // }, [isNewSalonAdded]))
+
   return (
-    <SafeAreaView className="bg-bgPrimary h-full">
+    <SafeAreaView className="bg-bgPrimary h-full relative">
+        <StatusBar style={isNewSalonAdded ? "light" : "dark"} />
+        {isNewSalonAdded && <View className="top-0 bottom-0 left-0 right-0 bg-black absolute opacity-90"></View>}
         <ScrollView>
             <View className="min-h-screen flex flex-col justify-between items-center">
                 <View className="w-full flex flex-row justify-between items-center px-4 mt-4">
                     <View>
-                        <Text className="text-textPrimary text-3xl font-bold">tiki <Text className="text-textSecondary text-2xl font-bold">manager</Text></Text>
+                        <Text className={`${isNewSalonAdded ? 'text-textSecondary' : 'text-textPrimary'} text-3xl font-bold`}>tiki <Text className="text-textSecondary text-2xl font-bold">manager</Text></Text>
                     </View>
 
                     <View className="flex flex-row justify-between items-center">
@@ -38,7 +45,8 @@ const HomeScreen = ({route}) => {
                 </View>
 
 
-                <View className="bg-bgSecondary flex-1 w-full min-h-screen mt-8 px-4" style={{borderTopLeftRadius: 50, borderTopRightRadius: 50}}>
+                <View className="bg-bgSecondary flex-1 w-full min-h-screen mt-8 px-4 relative" style={{borderTopLeftRadius: 50, borderTopRightRadius: 50}}>
+                    {isNewSalonAdded && <View className="top-0 bottom-0 left-0 right-0 bg-textPrimary absolute opacity-50 z-10"></View>}
                     <View className="flex flex-row justify-between items-center mt-10">
                         <View>
                             <Text className="text-textPrimary text-2xl font-bold">Natalija Lukic</Text>

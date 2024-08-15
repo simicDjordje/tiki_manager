@@ -16,36 +16,55 @@ const AddSalonStepFour = ({handleNext, images, setImages}) => {
       }
 
   return (
-    <View className="mt-10">  
-    <ScrollView>      
-        <View className="mt-4">
-            <View className="flex flex-row flex-wrap justify-between relative">
+    <View className="h-full">
+        {images.length == 0 && 
+            <View className="h-full flex flex-col justify-center items-center">
+                <Text className="text-xl text-textMid font-bold">Slike salona su obavezne</Text>
+                <Text className="text-textMid">Slike možeš promeniti kasnije na profilu salona</Text>
+            </View>
+        }
+
+
+        {images.length > 0 &&
+        <View className="h-full">
+            <View className="flex flex-row justify-center items-center">
+                <Text className="text-textMid -mt-4">Slike će se prikazivati istim redosledom kao ovde</Text>
+            </View>
+
+            <ScrollView 
+            className="mb-2 -mt-10 -mr-10"
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{
+                paddingLeft: 5,
+                paddingVertical: 20
+            }}>
                 {images.map((image, index) => {
+                    const lastImage = index + 1 == images.length
+
                     return (
-                        <View className="w-[48%] mb-5 flex flex-row justify-center items-center relative" key={index}>
-                            <TouchableOpacity onPress={() => removeImage(index)} className="p-1 bg-textPrimary rounded-full absolute -top-3 right-1 z-10">
+                        <View className={`mb-5 flex flex-row justify-center items-center relative ${lastImage ? 'mr-10' : 'mr-4'}`} key={index}>
+                            <TouchableOpacity onPress={() => removeImage(index)} className="p-2 bg-textPrimary rounded-full absolute top-7 -right-3 z-10">
                                 <Ionicons name="close" size={18} color="white" />
                             </TouchableOpacity>
                             <Image
-                                className="w-36 h-36 rounded-lg border-2 border-appColor"
+                                className="w-56 h-56 rounded-lg border-textSecondary"
+                                style={{borderWidth: 0.5}}
                                 source={image}
                                 placeholder={{ blurhash }}
-                                contentFit="scale-down"
+                                contentFit="cover"
                                 transition={1000}
                             />
                         </View>
                     )
                 })}
+            </ScrollView>
+
+            <View className="flex flex-col justify-center items-center">
+                <Text className="text-textMid -mt-4">{images.length >=2 && 'Skroluj u desno za ostale slike'}</Text>
             </View>
         </View>
-
-        <TouchableOpacity 
-            onPress={handleNext}
-            className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center mt-3">
-            <Text className="text-white font-bold text-lg">Dalje</Text>
-        </TouchableOpacity>
-
-        </ScrollView>
+        }
     </View>
   )
 }

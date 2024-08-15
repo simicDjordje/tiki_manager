@@ -10,7 +10,7 @@ const AddSalonStepTwo = ({handleNext}) => {
     }
 
   return (
-    <View className="mt-10 min-h-screen">
+    <View className="min-h-full">
         <Text className="mb-1 text-md font-bold">Lokacija salona</Text>
         <GooglePlacesAutocomplete
             placeholder='Pretraži adresu'
@@ -34,12 +34,6 @@ const AddSalonStepTwo = ({handleNext}) => {
                     },
             }}
             />
-
-        <TouchableOpacity 
-            onPress={handleNext}
-            className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center" style={{marginBottom: 300}}>
-            <Text className="text-white font-bold text-lg">Dalje</Text>
-        </TouchableOpacity>
     </View>
   )
 }

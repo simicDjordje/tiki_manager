@@ -4,7 +4,7 @@ import CustomInput from './CustomComponents/CustomInput'
 
 const AddSalonStepOne = ({handleNext}) => {
   return (
-    <View className="mt-10">
+    <View className="h-full">
         <CustomInput 
             label={'Naziv salona'}
             placeholder={'Unesi naziv salona'}
@@ -17,12 +17,6 @@ const AddSalonStepOne = ({handleNext}) => {
             numberOfLines={3}
             classNameCustom='mt-4'
         />
-
-        <TouchableOpacity 
-            onPress={handleNext}
-            className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center mt-52">
-            <Text className="text-white font-bold text-lg">Dalje</Text>
-        </TouchableOpacity>
     </View>
   )
 }

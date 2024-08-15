@@ -9,7 +9,10 @@ const blurhash =
 
 const SalonCard = () => {
   return (
-    <TouchableOpacity className="bg-appColor h-44 w-[48%] rounded-2xl mb-4 flex flex-col justify-between">
+    <TouchableOpacity className="bg-appColor h-44 w-[48%] rounded-2xl mb-4 flex flex-col justify-between z-20 relative">
+            <View className="bg-bgPrimary absolute -top-12 px-4 py-2 rounded-xl">
+                <Text className="text-textPrimary font-bold">Pogledaj svoj salon</Text>
+            </View>
             <View>
                 <View className="flex flex-row justify-between items-center px-2 pt-2">
                     <Image

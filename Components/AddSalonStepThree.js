@@ -33,7 +33,7 @@ const AddSalonStepThree = ({handleNext}) => {
 
 
   return (
-    <View className="mt-10">        
+    <View className="h-full">        
         <View className="flex flex-col justify-center items-center">
             <Text className="text-center text-textMid text-lg font-bold">
                 Logo
@@ -59,18 +59,12 @@ const AddSalonStepThree = ({handleNext}) => {
                         className="w-44 h-44 rounded-full border-4 border-appColor"
                         source={image}
                         placeholder={{ blurhash }}
-                        contentFit="scale-down"
+                        contentFit="cover"
                         transition={1000}
                     />
                 </View>
             }
         </View>
-
-        <TouchableOpacity 
-            onPress={handleNext}
-            className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center" style={{marginTop: 185}}>
-            <Text className="text-white font-bold text-lg">Dalje</Text>
-        </TouchableOpacity>
     </View>
   )
 }
