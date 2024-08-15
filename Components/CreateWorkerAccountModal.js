@@ -78,7 +78,7 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible}) => {
 
                         <View className="flex flex-col justify-center items-center w-full mt-2 p-3">
                             {!image && 
-                                <View className="w-44 h-44 border-2 border-textSecondary rounded-full relative flex flex-col justify-center items-center">
+                                <View className="w-44 h-44 border-2 border-dashed border-textSecondary rounded-full relative flex flex-col justify-center items-center">
                                     <Text className="text-textMid">Profilna slika je obavezna</Text>
                                     <TouchableOpacity onPress={pickImage} className="p-3 bg-textPrimary rounded-full absolute bottom-0 right-0">
                                         <Entypo name="plus" size={34} color="white" />

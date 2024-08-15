@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
-import Salon from '../Screens/Salon'
+import AddSalonScreen from '../Screens/AddSalonScreen'
 
 const Stack = createNativeStackNavigator();
 
@@ -10,7 +10,7 @@ const StackTab = () => {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="Salon" component={Salon} />
+      <Stack.Screen name="AddSalonStepOne" component={AddSalonScreen} />
     </Stack.Navigator>
   )
 }

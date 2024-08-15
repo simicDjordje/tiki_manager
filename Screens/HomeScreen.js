@@ -38,7 +38,7 @@ const HomeScreen = ({route}) => {
                 </View>
 
 
-                <View className="bg-bgSecondary flex-1 w-full mt-8 px-4" style={{borderTopLeftRadius: 50, borderTopRightRadius: 50}}>
+                <View className="bg-bgSecondary flex-1 w-full min-h-screen mt-8 px-4" style={{borderTopLeftRadius: 50, borderTopRightRadius: 50}}>
                     <View className="flex flex-row justify-between items-center mt-10">
                         <View>
                             <Text className="text-textPrimary text-2xl font-bold">Natalija Lukic</Text>
@@ -95,7 +95,7 @@ const HomeScreen = ({route}) => {
                         </TouchableOpacity>}
                     </View>
 
-                    <View className="h-28"></View>
+                    <View className="h-28 bg-bgSecondary"></View>
                 </View>
             </View>
         </ScrollView>

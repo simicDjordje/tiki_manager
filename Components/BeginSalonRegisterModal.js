@@ -2,17 +2,19 @@ import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import Modal from 'react-native-modal'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import LootieCity from '../Components/LootieAnimations/City'
-
-const blurhash =
-  '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
+import { useNavigation } from '@react-navigation/native'
 
 
 const BeginSalonRegisterModal = ({isModalVisible, setIsModalVisible}) => {
-    
+    const navigation = useNavigation()
 
     const closeModal = () => {
         setIsModalVisible(false)
+    }
+
+    const beginSalonRegister = () => {
+        setIsModalVisible(false)
+        navigation.navigate('StackTabScreens', {screen: 'AddSalonStepOneScreen'})
     }
 
     return (
@@ -52,21 +54,11 @@ const BeginSalonRegisterModal = ({isModalVisible, setIsModalVisible}) => {
                             </Text>
                         </View>
 
-{/*                         
-
-                        
-                        <View className="bg-red-500">
-                            <LootieCity />
-                        </View> */}
-
-                        
-                        
-
-
                         <View className="flex flex-col justify-center items-center mt-44">
                             <TouchableOpacity 
+                                onPress={beginSalonRegister}
                                 className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center w-full">
-                                <Text className="text-white font-bold text-lg">Potvrdi</Text>
+                                <Text className="text-white font-bold text-lg">Započni</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

@@ -3,15 +3,28 @@ import React, { useState } from 'react'
 
 const CustomInput = (props) => {
     const [isFocused, setIsFocused] = useState(false)
-    const { classNameCustom, label, inputIcon: IconComponent, iconSide, ...textInputProps } = props
+    const { 
+      classNameCustom, 
+      label, 
+      inputIcon: IconComponent, 
+      iconSide, 
+      isError,
+      errorMessage,
+      ...textInputProps 
+    } = props
+
 
   return (
     <View className={`w-full ${classNameCustom}`}>
-        <Text className={`mb-1 text-md font-bold ${isFocused ? 'text-appColor' : ''}`}>{label || 'No Label'}</Text>
+        <Text className={`mb-1 text-md font-bold ${isFocused ? 'text-appColor' : ''}`}>
+          {label || 'No Label'}
+          <Text className="text-red-500">{isError ? !errorMessage ? ' *' : ` / ${errorMessage}` : ''}</Text>
+        </Text>
         <View className={`
                 p-4 rounded-lg w-full border 
-                ${isFocused ? 'border-appColor' : 'border-textSecondary'} 
+                ${isError ? 'border-red-500' : isFocused ? 'border-appColor' : 'border-textSecondary'} 
                 flex flex-row ${IconComponent && iconSide === 'right' ? 'justify-between' : 'justify-start'} items-center`}
+              
             >
             {IconComponent && iconSide === 'left' && <IconComponent />}
             <TextInput 
