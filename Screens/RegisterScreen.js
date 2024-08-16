@@ -2,11 +2,9 @@ import { View, Text, TouchableOpacity, ScrollView } from 'react-native'
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
-import { useNavigation } from '@react-navigation/native'
 import CustomInput from '../Components/CustomComponents/CustomInput'
 
-const RegisterScreen = () => {
-    const navigation = useNavigation()
+const RegisterScreen = ({navigation}) => {
 
     const handleBack = () => {
         navigation.navigate('AuthTabScreens', {screen: 'AuthScreen'})

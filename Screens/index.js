@@ -6,6 +6,8 @@ export {default as AccountScreen} from './AccountScreen'
 export {default as StatisticsScreen} from './StatisticsScreen'
 
 export {default as AddSalonScreen} from './AddSalonScreen'
+export {default as SalonScreen} from './SalonScreen'
+
 
 
 

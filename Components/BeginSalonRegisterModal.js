@@ -14,7 +14,7 @@ const BeginSalonRegisterModal = ({isModalVisible, setIsModalVisible}) => {
 
     const beginSalonRegister = () => {
         setIsModalVisible(false)
-        navigation.navigate('StackTabScreens', {screen: 'AddSalonStepOneScreen'})
+        navigation.navigate('StackTabScreens', {screen: 'AddSalonScreen'})
     }
 
     return (

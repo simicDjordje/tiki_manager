@@ -1,16 +1,23 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, {forwardRef} from 'react'
 import { Image } from 'expo-image'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import Animated, {BounceInUp, BounceOut} from 'react-native-reanimated'
+import { useNavigation } from '@react-navigation/native'
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
-const SalonCard = ({isJustCreated}) => {
+const SalonCard = forwardRef(({isJustCreated}, ref) => {
+    const navigation = useNavigation()
+
+    const handleToSalon = () => {
+        navigation.navigate('StackTabScreens', {screen: 'SalonScreen'})
+    }
+
   return (
-    <TouchableOpacity className="bg-appColor h-44 w-[48%] rounded-2xl mb-4 flex flex-col justify-between z-20 relative">
+    <TouchableOpacity onPress={handleToSalon} ref={ref} className={`bg-appColor h-44 w-[48%] rounded-2xl mb-4 flex flex-col justify-between relative ${isJustCreated && 'z-20'}`}>
             {isJustCreated && 
                 <Animated.View entering={BounceInUp} exiting={BounceOut} className="bg-bgPrimary absolute -top-12 px-4 py-2 rounded-xl">
                     <Text className="text-textPrimary font-bold">Pogledaj svoj salon</Text>
@@ -70,6 +77,6 @@ const SalonCard = ({isJustCreated}) => {
             </View>
         </TouchableOpacity>
   )
-}
+})
 
 export default SalonCard

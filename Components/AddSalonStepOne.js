@@ -11,7 +11,7 @@ const AddSalonStepOne = ({handleNext}) => {
         />
 
         <CustomInput 
-            label={'Opis salona uli usluga'}
+            label={'Opis salona ili usluga'}
             placeholder={'Unesi kratak opis salona ili usluga'}
             multiline={true}
             numberOfLines={3}

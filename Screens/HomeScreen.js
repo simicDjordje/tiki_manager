@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import WelcomeModal from '../Components/WelcomeModal'
@@ -11,7 +11,7 @@ import BeginSalonRegisterModal from '../Components/BeginSalonRegisterModal'
 import { useFocusEffect } from '@react-navigation/native'
 import { StatusBar } from 'expo-status-bar'
 
-const HomeScreen = ({route}) => {
+const HomeScreen = ({route, navigation}) => {
     const params = route.params || {}
     console.log(params)
     const [isWelcomeModalVisible, setWelcomeModalVisible] = useState(params?.newAccount || false)
@@ -20,18 +20,36 @@ const HomeScreen = ({route}) => {
     const [isBeginSalonRegisterModalVisible, setIsBeginSalonRegisterModalVisible] = useState(false)
     const [haveWorkerAccount, setHaveWorkerAccount] = useState(false)
 
+    const scrollViewRef = useRef(null)
+    const salonCardRef = useRef(null)
+
     useFocusEffect(useCallback(()=>{
         if(!params?.newSalonCreated) return
         setIsNewSalonCreated(true)
 
-        setTimeout(()=>{setIsNewSalonCreated(false)}, 3000)
+        setTimeout(()=>{
+            setIsNewSalonCreated(false)
+            navigation.setParams({ newSalonCreated: null })
+        }, 3000)
     }, [params]))
+
+
+    useEffect(() => {
+        if (isNewSalonCreated && salonCardRef.current && scrollViewRef.current) {
+            salonCardRef.current.measureLayout(
+                scrollViewRef.current.getScrollableNode(),
+                (x, y) => {
+                    scrollViewRef.current.scrollTo({ y, animated: true })
+                }
+            );
+        }
+    }, [isNewSalonCreated])
 
   return (
     <SafeAreaView className="bg-bgPrimary h-full relative">
         <StatusBar style={isNewSalonCreated ? "light" : "dark"} />
         {isNewSalonCreated && <View className="top-0 bottom-0 left-0 right-0 bg-black absolute opacity-90"></View>}
-        <ScrollView>
+        <ScrollView ref={scrollViewRef}>
             <View className="min-h-screen flex flex-col justify-between items-center">
                 <View className="w-full flex flex-row justify-between items-center px-4 mt-4">
                     <View>
@@ -67,7 +85,11 @@ const HomeScreen = ({route}) => {
 
                     <View className="flex flex-row flex-wrap justify-between mt-10">
                         <WorkerCard />
-                        <SalonCard isJustCreated={isNewSalonCreated} /> 
+                        
+                        <SalonCard isJustCreated={false} /> 
+                        <SalonCard ref={salonCardRef} isJustCreated={isNewSalonCreated} /> 
+
+
                     </View>
 
                     <View className="mt-6">
@@ -114,7 +136,10 @@ const HomeScreen = ({route}) => {
         
         <WelcomeModal 
             isModalVisible={isWelcomeModalVisible}
-            setIsModalVisible={setWelcomeModalVisible}
+            setIsModalVisible={() => {
+                setWelcomeModalVisible(false)
+                navigation.setParams({ newAccount: null })
+            }}
         />
 
         <CreateWorkerAccountModal 

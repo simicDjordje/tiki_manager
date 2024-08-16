@@ -11,7 +11,7 @@ import AddSalonStepFour from '../Components/AddSalonStepFour'
 import Entypo from '@expo/vector-icons/Entypo'
 import * as ImagePicker from 'expo-image-picker'
 import AddSalonLastStep from '../Components/AddSalonLastStep'
-import Animated, { SequencedTransition } from 'react-native-reanimated'
+import Animated, { FadeIn, SequencedTransition } from 'react-native-reanimated'
 import LootieSuccess from '../Components/LootieAnimations/Success'
 
 
@@ -165,11 +165,13 @@ const AddSalonScreen = () => {
 
                        <View className="h-32 w-full">
                         {showFinishButton && 
-                          <TouchableOpacity 
-                              onPress={handleFinish}
-                              className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center mt-10 w-full">
-                              <Text className="text-white font-bold text-lg">Nazad na početnu</Text>
-                          </TouchableOpacity>  
+                        <AnimatedComponentView entering={FadeIn}>
+                            <TouchableOpacity 
+                                onPress={handleFinish}
+                                className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center mt-10 w-full">
+                                <Text className="text-white font-bold text-lg">Nazad na početnu</Text>
+                            </TouchableOpacity> 
+                          </AnimatedComponentView> 
                         }
                        </View>
                     
