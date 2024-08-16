@@ -40,7 +40,7 @@ const SalonScreen = ({navigation}) => {
             <TouchableOpacity onPress={handleBack}>
                 <MaterialIcons name="arrow-back-ios-new" size={24} color="#232323" />
             </TouchableOpacity>
-            <Text className="text-textPrimary text-lg font-bold">{salonName.length > 34 ? `${salonName.substring(0, 34)}...` : salonName}</Text>
+            <Text className="text-textPrimary text-lg" bold>{salonName.length > 34 ? `${salonName.substring(0, 34)}...` : salonName}</Text>
         </View>
 
         <ScrollView>
@@ -49,12 +49,12 @@ const SalonScreen = ({navigation}) => {
                     <TouchableOpacity onPress={handleToLogoScreen} 
                         className="flex flex-col justify-center items-center mb-4 bg-bgPrimary py-2 px-2 rounded-xl w-[48%] h-40">
                         <View className="flex flex-row justify-start items-center w-full">
-                            <Text className="text-textMid">Logo</Text>
+                            <Text className="text-textMid" semi>Logo</Text>
                         </View>
                         <View className="bg-textSecondary my-2 w-full" style={{height: 0.5}}></View>
                         <View className="flex flex-row justify-center items-center w-full flex-1">
                             <Image
-                                className="w-20 h-20 rounded-full border-2 border-appColor mb-2"
+                                className="w-20 h-20 rounded-full border-2 border-textPrimary mb-2"
                                 source={logo}
                                 placeholder={{ blurhash }}
                                 contentFit="cover"
@@ -71,7 +71,7 @@ const SalonScreen = ({navigation}) => {
                         onPress={handleToImagesScreen}
                         className="flex flex-col justify-center items-center mb-4 bg-bgPrimary py-2 px-2 rounded-xl w-[48%] h-40">
                         <View className="flex flex-row justify-start items-center w-full">
-                            <Text className="text-textMid">Slike</Text>
+                            <Text className="text-textMid" semi>Slike</Text>
                         </View>
                         <View className="bg-textSecondary my-2 w-full" style={{height: 0.5}}></View>
                         <View className="flex flex-row justify-start items-center w-full flex-1 flex-wrap -mt-0.5">
@@ -126,16 +126,16 @@ const SalonScreen = ({navigation}) => {
 
                 <TouchableOpacity className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2">
                     <View className="flex flex-col justify-between items-start">
-                        <Text className="text-textMid mb-2">Naziv:</Text>
-                        <Text className="text-md text-textPrimary font-bold">{salonName}</Text>
+                        <Text className="text-textMid mb-2" semi>Naziv:</Text>
+                        <Text className="text-md text-textPrimary" bold>{salonName}</Text>
                     </View>
                     <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
                 </TouchableOpacity>
 
                 <TouchableOpacity className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
                     <View className="flex flex-col justify-between items-start">
-                        <Text className="text-textMid mb-2">Opis:</Text>
-                        <Text className="text-md text-textPrimary font-bold">
+                        <Text className="text-textMid mb-2" semi>Opis:</Text>
+                        <Text className="text-md text-textPrimary" bold>
                             Lash and Brow studio PK
                         </Text>
                     </View>
@@ -144,8 +144,8 @@ const SalonScreen = ({navigation}) => {
 
                 <TouchableOpacity className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
                     <View className="flex flex-col justify-between items-start">
-                        <Text className="text-textMid mb-2">Lokacija:</Text>
-                        <Text className="text-md text-textPrimary font-bold">
+                        <Text className="text-textMid mb-2" semi>Lokacija:</Text>
+                        <Text className="text-md text-textPrimary" bold>
                             Kraljevica Jugovica 3/4, Novi Sad
                         </Text>
                     </View>
@@ -154,15 +154,15 @@ const SalonScreen = ({navigation}) => {
 
                 <TouchableOpacity className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
                     <View className="flex flex-col justify-between items-start">
-                        <Text className="text-textMid mb-2">Usluge:</Text>
+                        <Text className="text-textMid mb-2" semi>Usluge:</Text>
                         {services.length === 0 && 
-                            <Text className="text-md text-red-500 font-bold">
+                            <Text className="text-md text-red-500" bold>
                                 Dodaj usluge
                             </Text>
                         }
 
                         {services.length > 0 && 
-                            <Text className="text-md text-textPrimary font-bold">
+                            <Text className="text-md text-textPrimary" bold>
                                 Pogledaj usluge (12)
                             </Text>
                         }
@@ -176,9 +176,9 @@ const SalonScreen = ({navigation}) => {
 
                 <TouchableOpacity className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
                     <View className="flex flex-col justify-between items-start">
-                        <Text className="text-textMid mb-2">Tim salona:</Text>
+                        <Text className="text-textMid mb-2" semi>Tim salona:</Text>
                         {workers.length === 0 && 
-                            <Text className="text-md text-red-500 font-bold">
+                            <Text className="text-md text-red-500" bold>
                                 Kreiraj tim salona
                             </Text>
                         }

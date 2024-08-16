@@ -20,7 +20,7 @@ const AddSalonStepFour = ({handleNext, images, setImages}) => {
     <View className="h-full">
         {images.length == 0 && 
             <View className="h-full flex flex-col justify-center items-center">
-                <Text className="text-xl text-textMid font-bold">Slike salona su obavezne</Text>
+                <Text className="text-xl text-textMid" bold>Slike salona su obavezne</Text>
                 <Text className="text-textMid">Slike možeš promeniti kasnije na profilu salona</Text>
             </View>
         }

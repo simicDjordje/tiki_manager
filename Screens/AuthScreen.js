@@ -17,7 +17,7 @@ const AuthScreen = () => {
     <View className="h-full flex flex-col justify-between items-center">
             <View className="w-full flex-1 mt-4 flex flex-col justify-between">
                 <View className="px-4">
-                    <Text className="text-white text-3xl font-bold">tiki <Text className="text-2xl text-appColorDark">manager</Text></Text>
+                    <Text className="text-white text-3xl" bold>tiki <Text className="text-2xl text-appColorDark" semi>manager</Text></Text>
                 </View>
             </View>
 

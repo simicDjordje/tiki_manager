@@ -7,6 +7,8 @@ import { View, Text } from 'react-native';
 const loadFonts = async () => {
   await Font.loadAsync({
     'Inter': require('./assets/fonts/Inter-VariableFont_opsz,wght.ttf'),
+    'InterBlack': require('./assets/fonts/static/Inter_28pt-Black.ttf'),
+    'InterSemi': require('./assets/fonts/static/Inter_28pt-SemiBold.ttf'),
   })
 }
 

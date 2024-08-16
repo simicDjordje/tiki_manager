@@ -25,7 +25,7 @@ const WorkerCard = () => {
         />
         </View>
         <View className="flex flex-row justify-center items-center pb-2 pt-1">
-            <Text className="font-bold">Natalija Lukic</Text>
+            <Text bold>Natalija Lukic</Text>
         </View>
     </TouchableOpacity>
   )

@@ -35,7 +35,7 @@ const AddSalonStepThree = ({handleNext}) => {
   return (
     <View className="h-full">        
         <View className="flex flex-col justify-center items-center">
-            <Text className="text-center text-textMid text-lg font-bold">
+            <Text className="text-center text-textMid text-lg" bold>
                 Logo
             </Text>
         </View>

@@ -10,7 +10,7 @@ const blurhash =
 const AddSalonLastStep = () => {
   return (
     <View className="h-full flex flex-col justify-center items-center -mt-10">
-        <Text className="font-bold text-lg">Kako funkcioniše dodavanje salona?</Text>
+        <Text className="text-lg" bold>Kako funkcioniše dodavanje salona?</Text>
 
         <Text className="text-center text-textMid mt-2">
             Nakon potvrde, kreiraćemo tvoj salon, koji će se pojaviti na početnoj stranici.
@@ -38,11 +38,11 @@ const AddSalonLastStep = () => {
 
         <View className="flex flex-row justify-between items-center w-full px-4 mt-3">
             <Text className="text-textMid">Naziv: </Text>
-            <Text className="text-textMid font-bold">Beauty salon PK</Text>
+            <Text className="text-textMid" bold>Beauty salon PK</Text>
         </View>
         <View className="flex flex-row justify-between items-center w-full px-4">
             <Text className="text-textMid">Adresa: </Text>
-            <Text className="text-textMid font-bold">Marka Jugovica 1/2</Text>
+            <Text className="text-textMid" bold>Marka Jugovica 1/2</Text>
         </View>
     </View>
   )

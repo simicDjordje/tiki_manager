@@ -53,7 +53,7 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible}) => {
                     style={{borderTopRightRadius: 50, borderTopLeftRadius: 50}}
                 >
                     <View className="flex flex-row justify-between items-center w-full mt-6">
-                        <Text className="text-xl font-bold ml-2">Postani deo salona</Text>
+                        <Text className="text-xl ml-2" bold>Postani deo salona</Text>
 
                         <TouchableOpacity onPress={closeModal} className="p-1 bg-textPrimary rounded-full">
                             <Ionicons name="close" size={20} color="white" />
@@ -106,7 +106,7 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible}) => {
 
 
                         <View className="flex flex-col justify-center items-center mt-2">
-                            <Text className="font-bold text-2xl">Natalija Lukic</Text>
+                            <Text className="text-2xl" bold>Natalija Lukic</Text>
                         </View>
                         
 
@@ -115,7 +115,7 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible}) => {
                             <TouchableOpacity 
                                 onPress={() => setIsSuccess(true)}
                                 className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center w-full">
-                                <Text className="text-white font-bold text-lg">Potvrdi</Text>
+                                <Text className="text-white text-lg" bold>Potvrdi</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -124,8 +124,8 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible}) => {
                     {isSuccess && 
                         <View>
                             <View className="flex flex-col justify-center items-center mt-10">
-                                <Text className="font-bold text-2xl text-center"><Text>Uspešno</Text> kreiran profil radnika</Text>
-                                <Text className="text-lg text-center">Sačekaj da te menadžer salona doda i započni svoju karijeru uz <Text className="font-bold text-appColorDark">tiki</Text></Text>
+                                <Text className="text-2xl text-center" bold>Uspešno kreiran profil radnika</Text>
+                                <Text className="text-lg text-center">Sačekaj da te menadžer salona doda i započni svoju karijeru uz <Text className="text-appColorDark" semi>tiki</Text></Text>
 
                                 <LootieSuccess d={250} />
                             </View>

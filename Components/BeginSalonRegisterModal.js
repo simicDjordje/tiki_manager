@@ -32,7 +32,7 @@ const BeginSalonRegisterModal = ({isModalVisible, setIsModalVisible}) => {
                     style={{borderTopRightRadius: 50, borderTopLeftRadius: 50}}
                 >
                     <View className="flex flex-row justify-between items-center w-full mt-6">
-                        <Text className="text-xl font-bold ml-2">Dodavanje novog salona</Text>
+                        <Text className="text-xl ml-2" bold>Dodavanje novog salona</Text>
 
                         <TouchableOpacity onPress={closeModal} className="p-1 bg-textPrimary rounded-full">
                             <Ionicons name="close" size={20} color="white" />
@@ -43,7 +43,7 @@ const BeginSalonRegisterModal = ({isModalVisible, setIsModalVisible}) => {
 
                     <View>
                         <View className="flex flex-col justify-center items-center mt-4">
-                            <Text className="font-bold text-lg">Započni proces dodavanja svog salona!</Text>
+                            <Text className="text-lg" bold>Započni proces dodavanja svog salona!</Text>
 
                             <Text className="text-center text-textMid mt-2">
                                 U sledećim koracima ćemo ti pomoći da lako dodaš svoj salon i započneš svoj put.
@@ -59,7 +59,7 @@ const BeginSalonRegisterModal = ({isModalVisible, setIsModalVisible}) => {
                             <TouchableOpacity 
                                 onPress={beginSalonRegister}
                                 className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center w-full">
-                                <Text className="text-white font-bold text-lg">Započni</Text>
+                                <Text className="text-white text-lg" bold>Započni</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

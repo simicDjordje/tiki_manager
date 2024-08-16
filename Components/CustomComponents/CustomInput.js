@@ -1,5 +1,6 @@
-import { View, Text, TextInput } from 'react-native'
+import { View, TextInput } from 'react-native'
 import React, { useState } from 'react'
+import Text from './CustomText'
 
 const CustomInput = (props) => {
     const [isFocused, setIsFocused] = useState(false)
@@ -16,7 +17,7 @@ const CustomInput = (props) => {
 
   return (
     <View className={`w-full ${classNameCustom}`}>
-        <Text className={`mb-1 text-md font-bold ${isFocused ? 'text-appColor' : ''}`}>
+        <Text className={`mb-1 text-md ${isFocused ? 'text-appColor' : ''}`} semi>
           {label || 'No Label'}
           <Text className="text-red-500">{isError ? !errorMessage ? ' *' : ` / ${errorMessage}` : ''}</Text>
         </Text>

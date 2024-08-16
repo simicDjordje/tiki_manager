@@ -13,7 +13,7 @@ const AddSalonStepTwo = ({handleNext}) => {
 
   return (
     <View className="min-h-full">
-        <Text className="mb-1 text-md font-bold">Lokacija salona</Text>
+        <Text className="mb-1 text-md" semi>Lokacija salona</Text>
         <GooglePlacesAutocomplete
             placeholder='Pretraži adresu'
             query={{

@@ -22,7 +22,7 @@ const SalonCard = forwardRef(({isJustCreated}, ref) => {
     <TouchableOpacity onPress={handleToSalon} ref={ref} className={`bg-appColor h-44 w-[48%] rounded-2xl mb-4 flex flex-col justify-between relative ${isJustCreated && 'z-20'}`}>
             {isJustCreated && 
                 <Animated.View entering={BounceInUp} exiting={BounceOut} className="bg-bgPrimary absolute -top-12 px-4 py-2 rounded-xl">
-                    <Text className="text-textPrimary font-bold">Pogledaj svoj salon</Text>
+                    <Text className="text-textPrimary" bold>Pogledaj svoj salon</Text>
                 </Animated.View>
             }
             <View>
@@ -40,7 +40,7 @@ const SalonCard = forwardRef(({isJustCreated}, ref) => {
 
 
                 <View className="px-2 mt-2">
-                    <Text className="font-bold text-lg text-white">Beauty Studio PK</Text>
+                    <Text className="text-lg text-white" bold>Beauty Studio PK</Text>
                 </View>
             </View>
 

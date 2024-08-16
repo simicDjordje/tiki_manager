@@ -85,7 +85,7 @@ const AddSalonScreen = () => {
                     <TouchableOpacity onPress={handleBack}>
                         <MaterialIcons name="arrow-back-ios-new" size={24} color="black" />
                     </TouchableOpacity>
-                    <Text className="text-textPrimary text-3xl font-bold">tiki <Text className="text-2xl text-textSecondary">manager</Text></Text>
+                    <Text className="text-textPrimary text-3xl" bold>tiki <Text className="text-2xl text-textSecondary" semi>manager</Text></Text>
                 </View>
               }
 
@@ -99,7 +99,7 @@ const AddSalonScreen = () => {
                 {!isSuccess && 
                 <View className="flex flex-row justify-between items-center w-full mt-6">
                     <View>
-                      <Text className="text-lg font-bold ml-2 text-textPrimary">
+                      <Text className="text-lg ml-2 text-textPrimary" bold>
                         {step === 1 && 'Ime i opis salona'}
                         {step === 2 && 'Lokacija salona'}
                         {step === 3 && 'Logo salona'}
@@ -124,7 +124,7 @@ const AddSalonScreen = () => {
               {isSuccess && 
                 <View className="flex flex-row justify-between items-center w-full mt-6">
                     <View>
-                      <Text className="text-lg font-bold ml-2 text-textPrimary">
+                      <Text className="text-lg ml-2 text-textPrimary" bold>
                         Salon uspešno dodat
                       </Text>
                       <Text className="text-textMid ml-2">
@@ -151,13 +151,13 @@ const AddSalonScreen = () => {
                   <TouchableOpacity 
                       onPress={step === 5 ? ()=>{setIsSuccess(true)} : handleNext}
                       className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center mt-10">
-                      <Text className="text-white font-bold text-lg">{step === 5 ? 'Potvrdi' : 'Dalje'}</Text>
+                      <Text className="text-white text-lg" bold>{step === 5 ? 'Potvrdi' : 'Dalje'}</Text>
                   </TouchableOpacity>
                   }
 
                   {isSuccess &&
                     <View className="h-screen pt-10 flex flex-col justify-center items-center">
-                        <Text className="font-bold text-2xl text-center -mt-56"><Text>Uspešno</Text> kreiran salon</Text>
+                        <Text className="text-2xl text-center -mt-56" bold>Uspešno kreiran salon</Text>
                         <Text className="text-lg text-center">Salon je spreman na početnoj, vreme je da ga pokreneš!</Text>
 
                         <View className="pb-20">
@@ -170,7 +170,7 @@ const AddSalonScreen = () => {
                             <TouchableOpacity 
                                 onPress={handleFinish}
                                 className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center mt-10 w-full">
-                                <Text className="text-white font-bold text-lg">Nazad na početnu</Text>
+                                <Text className="text-white text-lg" bold>Nazad na početnu</Text>
                             </TouchableOpacity> 
                           </AnimatedComponentView> 
                         }

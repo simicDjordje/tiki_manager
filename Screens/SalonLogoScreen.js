@@ -53,11 +53,13 @@ const SalonLogoScreen = () => {
             <TouchableOpacity onPress={handleBack}>
                 <MaterialIcons name="arrow-back-ios-new" size={24} color="#232323" />
             </TouchableOpacity>
-            <Text className="text-textPrimary text-lg font-bold">{salonName.length > 34 ? `${salonName.substring(0, 34)}...` : salonName}</Text>
+            <Text className="text-textPrimary text-lg" bold>{salonName.length > 34 ? `${salonName.substring(0, 34)}...` : salonName}</Text>
         </View>
         <View className="h-full flex flex-col justify-between px-4">
           <View className="flex-1 flex flex-col justify-start items-center">
-            <Text className="mt-10 font-bold text-2xl">Izmeni logo</Text>
+            <View className="flex flex-row justify-start items-center mt-6 w-full">
+              <Text className="text-2xl" bold>Izmeni logo</Text>
+            </View>
             <View className="bg-textSecondary mt-8 w-full mb-20" style={{height: 0.5}}></View>
 
             <View className="w-44 h-44 rounded-full relative">
@@ -67,7 +69,7 @@ const SalonLogoScreen = () => {
                       </TouchableOpacity>
                     }
                     <Image
-                        className="w-44 h-44 rounded-full border-4 border-appColor"
+                        className="w-44 h-44 rounded-full border-2 border-textPrimary"
                         source={image ? image : logo}
                         placeholder={{ blurhash }}
                         contentFit="cover"
@@ -79,7 +81,7 @@ const SalonLogoScreen = () => {
               </View>
               <View className="w-full flex flex-row justify-between items-center px-8 mt-10 bg-bgPrimary py-2 rounded-xl">
                   <Image
-                        className="w-8 h-8 rounded-full border-2 border-appColor"
+                        className="w-8 h-8 rounded-full border-2 border-appColorDark"
                         source={image ? image : logo}
                         placeholder={{ blurhash }}
                         contentFit="cover"
@@ -87,7 +89,7 @@ const SalonLogoScreen = () => {
                   />
 
                   <Image
-                        className="w-12 h-12 rounded-full border-2 border-appColor"
+                        className="w-12 h-12 rounded-full border-2 border-textPrimary"
                         source={image ? image : logo}
                         placeholder={{ blurhash }}
                         contentFit="cover"
@@ -103,7 +105,7 @@ const SalonLogoScreen = () => {
                   />
 
                   <Image
-                        className="w-20 h-20 rounded-full border-2 border-appColor"
+                        className="w-20 h-20 rounded-full border-2 border-textPrimary"
                         source={image ? image : logo}
                         placeholder={{ blurhash }}
                         contentFit="cover"
@@ -116,7 +118,7 @@ const SalonLogoScreen = () => {
             <TouchableOpacity 
                 onPress={handleSave}
                 className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center mb-24">
-                <Text className="text-white font-bold text-lg">Sačuvaj</Text>
+                <Text className="text-white text-lg" bold>Sačuvaj</Text>
             </TouchableOpacity>
           </View>
         </View>

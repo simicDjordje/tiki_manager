@@ -16,7 +16,7 @@ const RegisterComponent = ({setAuthType}) => {
   return (
     <View>
         <View className="flex flex-row justify-center items-center">
-            <Text className="text-textPrimary text-2xl font-bold">Kreiraj nalog</Text>
+            <Text className="text-textPrimary text-2xl" bold>Kreiraj nalog</Text>
         </View>
 
         <View className="bg-textSecondary w-full h-0.5 mt-2"></View>
@@ -41,7 +41,7 @@ const RegisterComponent = ({setAuthType}) => {
             <TouchableOpacity 
                 onPress={handleNext}
                 className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center">
-                <Text className="text-white font-bold text-lg">Dalje</Text>
+                <Text className="text-white text-lg" bold>Dalje</Text>
             </TouchableOpacity>
         </View>
 
@@ -52,7 +52,7 @@ const RegisterComponent = ({setAuthType}) => {
             onPress={()=>setAuthType('login')}
             className="flex flex-row justify-center items-center mt-4">
             <Text className="mr-1">Imaš nalog?</Text>
-            <Text className="text-appColorDark font-bold">Uloguj se ovde</Text>
+            <Text className="text-appColorDark" bold>Uloguj se ovde</Text>
         </TouchableOpacity>
     </View>
   )
