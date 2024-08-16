@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import Modal from 'react-native-modal'
 import Ionicons from '@expo/vector-icons/Ionicons'
@@ -6,6 +6,8 @@ import Entypo from '@expo/vector-icons/Entypo'
 import * as ImagePicker from 'expo-image-picker'
 import { Image } from 'expo-image'
 import LootieSuccess from '../Components/LootieAnimations/Success'
+import Text from './CustomComponents/CustomText'
+
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';

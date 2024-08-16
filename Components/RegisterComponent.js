@@ -1,7 +1,9 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import CustomInput from './CustomComponents/CustomInput'
 import { useNavigation } from '@react-navigation/native'
+import Text from './CustomComponents/CustomText'
+
 
 const RegisterComponent = ({setAuthType}) => {
     const [email, setEmail] = useState('')

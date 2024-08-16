@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
+import { View, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
@@ -13,6 +13,7 @@ import * as ImagePicker from 'expo-image-picker'
 import AddSalonLastStep from '../Components/AddSalonLastStep'
 import Animated, { FadeIn, SequencedTransition } from 'react-native-reanimated'
 import LootieSuccess from '../Components/LootieAnimations/Success'
+import Text from '../Components/CustomComponents/CustomText'
 
 
 const AnimatedComponentView = Animated.createAnimatedComponent(View)

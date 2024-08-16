@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native'
+import { View } from 'react-native'
 import LootieCat from './LootieAnimations/Cat'
 import { useState } from 'react'
 import RegisterComponent from './RegisterComponent'

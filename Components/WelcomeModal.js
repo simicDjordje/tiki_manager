@@ -1,8 +1,11 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, TouchableOpacity } from 'react-native'
 import React from 'react'
 import Modal from 'react-native-modal'
 import Swiper from 'react-native-swiper'
 import Ionicons from '@expo/vector-icons/Ionicons'
+import Text from './CustomComponents/CustomText'
+import { StatusBar } from 'expo-status-bar'
+
 
 const SlideOne = () => {
   return (

@@ -8,6 +8,11 @@ export {default as StatisticsScreen} from './StatisticsScreen'
 export {default as AddSalonScreen} from './AddSalonScreen'
 export {default as SalonScreen} from './SalonScreen'
 
+//salon configuration screens
+export {default as SalonLogoScreen} from './SalonLogoScreen'
+export {default as SalonImagesScreen} from './SalonImagesScreen'
+
+
 
 
 

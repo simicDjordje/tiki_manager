@@ -1,7 +1,8 @@
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native'
+import { View, TouchableOpacity, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Image } from 'expo-image'
+import Text from './CustomComponents/CustomText'
 
 
 const blurhash =

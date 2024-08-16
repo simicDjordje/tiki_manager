@@ -1,5 +1,7 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import Text from './CustomComponents/CustomText'
+
 
 const AddSalonStepTwo = ({handleNext}) => {
 

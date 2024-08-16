@@ -1,9 +1,10 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import * as ImagePicker from 'expo-image-picker'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import Entypo from '@expo/vector-icons/Entypo'
 import { Image } from 'expo-image'
+import Text from './CustomComponents/CustomText'
 
 
 const blurhash =
@@ -11,7 +12,6 @@ const blurhash =
 
 
 const AddSalonStepThree = ({handleNext}) => {
-    const [images, setImages] = useState([])
     const [image, setImage] = useState(null)
 
     const pickImage = async () => {

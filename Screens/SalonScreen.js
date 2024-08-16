@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native'
+import { View, TouchableOpacity, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar'
 import * as ImagePicker from 'expo-image-picker'
 import { Image } from 'expo-image'
 import Entypo from '@expo/vector-icons/Entypo'
+import Text from '../Components/CustomComponents/CustomText'
 
 
 const blurhash =
@@ -13,32 +14,24 @@ const blurhash =
 
 
 const SalonScreen = ({navigation}) => {
-    const [oldLogo, setOldLogo] = useState('https://marketplace.canva.com/EAFbDkqUoJ8/1/0/1600w/canva-beige-brown-yellow-beauty-hair-salon-logo-mcTtlsA1WxM.jpg')
+    const [logo, setLogo] = useState('https://marketplace.canva.com/EAFbDkqUoJ8/1/0/1600w/canva-beige-brown-yellow-beauty-hair-salon-logo-mcTtlsA1WxM.jpg')
     const [services, setServices] = useState([1])
     const [workers, setWorkers] = useState([1])
-    const [image, setImage] = useState(null)
     const salonName = 'Beauty salon PK'
 
-    const pickImage = async () => {
-        // No permissions request is necessary for launching the image library
-        let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          allowsEditing: true,
-        //   aspect: [4, 3],
-          quality: 1,
-          
-        })
-    
-        console.log(result);
-    
-        if (!result.canceled) {
-          setImage(result.assets[0].uri)
-        }
-      }
 
     const handleBack = () => {
         navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
     }
+
+    const handleToLogoScreen = () => {
+        navigation.navigate('StackTabScreens', {screen: 'SalonLogoScreen'})
+    }
+
+    const handleToImagesScreen = () => {
+        navigation.navigate('StackTabScreens', {screen: 'SalonImagesScreen'})
+    }
+
 
   return (
     <SafeAreaView className="bg-bgSecondary h-full">
@@ -53,28 +46,30 @@ const SalonScreen = ({navigation}) => {
         <ScrollView>
             <View className="px-4 mt-10">
                 <View className="flex flex-row justify-between items-center">
-                    <View className="flex flex-col justify-center items-center mb-4 bg-bgPrimary py-2 px-2 rounded-xl w-[48%] h-40">
+                    <TouchableOpacity onPress={handleToLogoScreen} 
+                        className="flex flex-col justify-center items-center mb-4 bg-bgPrimary py-2 px-2 rounded-xl w-[48%] h-40">
                         <View className="flex flex-row justify-start items-center w-full">
                             <Text className="text-textMid">Logo</Text>
                         </View>
                         <View className="bg-textSecondary my-2 w-full" style={{height: 0.5}}></View>
-                        <View className="flex flex-row justify-center items-center">
-                            <View className="w-28 h-28 rounded-full relative">
-                                <TouchableOpacity onPress={pickImage} className="p-2 bg-textPrimary rounded-full absolute bottom-0 right-1 z-10">
-                                    <Entypo name="plus" size={16} color="white" />
-                                </TouchableOpacity>
-                                <Image
-                                    className="w-28 h-28 rounded-full border-4 border-appColor"
-                                    source={image ? image : oldLogo}
-                                    placeholder={{ blurhash }}
-                                    contentFit="cover"
-                                    transition={1000}
-                                />
-                            </View>
+                        <View className="flex flex-row justify-center items-center w-full flex-1">
+                            <Image
+                                className="w-20 h-20 rounded-full border-2 border-appColor mb-2"
+                                source={logo}
+                                placeholder={{ blurhash }}
+                                contentFit="cover"
+                                transition={1000}
+                            />
                         </View>
-                    </View>
+                        <View className="bg-textSecondary w-full mb-1" style={{height: 0.5}}></View>
+                        <View className="flex flex-row justify-end items-center w-full">
+                            <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
+                        </View>
+                    </TouchableOpacity>
 
-                    <TouchableOpacity className="flex flex-col justify-center items-center mb-4 bg-bgPrimary py-2 px-2 rounded-xl w-[48%] h-40">
+                    <TouchableOpacity 
+                        onPress={handleToImagesScreen}
+                        className="flex flex-col justify-center items-center mb-4 bg-bgPrimary py-2 px-2 rounded-xl w-[48%] h-40">
                         <View className="flex flex-row justify-start items-center w-full">
                             <Text className="text-textMid">Slike</Text>
                         </View>

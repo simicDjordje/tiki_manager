@@ -1,5 +1,7 @@
-import { View, Text } from 'react-native'
+import { View } from 'react-native'
 import React from 'react'
+import Text from '../Components/CustomComponents/CustomText'
+
 
 const StatisticsScreen = () => {
   return (

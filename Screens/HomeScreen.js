@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
+import { View, ScrollView, TouchableOpacity } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Ionicons from '@expo/vector-icons/Ionicons'
@@ -10,6 +10,9 @@ import WorkerCard from '../Components/WorkerCard'
 import BeginSalonRegisterModal from '../Components/BeginSalonRegisterModal'
 import { useFocusEffect } from '@react-navigation/native'
 import { StatusBar } from 'expo-status-bar'
+import Text from '../Components/CustomComponents/CustomText'
+
+
 
 const HomeScreen = ({route, navigation}) => {
     const params = route.params || {}

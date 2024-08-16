@@ -1,6 +1,7 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View } from 'react-native'
 import React from 'react'
 import CustomInput from './CustomComponents/CustomInput'
+
 
 const AddSalonStepOne = ({handleNext}) => {
   return (

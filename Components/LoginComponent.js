@@ -1,7 +1,8 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import CustomInput from './CustomComponents/CustomInput'
 import Feather from '@expo/vector-icons/Feather'
+import Text from './CustomComponents/CustomText'
 
 const LoginComponent = ({setAuthType}) => {
     const [passwordVisible, setPasswordVisible] = useState(false)
