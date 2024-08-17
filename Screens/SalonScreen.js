@@ -32,6 +32,18 @@ const SalonScreen = ({navigation}) => {
         navigation.navigate('StackTabScreens', {screen: 'SalonImagesScreen'})
     }
 
+    const handleToNameDescScreen = () => {
+        navigation.navigate('StackTabScreens', {screen: 'SalonNameDescScreen'})
+    }
+
+    const handleToLocationScreen = () => {
+        navigation.navigate('StackTabScreens', {screen: 'SalonLocationScreen'})
+    }
+
+    const handleToServicesScreen = () => {
+        navigation.navigate('StackTabScreens', {screen: 'SalonServicesScreen'})
+    }
+
 
   return (
     <SafeAreaView className="bg-bgSecondary h-full">
@@ -124,7 +136,7 @@ const SalonScreen = ({navigation}) => {
                     </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2">
+                <TouchableOpacity onPress={handleToNameDescScreen} className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2">
                     <View className="flex flex-col justify-between items-start">
                         <Text className="text-textMid mb-2" semi>Naziv:</Text>
                         <Text className="text-md text-textPrimary" bold>{salonName}</Text>
@@ -132,7 +144,7 @@ const SalonScreen = ({navigation}) => {
                     <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
                 </TouchableOpacity>
 
-                <TouchableOpacity className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
+                <TouchableOpacity onPress={handleToNameDescScreen} className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
                     <View className="flex flex-col justify-between items-start">
                         <Text className="text-textMid mb-2" semi>Opis:</Text>
                         <Text className="text-md text-textPrimary" bold>
@@ -142,7 +154,7 @@ const SalonScreen = ({navigation}) => {
                     <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
                 </TouchableOpacity>
 
-                <TouchableOpacity className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
+                <TouchableOpacity onPress={handleToLocationScreen} className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
                     <View className="flex flex-col justify-between items-start">
                         <Text className="text-textMid mb-2" semi>Lokacija:</Text>
                         <Text className="text-md text-textPrimary" bold>
@@ -152,7 +164,7 @@ const SalonScreen = ({navigation}) => {
                     <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
                 </TouchableOpacity>
 
-                <TouchableOpacity className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
+                <TouchableOpacity onPress={handleToServicesScreen} className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
                     <View className="flex flex-col justify-between items-start">
                         <Text className="text-textMid mb-2" semi>Usluge:</Text>
                         {services.length === 0 && 
@@ -163,7 +175,7 @@ const SalonScreen = ({navigation}) => {
 
                         {services.length > 0 && 
                             <Text className="text-md text-textPrimary" bold>
-                                Pogledaj usluge (12)
+                                Pogledaj / Izmeni usluge ({services.length})
                             </Text>
                         }
                     </View>
@@ -176,7 +188,7 @@ const SalonScreen = ({navigation}) => {
 
                 <TouchableOpacity className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
                     <View className="flex flex-col justify-between items-start">
-                        <Text className="text-textMid mb-2" semi>Tim salona:</Text>
+                        <Text className="text-textMid mb-2" semi>Članovi salona:</Text>
                         {workers.length === 0 && 
                             <Text className="text-md text-red-500" bold>
                                 Kreiraj tim salona

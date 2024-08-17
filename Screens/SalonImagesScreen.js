@@ -97,8 +97,10 @@ const SalonImagesScreen = () => {
         <View className="h-full flex flex-col justify-between px-4">
           <View className="flex-1 flex flex-col justify-start items-center">
             <View className="w-full flex flex-row justify-between items-center mt-6">
-                <Text className="text-2xl" bold>Izmeni slike</Text>
-                
+                <View>
+                  <Text className="text-2xl" bold>Izmeni slike</Text>
+                  <Text semi className="text-appColorDark">Salon može imati najviše <Text bold className="text-textPrimary">6</Text> slika</Text>
+                </View>
                 <TouchableOpacity onPress={pickMultipleImage} className="p-3 bg-textPrimary rounded-full">
                     <Entypo name="plus" size={24} color="white" />
                 </TouchableOpacity>
@@ -108,7 +110,7 @@ const SalonImagesScreen = () => {
             <Text className="text-center text-textMid" bold>Slike će biti prikazane u istom redosledu</Text>
             <Text className="text-center text-textMid">Prva slika u nizu će biti početna slika kada neko uđe na profil salona</Text>
 
-            <View className="flex-1 w-full">
+            <View className="flex-1 w-full mb-3 -mt-4">
                 {images.length === 0 && 
                     <View className="flex flex-col justify-center items-center mt-10">
                         <Text className="text-lg mb-3" bold>Dodaj slike</Text>
