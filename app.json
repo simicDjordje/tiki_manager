@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "tiki",
-    "slug": "tiki",
+    "name": "tiki_manager",
+    "slug": "tiki_manager",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -15,19 +15,32 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.iamdjordjesimic.tiki"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.iamdjordjesimic.tiki"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "003395d2-1c6a-4996-9c67-f988af61a3c3"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/003395d2-1c6a-4996-9c67-f988af61a3c3"
+    }
   }
 }
