@@ -1,12 +1,12 @@
 import { View, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Modal from 'react-native-modal'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import Entypo from '@expo/vector-icons/Entypo'
 import { Image } from 'expo-image'
-import LootieSuccess from '../Components/LootieAnimations/Success'
 import Text from './CustomComponents/CustomText'
 import CustomInput from './CustomComponents/CustomInput'
+import CustomButton from './CustomComponents/CustomButton'
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
@@ -36,9 +36,18 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
     const [workerSetDuration, setWorkerSetDuration] = useState(false)
 
     const closeModal = () => {
-        setIsSuccess(false)
         setIsModalVisible(false)
+        setIsSuccess(false)
     }
+
+    useEffect(()=>{
+        if(!isSuccess) return
+
+        setTimeout(()=>{
+            setIsModalVisible(false)
+            setIsSuccess(false)
+        }, 3000)
+    }, [isSuccess])
 
     return (
       <Modal 
@@ -62,7 +71,6 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                     </View>
 
                     <View className="bg-textSecondary w-full h-0.5 mt-4"></View>
-                    {!isSuccess &&
                     <View className="h-5/6 flex flex-col justify-between">
                         <View className="flex-1">
                             <CustomInput 
@@ -106,7 +114,8 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                     const lastItem = durations.length == indexPlusOne
                                     const isSelected = selectedDuration.value === duration.value
                                     return (
-                                        <TouchableOpacity onPress={()=>{setSelectedDuration(duration)}} className={`w-20 h-14 ${isSelected ? 'bg-appColor' : 'bg-bgSecondary'} ml-2 rounded-xl flex flex-row justify-center items-center ${lastItem && 'mr-20'}`}>
+                                        <TouchableOpacity key={index} onPress={()=>{setSelectedDuration(duration)}} className={`w-20
+                                         h-14 ${isSelected ? 'bg-appColor' : 'bg-bgSecondary'} ml-2 rounded-xl flex flex-row justify-center items-center ${lastItem && 'mr-20'}`}>
                                             <Text semi className={`${isSelected ? 'text-white' : 'text-textPrimary'}`}>{duration.label}</Text>
                                         </TouchableOpacity>
                                     )
@@ -213,25 +222,13 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
 
 
                         <View className="flex flex-col justify-center items-center">
-                            <TouchableOpacity 
-                                onPress={() => setIsSuccess(true)}
-                                className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center w-full">
-                                <Text className="text-white text-lg" bold>Potvrdi</Text>
-                            </TouchableOpacity>
+                            <CustomButton 
+                                onPress={()=> setIsSuccess(true)}
+                                text={'Potvrdi'}
+                                isSuccess={isSuccess}
+                            />
                         </View>
                     </View>
-                    }
-
-                    {isSuccess && 
-                        <View>
-                            <View className="flex flex-col justify-center items-center mt-10">
-                                <Text className="text-2xl text-center" bold>Uspešno kreiran profil radnika</Text>
-                                <Text className="text-lg text-center">Sačekaj da te menadžer salona doda i započni svoju karijeru uz <Text className="text-appColorDark" semi>tiki</Text></Text>
-
-                                <LootieSuccess d={250} />
-                            </View>
-                        </View>
-                    }
                 </View>
               </View>
           </View>

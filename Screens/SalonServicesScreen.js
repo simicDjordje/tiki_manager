@@ -82,7 +82,7 @@ const SalonServicesScreen = () => {
 
                 {services.length === 0 && 
                     <View className="flex flex-col justify-center items-center mt-5">
-                        <Text className="text-lg mb-3" bold>Kopiraj iz drugog salona</Text>
+                        <Text className="text-lg mb-3" bold>Kopiraj iz jednog od svojih salona</Text>
                         <TouchableOpacity onPress={beginAddService} className="p-5 bg-textPrimary rounded-full">
                             <Feather name="copy" size={58} color="white" />
                         </TouchableOpacity>
