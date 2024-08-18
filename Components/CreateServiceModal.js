@@ -14,6 +14,7 @@ const blurhash =
 
 const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
     const [isSuccess, setIsSuccess] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const [durations, setDurations] = useState([
         { value: 900, label: '15min' },       // 15 minutes
         { value: 1800, label: '30min' },      // 30 minutes
@@ -40,12 +41,20 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
         setIsSuccess(false)
     }
 
+    const handleSave = () => {
+        setIsLoading(true)
+
+        setTimeout(()=>{
+            setIsLoading(false)
+            setIsSuccess(true)
+        }, 2500)
+    }
+
     useEffect(()=>{
         if(!isSuccess) return
 
         setTimeout(()=>{
             setIsModalVisible(false)
-            setIsSuccess(false)
         }, 3000)
     }, [isSuccess])
 
@@ -55,11 +64,14 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
           animationInTiming={300}
           animationOutTiming={300}
           style={{margin: 0}}
+          onModalHide={()=>{
+            setIsSuccess(false)
+          }}
       >
           <View className="flex-1 flex flex-col justify-end items-center w-full">
               <View className="h-full w-full">
                 <View 
-                    className="h-full w-full bg-bgPrimary px-4"
+                    className="h-full w-full bg-bgSecondary px-4"
                     style={{borderTopRightRadius: 50, borderTopLeftRadius: 50}}
                 >
                     <View className="flex flex-row justify-between items-center w-full mt-6">
@@ -99,7 +111,7 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
 
                             <View className="flex flex-row justify-between items-center">
                                 <Text className={`mb-1 text-md mt-4`} semi>Vreme trajanja usluge</Text>
-                                <Text className={`mb-1 text-xs mt-4`}>Skroluj za još</Text>
+                                <Text className={`mb-1 text-xs mt-4`}>Skroluj desno za još</Text>
                             </View>
                             <ScrollView 
                                 className="mb-2 -mr-10"
@@ -114,8 +126,8 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                     const lastItem = durations.length == indexPlusOne
                                     const isSelected = selectedDuration.value === duration.value
                                     return (
-                                        <TouchableOpacity key={index} onPress={()=>{setSelectedDuration(duration)}} className={`w-20
-                                         h-14 ${isSelected ? 'bg-appColor' : 'bg-bgSecondary'} ml-2 rounded-xl flex flex-row justify-center items-center ${lastItem && 'mr-20'}`}>
+                                        <TouchableOpacity key={index} onPress={()=>{setSelectedDuration(duration)}} className={`w-24
+                                         h-14 ${isSelected ? 'bg-appColor' : 'bg-bgPrimary'} ml-2 rounded-xl flex flex-row justify-center items-center ${lastItem && 'mr-20'}`}>
                                             <Text semi className={`${isSelected ? 'text-white' : 'text-textPrimary'}`}>{duration.label}</Text>
                                         </TouchableOpacity>
                                     )
@@ -131,13 +143,14 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                     paddingLeft: 5,
                                     paddingVertical: 20
                             }}>
-                                <TouchableOpacity className="flex flex-col justify-between items-center ml-2">
+                                <TouchableOpacity className="flex flex-col justify-start items-center ml-2">
                                     <Image
-                                        className={`w-16 h-16 rounded-full border-4 ${'border-appColor'}`}
+                                        className={`rounded-full border-4 ${'border-appColor'}`}
                                         source={require(`../assets/e1.jpg`)}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
+                                        style={{width: 68, height: 68}}
                                     />
 
                                     <Text className="text-xs mt-2 text-appColorDark" semi>Marko</Text>
@@ -145,11 +158,12 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
 
                                 <TouchableOpacity className="flex flex-col justify-between items-center ml-2">
                                     <Image
-                                        className={`w-16 h-16 rounded-full border-4 ${'border-appColor'}`}
+                                        className={`rounded-full border-4 ${'border-appColor'}`}
                                         source={require(`../assets/e5.jpg`)}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
+                                        style={{width: 68, height: 68}}
                                     />
 
                                     <Text className="text-xs mt-2 text-appColorDark" semi>Dragan</Text>
@@ -157,11 +171,12 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
 
                                 <TouchableOpacity className="flex flex-col justify-between items-center ml-2">
                                     <Image
-                                        className={`w-16 h-16 rounded-full border-2 ${'border-textPrimary'}`}
+                                        className={`rounded-full border-2 ${'border-textPrimary'}`}
                                         source={require(`../assets/fpp.png`)}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
+                                        style={{width: 68, height: 68}}
                                     />
 
                                     <Text className="text-xs mt-2">Jovanka</Text>
@@ -169,11 +184,12 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
 
                                 <TouchableOpacity className="flex flex-col justify-between items-center ml-2">
                                     <Image
-                                        className={`w-16 h-16 rounded-full border-4 ${'border-appColor'}`}
+                                        className={`rounded-full border-4 ${'border-appColor'}`}
                                         source={require(`../assets/fpp2.png`)}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
+                                        style={{width: 68, height: 68}}
                                     />
 
                                     <Text className="text-xs mt-2 text-appColorDark" semi>Katarina</Text>
@@ -181,11 +197,12 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
 
                                 <TouchableOpacity className="flex flex-col justify-between items-center ml-2">
                                     <Image
-                                        className={`w-16 h-16 rounded-full border-2 ${'border-textPrimary'}`}
+                                        className={`rounded-full border-2 ${'border-textPrimary'}`}
                                         source={require(`../assets/e4.jpg`)}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
+                                        style={{width: 68, height: 68}}
                                     />
 
                                     <Text className="text-xs mt-2">Jorgovan</Text>
@@ -193,11 +210,12 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
 
                                 <TouchableOpacity className="flex flex-col justify-between items-center ml-2">
                                     <Image
-                                        className={`w-16 h-16 rounded-full border-2 ${'border-textPrimary'}`}
+                                        className={`rounded-full border-2 ${'border-textPrimary'}`}
                                         source={require(`../assets/e1.jpg`)}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
+                                        style={{width: 68, height: 68}}
                                     />
 
                                     <Text className="text-xs mt-2">Natalija</Text>
@@ -205,11 +223,12 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
 
                                 <TouchableOpacity className="flex flex-col justify-between items-center ml-2 mr-20">
                                     <Image
-                                        className={`w-16 h-16 rounded-full border-2 ${'border-textPrimary'}`}
+                                        className={`rounded-full border-2 ${'border-textPrimary'}`}
                                         source={require(`../assets/e1.jpg`)}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
+                                        style={{width: 68, height: 68}}
                                     />
 
                                     <Text className="text-xs mt-2">Natalija</Text>
@@ -223,9 +242,10 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
 
                         <View className="flex flex-col justify-center items-center">
                             <CustomButton 
-                                onPress={()=> setIsSuccess(true)}
+                                onPress={handleSave}
                                 text={'Potvrdi'}
                                 isSuccess={isSuccess}
+                                isLoading={isLoading}
                             />
                         </View>
                     </View>

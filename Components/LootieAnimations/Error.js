@@ -1,6 +1,6 @@
 import LottieView from 'lottie-react-native'
 
-const LootieCity = ({d}) => {
+const LootieError = ({d}) => {
   return (
     <LottieView
             autoPlay
@@ -11,9 +11,9 @@ const LootieCity = ({d}) => {
             marginLeft: 'auto',
             marginRight: 'auto',
             }}
-        source={require('../../assets/LootieAnimations/CityAnimation.json')}
+        source={require('../../assets/LootieAnimations/ErrorAnimation.json')}
     />
   )
 }
 
-export default LootieCity
+export default LootieError

@@ -13,7 +13,10 @@ export {default as SalonLogoScreen} from './SalonLogoScreen'
 export {default as SalonImagesScreen} from './SalonImagesScreen'
 export {default as SalonNameDescScreen} from './SalonNameDescScreen'
 export {default as SalonLocationScreen} from './SalonLocationScreen'
+export {default as SalonServicesCategoriesScreen} from './SalonServicesCategoriesScreen'
 export {default as SalonServicesScreen} from './SalonServicesScreen'
+export {default as ServiceScreen} from './ServiceScreen'
+
 
 
 

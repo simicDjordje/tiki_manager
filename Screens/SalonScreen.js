@@ -40,8 +40,8 @@ const SalonScreen = ({navigation}) => {
         navigation.navigate('StackTabScreens', {screen: 'SalonLocationScreen'})
     }
 
-    const handleToServicesScreen = () => {
-        navigation.navigate('StackTabScreens', {screen: 'SalonServicesScreen'})
+    const handleToServicesCategoriesScreen = () => {
+        navigation.navigate('StackTabScreens', {screen: 'SalonServicesCategoriesScreen'})
     }
 
 
@@ -164,7 +164,7 @@ const SalonScreen = ({navigation}) => {
                     <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={handleToServicesScreen} className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
+                <TouchableOpacity onPress={handleToServicesCategoriesScreen} className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
                     <View className="flex flex-col justify-between items-start">
                         <Text className="text-textMid mb-2" semi>Usluge:</Text>
                         {services.length === 0 && 

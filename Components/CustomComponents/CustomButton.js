@@ -1,15 +1,48 @@
 import { TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Text from './CustomText'
 import LootieSuccess from '../LootieAnimations/Success'
+import LootieLoader from '../LootieAnimations/Loader'
+import LootieError from '../LootieAnimations/Error'
 
-const CustomButton = ({onPress, text, isLoading, isSuccess}) => {
+const CustomButton = ({onPress, text, isLoading, isSuccess, isError}) => {
+    const [innerError, setInnerError] = useState(isError || false)
+
+    useEffect(()=>{
+        if(!innerError) return
+
+        setTimeout(()=>{
+            setInnerError(false)
+        }, 2000)
+    }, [innerError])
+
+    if(innerError) return (
+        <TouchableOpacity 
+            className="bg-appColorDark rounded-3xl h-14 flex flex-row justify-center items-center w-full">
+            <LootieError d={40} />
+        </TouchableOpacity>
+    )
+
+
+    if(isLoading) return (
+        <TouchableOpacity 
+            className="bg-appColorDark rounded-3xl h-14 flex flex-row justify-center items-center w-full">
+            <LootieLoader d={40} />
+        </TouchableOpacity>
+    )
+
+    if(isSuccess) return (
+        <TouchableOpacity 
+            className="bg-appColorDark rounded-3xl h-14 flex flex-row justify-center items-center w-full">
+           <LootieSuccess d={150} />
+        </TouchableOpacity>
+    )
+
   return (
     <TouchableOpacity 
         onPress={onPress}
         className="bg-appColorDark rounded-3xl h-14 flex flex-row justify-center items-center w-full">
-        {isSuccess && <LootieSuccess d={150} />}
-        {!isSuccess && <Text className="text-white text-lg" bold>{text}</Text>}
+        <Text className="text-white text-lg" bold>{text}</Text>
     </TouchableOpacity>
   )
 }
