@@ -44,6 +44,10 @@ const SalonScreen = ({navigation}) => {
         navigation.navigate('StackTabScreens', {screen: 'SalonServicesCategoriesScreen'})
     }
 
+    const handleToSalonWorkersScreen = () => {
+        navigation.navigate('StackTabScreens', {screen: 'SalonWorkersScreen'})
+    }
+
 
   return (
     <SafeAreaView className="bg-bgSecondary h-full">
@@ -186,7 +190,9 @@ const SalonScreen = ({navigation}) => {
                     {services.length > 0 &&   <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />}
                 </TouchableOpacity>
 
-                <TouchableOpacity className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
+                <TouchableOpacity 
+                onPress={handleToSalonWorkersScreen}
+                className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
                     <View className="flex flex-col justify-between items-start">
                         <Text className="text-textMid mb-2" semi>Članovi salona:</Text>
                         {workers.length === 0 && 

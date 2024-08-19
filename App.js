@@ -3,6 +3,7 @@ import Navigation from './Navigation';
 import * as Font from 'expo-font'
 import { useEffect, useState } from 'react';
 import { View, Text } from 'react-native';
+import LootieLoader from './Components/LootieAnimations/Loader';
 
 const loadFonts = async () => {
   await Font.loadAsync({
@@ -20,7 +21,11 @@ export default function App() {
   }, [])
 
   if (!fontsLoaded) {
-    return <View className="mt-56"><Text>Loading fontss wait....</Text></View>
+    return (
+      <View className="h-full bg-appColor flex flex-col justify-center items-center">
+        <LootieLoader d={70} />
+      </View>
+      )
   }
 
   return (

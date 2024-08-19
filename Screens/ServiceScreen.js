@@ -6,12 +6,17 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import { useNavigation } from '@react-navigation/native'
 import Text from '../Components/CustomComponents/CustomText'
 import CustomInput from '../Components/CustomComponents/CustomInput'
+import Entypo from '@expo/vector-icons/Entypo'
+import { Image } from 'expo-image'
+import ServiceWorkersModal from '../Components/ServiceWorkersModal'
+
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
 const ServiceScreen = () => {
+  const [isServiceWorkerModalVisible, setIsServiceWorkerModalVisible] = useState(false)
   const navigation = useNavigation()
   const salonName = 'Beauty salon PK'
   const [durations, setDurations] = useState([
@@ -33,7 +38,7 @@ const ServiceScreen = () => {
     { value: 36000, label: '10h' }        // 10 hours
    ])
    const [selectedDuration, setSelectedDuration] = useState({ value: 1800, label: '30min' })
-
+   const [workers, setWorkers] = useState([1])
 
   const handleBack = () => {
     navigation.navigate('StackTabScreens', {screen: 'SalonServicesScreen'})
@@ -119,16 +124,97 @@ const ServiceScreen = () => {
                         </ScrollView>
                     </View>
                     
-                    <Text className={`mb-1 text-md -mt-28`} semi>Članovi</Text>
-                    <View className="w-full h-32 border-textSecondary flex flex-col justify-between rounded-xl border p-2">
-                        <View>
-                            <Text semi className="text-textMid">Izmeni ili dodeli ovu uslugu novom članu</Text>
-                            <View className="bg-textSecondary mt-2 w-full" style={{height: 0.5}}></View>
-                        </View>
+                    <Text className={`mb-1 text-md -mt-28`} semi>Dodeli ili ukloni uslugu</Text>
+                    <TouchableOpacity 
+                        onPress={() => setIsServiceWorkerModalVisible(true)}
+                        className="w-full h-16 border-textSecondary flex flex-row justify-between items-center rounded-xl border p-2">
                         <View className="flex-1">
+                            {workers.length === 0 && <Text className="text-textMid" semi>Usluga nije dodeljena nikom</Text>}
+                            {workers.length > 0 && 
+                                <View className="flex flex-row justify-start items-center">
+                                    <Image
+                                        className="w-8 h-8 rounded-full border-2 border-appColorDark"
+                                        source={require('../assets/fpp.png')}
+                                        placeholder={{ blurhash }}
+                                        contentFit="cover"
+                                        transition={1000}
+                                    />
 
+                                    <Image
+                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
+                                        source={require('../assets/e2.jpg')}
+                                        placeholder={{ blurhash }}
+                                        contentFit="cover"
+                                        transition={1000}
+                                    />
+
+                                    <Image
+                                        className="w-8 h-8 rounded-full border-2 border-appColorDark -ml-2"
+                                        source={require('../assets/fpp2.png')}
+                                        placeholder={{ blurhash }}
+                                        contentFit="cover"
+                                        transition={1000}
+                                    />
+                                    <Image
+                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
+                                        source={require('../assets/e4.jpg')}
+                                        placeholder={{ blurhash }}
+                                        contentFit="cover"
+                                        transition={1000}
+                                    />
+                                    <Image
+                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
+                                        source={require('../assets/e4.jpg')}
+                                        placeholder={{ blurhash }}
+                                        contentFit="cover"
+                                        transition={1000}
+                                    />
+                                    <Image
+                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
+                                        source={require('../assets/e4.jpg')}
+                                        placeholder={{ blurhash }}
+                                        contentFit="cover"
+                                        transition={1000}
+                                    />
+                                    <Image
+                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
+                                        source={require('../assets/e4.jpg')}
+                                        placeholder={{ blurhash }}
+                                        contentFit="cover"
+                                        transition={1000}
+                                    />
+                                    <Image
+                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
+                                        source={require('../assets/e4.jpg')}
+                                        placeholder={{ blurhash }}
+                                        contentFit="cover"
+                                        transition={1000}
+                                    />
+                                    <Image
+                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
+                                        source={require('../assets/e4.jpg')}
+                                        placeholder={{ blurhash }}
+                                        contentFit="cover"
+                                        transition={1000}
+                                    />
+                                    <Image
+                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
+                                        source={require('../assets/e4.jpg')}
+                                        placeholder={{ blurhash }}
+                                        contentFit="cover"
+                                        transition={1000}
+                                    />
+                                    <View className="w-8 h-8 rounded-full border-2 border-textMid bg-textPrimary -ml-2 flex flex-row justify-center items-center">
+                                        <Text className="text-white">+4</Text>
+                                    </View>
+                                </View>
+                            }
                         </View>
-                    </View>
+                        <View>
+                            {workers.length === 0 && <Entypo name="plus" size={24} color="#232323" />}
+                            {workers.length > 0 && <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />}
+                        </View>
+                    </TouchableOpacity>
 
                     <TouchableOpacity 
                         onPress={handleSave}
@@ -138,6 +224,10 @@ const ServiceScreen = () => {
                 </View>
                 <View className="mb-16"></View>
             </ScrollView>
+            <ServiceWorkersModal 
+                isModalVisible={isServiceWorkerModalVisible}
+                setIsModalVisible={setIsServiceWorkerModalVisible}
+            />
           </View>
         </View>
     </SafeAreaView>

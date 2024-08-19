@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
-import { AddSalonScreen, SalonImagesScreen, SalonLocationScreen, SalonLogoScreen, SalonNameDescScreen, SalonScreen, SalonServicesCategoriesScreen, SalonServicesScreen, ServiceScreen } from "../Screens";
+import { AddSalonScreen, SalonImagesScreen, SalonLocationScreen, SalonLogoScreen, SalonNameDescScreen, SalonScreen, SalonServicesCategoriesScreen, SalonServicesScreen, SalonSingleWorkerScreen, SalonWorkersScreen, ServiceScreen } from "../Screens";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +19,9 @@ const StackTab = () => {
       <Stack.Screen name="SalonServicesCategoriesScreen" component={SalonServicesCategoriesScreen} />
       <Stack.Screen name="SalonServicesScreen" component={SalonServicesScreen} />
       <Stack.Screen name="ServiceScreen" component={ServiceScreen} />
+      <Stack.Screen name="SalonWorkersScreen" component={SalonWorkersScreen} />
+      <Stack.Screen name="SalonSingleWorkerScreen" component={SalonSingleWorkerScreen} />
+
     </Stack.Navigator>
   )
 }

@@ -16,6 +16,9 @@ export {default as SalonLocationScreen} from './SalonLocationScreen'
 export {default as SalonServicesCategoriesScreen} from './SalonServicesCategoriesScreen'
 export {default as SalonServicesScreen} from './SalonServicesScreen'
 export {default as ServiceScreen} from './ServiceScreen'
+export {default as SalonWorkersScreen} from './SalonWorkersScreen'
+export {default as SalonSingleWorkerScreen} from './SalonSingleWorkerScreen'
+
 
 
 
