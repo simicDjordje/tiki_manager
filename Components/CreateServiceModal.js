@@ -15,24 +15,24 @@ const blurhash =
 const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
     const [isSuccess, setIsSuccess] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
-    const [durations, setDurations] = useState([
-        { value: 900, label: '15min' },       // 15 minutes
-        { value: 1800, label: '30min' },      // 30 minutes
-        { value: 3600, label: '1h' },         // 1 hour
-        { value: 5400, label: '1h 30min' },   // 1 hour 30 minutes
-        { value: 7200, label: '2h' },         // 2 hours
-        { value: 9000, label: '2h 30min' },   // 2 hours 30 minutes
-        { value: 10800, label: '3h' },        // 3 hours
-        { value: 12600, label: '3h 30min' },  // 3 hours 30 minutes
-        { value: 14400, label: '4h' },        // 4 hours
-        { value: 16200, label: '4h 30min' },  // 4 hours 30 minutes
-        { value: 18000, label: '5h' },        // 5 hours
-        { value: 21600, label: '6h' },        // 6 hours
-        { value: 25200, label: '7h' },        // 7 hours
-        { value: 28800, label: '8h' },        // 8 hours
-        { value: 32400, label: '9h' },        // 9 hours
-        { value: 36000, label: '10h' }        // 10 hours
-    ])
+    // const [durations, setDurations] = useState([
+    //     { value: 900, label: '15min' },       // 15 minutes
+    //     { value: 1800, label: '30min' },      // 30 minutes
+    //     { value: 3600, label: '1h' },         // 1 hour
+    //     { value: 5400, label: '1h 30min' },   // 1 hour 30 minutes
+    //     { value: 7200, label: '2h' },         // 2 hours
+    //     { value: 9000, label: '2h 30min' },   // 2 hours 30 minutes
+    //     { value: 10800, label: '3h' },        // 3 hours
+    //     { value: 12600, label: '3h 30min' },  // 3 hours 30 minutes
+    //     { value: 14400, label: '4h' },        // 4 hours
+    //     { value: 16200, label: '4h 30min' },  // 4 hours 30 minutes
+    //     { value: 18000, label: '5h' },        // 5 hours
+    //     { value: 21600, label: '6h' },        // 6 hours
+    //     { value: 25200, label: '7h' },        // 7 hours
+    //     { value: 28800, label: '8h' },        // 8 hours
+    //     { value: 32400, label: '9h' },        // 9 hours
+    //     { value: 36000, label: '10h' }        // 10 hours
+    // ])
     const [selectedDuration, setSelectedDuration] = useState({ value: 1800, label: '30min' })
     const [workerSetDuration, setWorkerSetDuration] = useState(false)
 
@@ -69,7 +69,7 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
           }}
       >
           <View className="flex-1 flex flex-col justify-end items-center w-full">
-              <View className="h-full w-full">
+              <View className="w-full" style={{height: '92%'}}>
                 <View 
                     className="h-full w-full bg-bgSecondary px-4"
                     style={{borderTopRightRadius: 50, borderTopLeftRadius: 50}}
@@ -109,11 +109,11 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                 iconSide='right'
                             />
 
-                            <View className="flex flex-row justify-between items-center">
+                            {/* <View className="flex flex-row justify-between items-center">
                                 <Text className={`mb-1 text-md mt-4`} semi>Vreme trajanja usluge</Text>
                                 <Text className={`mb-1 text-xs mt-4`}>Skroluj desno za još</Text>
-                            </View>
-                            <ScrollView 
+                            </View> */}
+                            {/* <ScrollView 
                                 className="mb-2 -mr-10"
                                 horizontal={true}
                                 showsHorizontalScrollIndicator={false}
@@ -132,9 +132,10 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                         </TouchableOpacity>
                                     )
                                 })}
-                            </ScrollView>
+                            </ScrollView> */}
 
-                            <Text className={`mb-1 text-md mt-2`} semi>Možeš dodeliti uslugu članovima ovde ili kasnije</Text>
+                            <Text className={`text-md mt-8`} semi>Ovde možeš dodeliti uslugu članovima</Text>
+                            <Text className={`mb-1 text-md text-textMid`} semi>ili kasnije u podešavanjima usluge</Text>
                             <ScrollView 
                                 className="mb-2 -mr-10"
                                 horizontal={true}
@@ -156,7 +157,7 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                     <Text className="text-xs mt-2 text-appColorDark" semi>Marko</Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity className="flex flex-col justify-between items-center ml-2">
+                                <TouchableOpacity className="flex flex-col justify-start items-center ml-2">
                                     <Image
                                         className={`rounded-full border-4 ${'border-appColor'}`}
                                         source={require(`../assets/e5.jpg`)}
@@ -169,7 +170,7 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                     <Text className="text-xs mt-2 text-appColorDark" semi>Dragan</Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity className="flex flex-col justify-between items-center ml-2">
+                                <TouchableOpacity className="flex flex-col justify-start items-center ml-2">
                                     <Image
                                         className={`rounded-full border-2 ${'border-textPrimary'}`}
                                         source={require(`../assets/fpp.png`)}
@@ -182,7 +183,7 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                     <Text className="text-xs mt-2">Jovanka</Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity className="flex flex-col justify-between items-center ml-2">
+                                <TouchableOpacity className="flex flex-col justify-start items-center ml-2">
                                     <Image
                                         className={`rounded-full border-4 ${'border-appColor'}`}
                                         source={require(`../assets/fpp2.png`)}
@@ -195,7 +196,7 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                     <Text className="text-xs mt-2 text-appColorDark" semi>Katarina</Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity className="flex flex-col justify-between items-center ml-2">
+                                <TouchableOpacity className="flex flex-col justify-start items-center ml-2">
                                     <Image
                                         className={`rounded-full border-2 ${'border-textPrimary'}`}
                                         source={require(`../assets/e4.jpg`)}
@@ -208,7 +209,7 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                     <Text className="text-xs mt-2">Jorgovan</Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity className="flex flex-col justify-between items-center ml-2">
+                                <TouchableOpacity className="flex flex-col justify-start items-center ml-2">
                                     <Image
                                         className={`rounded-full border-2 ${'border-textPrimary'}`}
                                         source={require(`../assets/e1.jpg`)}
@@ -221,7 +222,7 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                     <Text className="text-xs mt-2">Natalija</Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity className="flex flex-col justify-between items-center ml-2 mr-20">
+                                <TouchableOpacity className="flex flex-col justify-start items-center ml-2 mr-20">
                                     <Image
                                         className={`rounded-full border-2 ${'border-textPrimary'}`}
                                         source={require(`../assets/e1.jpg`)}

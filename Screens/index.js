@@ -20,6 +20,10 @@ export {default as SalonWorkersScreen} from './SalonWorkersScreen'
 export {default as SalonSingleWorkerScreen} from './SalonSingleWorkerScreen'
 
 
+export {default as WorkerScreen} from './WorkerScreen'
+
+
+
 
 
 

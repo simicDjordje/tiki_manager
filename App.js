@@ -23,6 +23,7 @@ export default function App() {
   if (!fontsLoaded) {
     return (
       <View className="h-full bg-appColor flex flex-col justify-center items-center">
+        <StatusBar style={'light'} />
         <LootieLoader d={70} />
       </View>
       )

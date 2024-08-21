@@ -100,7 +100,9 @@ const SalonServicesScreen = () => {
                             <Text className="text-textMid" semi>Kategorije usluga</Text>
                         </View>
 
-                        <TouchableOpacity onPress={handleToService} className="bg-bgPrimary w-full h-64 mt-4 rounded-xl p-4 flex flex-col justify-between">
+                        <View className="flex flex-col justify-between">
+                        
+                        <TouchableOpacity onPress={handleToService} className="bg-bgPrimary w-full mt-4 rounded-xl p-4">
                             <View className="flex flex-row justify-between items-center">
                                 <Text className="text-textPrimary text-xl" bold>Mikropigmentacija obrva</Text>
                                 <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
@@ -119,161 +121,64 @@ const SalonServicesScreen = () => {
                                     <Text>Cena: </Text>
                                     <Text semi>800.00 RSD</Text>
                                 </View>
-                                <View className="flex flex-row justify-between items-center mt-2">
+                                {/* <View className="flex flex-row justify-between items-center mt-2">
                                     <Text>Vreme trajanja usluge: </Text>
                                     <Text semi>1h 30min</Text>
-                                </View>
+                                </View> */}
 
                                 <View className="bg-textSecondary mt-3 w-full" style={{height: 0.5}}></View>
 
                                 <View className="flex flex-row justify-start items-center mt-2">
                                     <Image
-                                        className="w-12 h-12 rounded-full border-2 border-appColorDark"
+                                        className="w-10 h-10 rounded-full border-2 border-appColorDark"
                                         source={require('../assets/fpp.png')}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
                                     />
                                     <Image
-                                        className="w-12 h-12 rounded-full border-2 border-appColorDark -ml-2"
+                                        className="w-10 h-10 rounded-full border-2 border-appColorDark -ml-2"
                                         source={require('../assets/fpp2.png')}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
                                     />
                                     <Image
-                                        className="w-12 h-12 rounded-full border-2 border-appColorDark -ml-2"
+                                        className="w-10 h-10 rounded-full border-2 border-appColorDark -ml-2"
                                         source={require('../assets/e1.jpg')}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
                                     />
                                     <Image
-                                        className="w-12 h-12 rounded-full border-2 border-appColorDark -ml-2"
+                                        className="w-10 h-10 rounded-full border-2 border-appColorDark -ml-2"
                                         source={require('../assets/e4.jpg')}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
                                     />
                                     <Image
-                                        className="w-12 h-12 rounded-full border-2 border-appColorDark"
+                                        className="w-10 h-10 rounded-full border-2 border-appColorDark"
                                         source={require('../assets/fpp.png')}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
                                     />
                                     <Image
-                                        className="w-12 h-12 rounded-full border-2 border-appColorDark -ml-2"
+                                        className="w-10 h-10 rounded-full border-2 border-appColorDark -ml-2"
                                         source={require('../assets/fpp2.png')}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
                                     />
 
-                                    <View className="w-12 h-12 rounded-full border-2 border-textMid bg-textPrimary -ml-2 flex flex-row justify-center items-center">
+                                    <View className="w-10 h-10 rounded-full border-2 border-textMid bg-textPrimary -ml-2 flex flex-row justify-center items-center">
                                         <Text className="text-white">+4</Text>
                                     </View>
                                 </View>
                             </View>
                         </TouchableOpacity>
-
-                        <TouchableOpacity onPress={handleToService} className="bg-bgPrimary w-full h-64 mt-8 rounded-xl p-4 flex flex-col justify-between">
-                            <View className="flex flex-row justify-between items-center">
-                                <Text className="text-textPrimary text-xl" bold>Prva korekcija</Text>
-                                <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
-                            </View>
-                            <View className="bg-textSecondary mt-3 w-full" style={{height: 0.5}}></View>
-
-                            <View className="flex-1">
-                                <View className="flex flex-row justify-between items-center mt-2">
-                                    <Text semi>Obrve i usne</Text>
-                                </View>
-
-                                <View className="bg-textSecondary mt-3 w-full" style={{height: 0.5}}></View>
-
-
-                                <View className="flex flex-row justify-between items-center mt-2">
-                                    <Text>Cena: </Text>
-                                    <Text semi>3800.00 RSD</Text>
-                                </View>
-                                <View className="flex flex-row justify-between items-center mt-2">
-                                    <Text>Vreme trajanja usluge: </Text>
-                                    <Text semi>2h</Text>
-                                </View>
-
-                                <View className="bg-textSecondary mt-3 w-full" style={{height: 0.5}}></View>
-
-                                <View className="flex flex-row justify-start items-center mt-2">
-                                    <Image
-                                        className="w-12 h-12 rounded-full border-2 border-appColorDark"
-                                        source={require('../assets/e2.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                                    <Image
-                                        className="w-12 h-12 rounded-full border-2 border-appColorDark -ml-2"
-                                        source={require('../assets/e3.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                                    <Image
-                                        className="w-12 h-12 rounded-full border-2 border-appColorDark -ml-2"
-                                        source={require('../assets/e5.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                                </View>
-                            </View>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity onPress={handleToService} className="bg-bgPrimary w-full h-64 mt-8 rounded-xl p-4 flex flex-col justify-between">
-                            <View className="flex flex-row justify-between items-center">
-                                <Text className="text-textPrimary text-xl" bold>Mikropigmentacija usana</Text>
-                                <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
-                            </View>
-                            <View className="bg-textSecondary mt-3 w-full" style={{height: 0.5}}></View>
-
-                            <View className="flex-1">
-                                <View className="flex flex-row justify-between items-center mt-2">
-                                    <Text semi>Mikropigmentacija usana na nivou na nivou nivou na</Text>
-                                </View>
-
-                                <View className="bg-textSecondary mt-3 w-full" style={{height: 0.5}}></View>
-
-
-                                <View className="flex flex-row justify-between items-center mt-2">
-                                    <Text>Cena: </Text>
-                                    <Text semi>9000.00 RSD</Text>
-                                </View>
-                                <View className="flex flex-row justify-between items-center mt-2">
-                                    <Text>Vreme trajanja usluge: </Text>
-                                    <Text semi>2h 30min</Text>
-                                </View>
-
-                                <View className="bg-textSecondary mt-3 w-full" style={{height: 0.5}}></View>
-
-                                <View className="flex flex-row justify-start items-center mt-2">
-                                    <Image
-                                        className="w-12 h-12 rounded-full border-2 border-appColorDark"
-                                        source={require('../assets/fpp2.png')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                                    <Image
-                                        className="w-12 h-12 rounded-full border-2 border-appColorDark -ml-2"
-                                        source={require('../assets/e3.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                                </View>
-                            </View>
-                        </TouchableOpacity>
-
+                        </View>
                     </View>
 
                     <View className="mb-44"></View>

@@ -13,6 +13,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome'
 import CreateServicesCategoryModal from '../Components/CreateServicesCategoryModal'
 import AddWorkerToSalonModal from '../Components/AddWorkerToSalonModal'
 import CustomInput from '../Components/CustomComponents/CustomInput'
+import SalonWorkerDetailsModal from '../Components/SalonWorkerDetailsModal'
 
 
 const blurhash =
@@ -22,6 +23,7 @@ const blurhash =
 const SalonWorkersScreen = () => {
   const [workers, setWorkers] = useState([1])
   const [isAddWorkerToSalonModalVisible, setIsAddWorkerToSalonModalVisible] = useState(false)
+  const [isSalonWorkerDetailsModalVisible, setIsSalonWorkerDetailsModalVisible] = useState(false)
   const navigation = useNavigation()
   const salonName = 'Beauty salon PK'
 
@@ -29,8 +31,8 @@ const SalonWorkersScreen = () => {
     navigation.navigate('StackTabScreens', {screen: 'SalonScreen'})
   }
 
-  const handleToSingleWorkerScreen = () => {
-    navigation.navigate('StackTabScreens', {screen: 'SalonSingleWorkerScreen'})
+  const seeWorkerDetails = () => {
+    setIsSalonWorkerDetailsModalVisible(true)
   }
 
   const beginAddWorker = () => {
@@ -98,7 +100,7 @@ const SalonWorkersScreen = () => {
               {workers.length > 0 && 
                 <ScrollView className="w-full -mt-16">
                     <View className="min-h-screen">
-                        <TouchableOpacity onPress={handleToSingleWorkerScreen} className="bg-bgPrimary w-full mt-4 rounded-xl p-4 flex flex-col justify-between">
+                        <TouchableOpacity onPress={seeWorkerDetails} className="bg-bgPrimary w-full mt-4 rounded-xl p-4 flex flex-col justify-between">
                             <View className="flex flex-row justify-between items-center pb-2">
                                 <Image
                                     className="w-16 h-16 rounded-full border-2 border-appColorDark"
@@ -144,7 +146,7 @@ const SalonWorkersScreen = () => {
                             </View>
                         </TouchableOpacity>
 
-                        <TouchableOpacity onPress={handleToSingleWorkerScreen} className="bg-bgPrimary w-full mt-4 rounded-xl p-4 flex flex-col justify-between">
+                        <TouchableOpacity onPress={seeWorkerDetails} className="bg-bgPrimary w-full mt-4 rounded-xl p-4 flex flex-col justify-between">
                             <View className="flex flex-row justify-between items-center pb-2">
                                 <Image
                                     className="w-16 h-16 rounded-full border-2 border-appColorDark"
@@ -196,6 +198,11 @@ const SalonWorkersScreen = () => {
         <AddWorkerToSalonModal 
             isModalVisible={isAddWorkerToSalonModalVisible}
             setIsModalVisible={setIsAddWorkerToSalonModalVisible}
+        />
+
+        <SalonWorkerDetailsModal 
+            isModalVisible={isSalonWorkerDetailsModalVisible}
+            setIsModalVisible={setIsSalonWorkerDetailsModalVisible}
         />
     </SafeAreaView>
   )

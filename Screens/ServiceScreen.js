@@ -68,7 +68,8 @@ const ServiceScreen = () => {
             </View>
             <View className="bg-textSecondary mt-8 w-full mb-4" style={{height: 0.5}}></View>
 
-            <ScrollView>
+            {/* <ScrollView> */}
+            <View>
                 <View className="min-h-screen">
                     <CustomInput 
                         label={'Naziv usluge'}
@@ -98,11 +99,11 @@ const ServiceScreen = () => {
                         value={'800.00'}
                     />
 
-                    <View className="flex flex-row justify-between items-center w-full">
+                    {/* <View className="flex flex-row justify-between items-center w-full">
                         <Text className={`mb-1 text-md mt-4`} semi>Vreme trajanja usluge</Text>
                         <Text className={`mb-1 text-xs mt-4`}>Skroluj desno za još</Text>
-                    </View>
-                    <View className="mb-32 -mr-10">
+                    </View> */}
+                    {/* <View className="mb-32 -mr-10">
                         <ScrollView 
                             horizontal={true}
                             showsHorizontalScrollIndicator={false}
@@ -122,9 +123,9 @@ const ServiceScreen = () => {
                                 )
                             })}
                         </ScrollView>
-                    </View>
+                    </View> */}
                     
-                    <Text className={`mb-1 text-md -mt-28`} semi>Dodeli ili ukloni uslugu</Text>
+                    <Text className={`mb-1 text-md mt-4`} semi>Dodeli ili ukloni uslugu</Text>
                     <TouchableOpacity 
                         onPress={() => setIsServiceWorkerModalVisible(true)}
                         className="w-full h-16 border-textSecondary flex flex-row justify-between items-center rounded-xl border p-2">
@@ -223,7 +224,8 @@ const ServiceScreen = () => {
                     </TouchableOpacity>
                 </View>
                 <View className="mb-16"></View>
-            </ScrollView>
+            {/* </ScrollView> */}
+            </View>
             <ServiceWorkersModal 
                 isModalVisible={isServiceWorkerModalVisible}
                 setIsModalVisible={setIsServiceWorkerModalVisible}

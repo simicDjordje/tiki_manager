@@ -3,6 +3,7 @@ import React from 'react'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { Image } from 'expo-image'
 import Text from './CustomComponents/CustomText'
+import { useNavigation } from '@react-navigation/native'
 
 
 const blurhash =
@@ -10,8 +11,14 @@ const blurhash =
 
 
 const WorkerCard = () => {
+  const navigation = useNavigation()
+
+  const handleToWorkerScreen = () => {
+    navigation.navigate('StackTabScreens', {screen: 'WorkerScreen'})
+  }
+
   return (
-    <TouchableOpacity className="bg-bgPrimary h-44 w-[48%] rounded-2xl mb-4 flex flex-col justify-between">
+    <TouchableOpacity onPress={handleToWorkerScreen} className="bg-bgPrimary h-44 w-[48%] rounded-2xl mb-4 flex flex-col justify-between">
         <View className="flex flex-row justify-end items-center px-2 pt-1">
             <MaterialCommunityIcons name="account-details" size={24} color="black" />
         </View>
