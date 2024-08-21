@@ -7,9 +7,14 @@ import Text from './CustomComponents/CustomText'
 
 const RegisterComponent = ({setAuthType}) => {
     const [email, setEmail] = useState('')
+    const [validation, setValidation] = useState(false)
     const navigation = useNavigation()
 
     const handleNext = () => {
+        if(!email){
+            setValidation(true)
+            return
+        }
         navigation.navigate('AuthTabScreens', {screen: 'RegisterScreen'})
     }
 
@@ -34,6 +39,8 @@ const RegisterComponent = ({setAuthType}) => {
                 placeholder={'Unesi email'}
                 value={email}
                 onChangeText={text => setEmail(text)}
+                isError={validation && !email}
+                errorMessage={'obavezno polje'}
             />
         </View>
 

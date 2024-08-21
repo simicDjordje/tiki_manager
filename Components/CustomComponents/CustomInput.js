@@ -17,7 +17,7 @@ const CustomInput = (props) => {
 
   return (
     <View className={`w-full ${classNameCustom}`}>
-        <Text className={`mb-1 text-md ${isFocused ? 'text-appColor' : ''}`} semi>
+        <Text className={`mb-1 text-md ${isError ? 'text-red-500' : isFocused ? 'text-appColor' : ''}`} semi>
           {label || 'No Label'}
           <Text className="text-red-500">{isError ? !errorMessage ? ' *' : ` / ${errorMessage}` : ''}</Text>
         </Text>
