@@ -40,7 +40,21 @@ const RegisterScreen = ({navigation}) => {
             return
         }
 
+        try{
+            const {error, data} = await signUpUser({...data})
 
+            if(error){
+                if(error?.data?.message === 'Invalid user data'){
+                    setErrorMessage('Ova email adresa je već registrovana')
+                }else{
+                    setErrorMessage('Došlo je do greške')
+                }
+
+                return
+            }
+        }catch(error){
+            console.log(error)
+        }
 
         navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newAccount: true}})
     }
