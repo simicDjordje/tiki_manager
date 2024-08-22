@@ -3,14 +3,25 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { textData } from '../constants'
 import AuthComponent from '../Components/AuthComponent'
 import Text from '../Components/CustomComponents/CustomText'
+import { useFocusEffect } from '@react-navigation/native'
+import { useCallback } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
 
 // const AnimatedComponentView = Animated.createAnimatedComponent(View)
 
 
-const AuthScreen = () => {
-  const title = textData.registerScreen['sr'].title
+const AuthScreen = ({navigation}) => {
+  useFocusEffect(useCallback(()=>{
+    (async () => {
+        const user = await AsyncStorage.getItem('@userData')
+        if(!user) return
+
+        navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newAccount: false}})
+    })()
+  }, []))
+
 
   return (
     <SafeAreaView className="bg-appColor h-full">

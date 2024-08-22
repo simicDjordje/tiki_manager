@@ -1,6 +1,6 @@
 import LottieView from 'lottie-react-native'
 
-const LootieLoader = ({d}) => {
+const LootieLoader = ({d, dark}) => {
   return (
     <LottieView
             autoPlay
@@ -11,7 +11,7 @@ const LootieLoader = ({d}) => {
             marginLeft: 'auto',
             marginRight: 'auto',
             }}
-        source={require('../../assets/LootieAnimations/LoaderAnimation.json')}
+        source={dark ? require('../../assets/LootieAnimations/LoaderAnimationDark.json') : require('../../assets/LootieAnimations/LoaderAnimation.json')}
     />
   )
 }

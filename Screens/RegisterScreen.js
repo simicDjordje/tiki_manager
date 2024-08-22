@@ -1,11 +1,14 @@
 import { View, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import CustomInput from '../Components/CustomComponents/CustomInput'
 import Text from '../Components/CustomComponents/CustomText'
 import Feather from '@expo/vector-icons/Feather'
 import { useSignUpUserMutation } from '../redux/apiCore'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import CustomButton from '../Components/CustomComponents/CustomButton'
+import { useFocusEffect } from '@react-navigation/native'
 
 
 const RegisterScreen = ({navigation}) => {
@@ -19,6 +22,17 @@ const RegisterScreen = ({navigation}) => {
     const [isPassVisible, setIsPassVisible] = useState(false)
     const [isConPassVisible, setIsConfPassVisible] = useState(false)
     const [signUpUser, {isLoading}] = useSignUpUserMutation()
+    const [errorMessage, setErrorMessage] = useState(null)
+    const [isLoadingCustom, setIsLoadingCustom] = useState(false)
+
+    useFocusEffect(useCallback(()=>{
+        (async () => {
+            const user = await AsyncStorage.getItem('@userData')
+            if(!user) return
+
+            navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newAccount: false}})
+        })()
+    }, []))
 
     const handleBack = () => {
         navigation.navigate('AuthTabScreens', {screen: 'AuthScreen'})
@@ -40,23 +54,27 @@ const RegisterScreen = ({navigation}) => {
             return
         }
 
+        setIsLoadingCustom(true)
+
         try{
-            const {error, data} = await signUpUser({...data})
-
+            const email = await AsyncStorage.getItem('@register_user_email')
+            const {error, data: signUpData} = await signUpUser({...data, email: email})
+            
             if(error){
-                if(error?.data?.message === 'Invalid user data'){
-                    setErrorMessage('Ova email adresa je već registrovana')
-                }else{
-                    setErrorMessage('Došlo je do greške')
-                }
-
+                setErrorMessage('Došlo je do greške')
                 return
+            }
+
+            if(signUpData.success){
+                await AsyncStorage.removeItem('@register_user_email')
+                await AsyncStorage.setItem('@userData', JSON.stringify(signUpData.result))
+                navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newAccount: true}})
             }
         }catch(error){
             console.log(error)
+        }finally{
+            setIsLoadingCustom(false)
         }
-
-        navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newAccount: true}})
     }
 
   return (
@@ -138,11 +156,12 @@ const RegisterScreen = ({navigation}) => {
                         </View>
 
                         <View className="mt-10">
-                            <TouchableOpacity 
-                                onPress={handleConfirm}
-                                className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center">
-                                <Text className="text-white text-lg" bold>Potvrdi</Text>
-                            </TouchableOpacity>
+                            <CustomButton 
+                                 onPress={handleConfirm}
+                                 text={'Potvrdi'}
+                                 isLoading={isLoading || isLoadingCustom}
+                                 isError={!!errorMessage}
+                            />
                         </View>
                     </View>
                 </View>

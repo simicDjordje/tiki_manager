@@ -6,8 +6,11 @@ export const apiCore = createApi({
 	baseQuery: fetchBaseQuery({
 		baseUrl: 'http://192.168.1.4:5000/api/v1',
 		prepareHeaders: async (headers) => {
-			const token = await AsyncStorage.getItem('@userToken')
-			
+			let user = await AsyncStorage.getItem('@userData')
+			user = JSON.parse(user)
+
+			const token = user?.token
+
 			if(token){
 				headers.set('Authorization', `Bearer ${token}`)
 			}
@@ -33,10 +36,20 @@ export const apiCore = createApi({
 				}
 			}
 		}),
+		createWorkerAccount: builder.mutation({
+			query: (data) => {
+				return {
+					url: '/users/create-worker',
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
 	})
 })
 
 export const { 
 	useCheckIfUserExistsMutation,
-	useSignUpUserMutation
+	useSignUpUserMutation,
+	useCreateWorkerAccountMutation
 } = apiCore;

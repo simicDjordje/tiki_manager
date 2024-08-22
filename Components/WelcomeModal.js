@@ -7,7 +7,7 @@ import Text from './CustomComponents/CustomText'
 import { StatusBar } from 'expo-status-bar'
 
 
-const SlideOne = () => {
+const SlideOne = ({userData}) => {
   return (
     <View className="h-full w-full bg-appColor flex flex-col justify-between items-center" style={{borderRadius: 50}}>
         <View className="w-full flex-row justify-start items-center mt-4 px-6">
@@ -17,13 +17,13 @@ const SlideOne = () => {
         <View className="mt-4 bg-bgPrimary w-full flex-1 px-4 flex flex-col justify-between" style={{borderRadius: 50}}>
             <View>
               <View className="flex flex-col justify-center items-center mt-4">
-                <Text className="text-2xl text-textPrimary" bold>Natalija,</Text>
+                <Text className="text-2xl text-textPrimary" bold>{userData?.first_name},</Text>
                 <Text className="text-textMid text-lg" bold>drago nam je što si tu!</Text>
               </View>
 
               <View className="mt-4 flex flex-row justify-center items-center">
                 <Text className="text-textMid text-center" style={{fontSize: 17}}>
-                  Dok je <Text className="text-textPrimary" semi>tiki</Text> namenjen vašim klijentima za rezervaciju usluga, <Text className="text-textPrimary" semi>tiki manager</Text> vam omogućava da lako upravljate svojim salonom, radnicima i rezervacijama.
+                  Dok je <Text className="text-textPrimary" semi>tiki</Text> namenjen tvojim klijentima za rezervaciju usluga, <Text className="text-textPrimary" semi>tiki manager</Text> ti omogućava da lako upravljaš svojim salonom, radnicima i rezervacijama.
                 </Text>
               </View>
             </View>
@@ -36,7 +36,7 @@ const SlideTwo = () => {
   return (
     <View className="h-full w-full bg-bgPrimary flex flex-col justify-between items-center px-4" style={{borderRadius: 50}}>
       <View className="px-4 mt-10">
-        <Text className="mt-4 text-center text-xl text-textPrimary" bold>Kreirajte svoj salon i prilagodite radno vreme, usluge, i druge važne detalje.</Text>
+        <Text className="mt-4 text-center text-xl text-textPrimary" bold>Kreiraj svoj salon i prilagodi radno vreme, usluge, i druge važne detalje.</Text>
         <Text className="mt-2 text-lg text-textMid text-center" bold>Sve počinje ovde!</Text>
       </View>
     </View>
@@ -48,7 +48,7 @@ const SlideThree = () => {
     <View className="h-full w-full bg-bgPrimary flex flex-col justify-between items-center px-4" style={{borderRadius: 50}}>
       <View className="px-4 mt-10">
         <Text className="mt-4 text-center text-xl text-textPrimary" bold>Svaki salon treba svoj tim.</Text>
-        <Text className="mt-2 text-lg text-textMid text-center" bold>Dodajte radnike, uključujući sebe, kako biste osigurali glatko poslovanje.</Text>
+        <Text className="mt-2 text-lg text-textMid text-center" bold>Dodaj radnike, uključujući sebe, kako bi osigurali glatko poslovanje.</Text>
       </View>
     </View>
   )
@@ -64,14 +64,15 @@ const SlideFour = ({setIsModalVisible}) => {
           </TouchableOpacity>
         </View>
         <Text className="mt-4 text-center text-xl text-textPrimary" bold>Svi radnici treba da imaju svoj nalog.</Text>
-        <Text className="mt-2 text-lg text-textMid text-center" bold>Pronađite idealan tim za vaš salon i upravljajte rezervacijama efikasno.</Text>
+        <Text className="mt-2 text-lg text-textMid text-center" bold>Pronađi idealan tim za tvoj salon i upravljaj rezervacijama efikasno.</Text>
       </View>
     </View>
   )
 }
 
 
-const WelcomeModal = ({isModalVisible, setIsModalVisible}) => {
+const WelcomeModal = ({isModalVisible, setIsModalVisible, userData}) => {
+
   return (
     <Modal 
         isVisible={isModalVisible}
@@ -85,7 +86,7 @@ const WelcomeModal = ({isModalVisible, setIsModalVisible}) => {
                 activeDotColor='#00505b'
                 loop={false}
               >
-                <SlideOne />
+                <SlideOne userData={userData}/>
                 <SlideTwo />
                 <SlideThree />
                 <SlideFour setIsModalVisible={setIsModalVisible} />

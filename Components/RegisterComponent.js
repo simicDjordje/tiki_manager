@@ -43,7 +43,7 @@ const RegisterComponent = ({setAuthType}) => {
             }
 
             setErrorMessage(null)
-            await AsyncStorage.setItem('@register_user_email', email)
+            await AsyncStorage.setItem('@register_user_email', email.toLocaleLowerCase())
             navigation.navigate('AuthTabScreens', {screen: 'RegisterScreen'})
         }catch(error){
             console.log(error)

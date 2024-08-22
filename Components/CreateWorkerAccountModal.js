@@ -1,4 +1,4 @@
-import { View, TouchableOpacity } from 'react-native'
+import { View, TouchableOpacity, Platform } from 'react-native'
 import React, { useState } from 'react'
 import Modal from 'react-native-modal'
 import Ionicons from '@expo/vector-icons/Ionicons'
@@ -7,15 +7,21 @@ import * as ImagePicker from 'expo-image-picker'
 import { Image } from 'expo-image'
 import LootieSuccess from '../Components/LootieAnimations/Success'
 import Text from './CustomComponents/CustomText'
-
+import CustomButton from './CustomComponents/CustomButton'
+import { useCreateWorkerAccountMutation } from '../redux/apiCore'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
-const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible}) => {
+const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible, userData}) => {
     const [image, setImage] = useState(null)
     const [isSuccess, setIsSuccess] = useState(false)
+    const [validation, setValidation] = useState(false)
+    const [createWorkerAccount, {isLoading}] = useCreateWorkerAccountMutation()
+    const [errorMessage, setErrorMessage] = useState(null)
+    const [isLoadingCustom, setIsLoadingCustom] = useState(false)
 
     const pickImage = async () => {
         // No permissions request is necessary for launching the image library
@@ -29,14 +35,54 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible}) => {
         console.log(result);
     
         if (!result.canceled) {
-          setImage(result.assets[0].uri)
+          setImage(result.assets[0])
         }
       }
 
     const closeModal = () => {
+        setIsLoadingCustom(false)
+        setErrorMessage(null)
+        setValidation(false)
         setImage(null)
         setIsSuccess(false)
         setIsModalVisible(false)
+    }
+
+    const handleConfirm = async () => {
+        if(!image){
+            setValidation(true)
+            return
+        }
+
+        setIsLoadingCustom(true)
+
+        try{
+            const formData = new FormData()
+            formData.append('profile-photo', {
+                uri: Platform.OS === 'android' ? image.uri : image.uri.replace('file://', ''),  // Handle the URI for different platforms
+                type: image.mimeType,
+                name: image.fileName
+            })
+
+            const {error, data} = await createWorkerAccount(formData)
+
+            setValidation(false)
+
+            if(error){
+                setErrorMessage('Došlo je do greške')
+                return
+            }
+
+            if(data.success){
+                await AsyncStorage.setItem('@userData', JSON.stringify(data.result))
+                await AsyncStorage.setItem('@isWorkerAccCreated', 'yes')
+                setIsSuccess(true)
+            }
+        }catch(error){
+            console.log(error)
+        }finally{
+            setIsLoadingCustom(false)
+        }
     }
 
     return (
@@ -75,13 +121,13 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible}) => {
                         </View>
 
                         <View className="flex flex-row justify-center items-center mt-6">
-                            {image ? <Text>Slika uspešno dodata</Text> : <Text>Dodaj profilnu sliku</Text>}
+                            {image ? <Text>Slika uspešno dodata</Text> : <Text className={`${validation && !image && 'text-red-500'}`}>Dodaj profilnu sliku</Text>}
                         </View>
 
                         <View className="flex flex-col justify-center items-center w-full mt-2 p-3">
                             {!image && 
-                                <View className="w-44 h-44 border-2 border-dashed border-textSecondary rounded-full relative flex flex-col justify-center items-center">
-                                    <Text className="text-textMid">Profilna slika je obavezna</Text>
+                                <View className={`w-44 h-44 border-2 border-dashed ${validation && !image ? 'border-red-500' : 'border-textSecondary'} rounded-full relative flex flex-col justify-center items-center`}>
+                                    <Text className={`${validation && !image ? 'text-red-500' : 'text-textMid'}`}>Profilna slika je obavezna</Text>
                                     <TouchableOpacity onPress={pickImage} className="p-3 bg-textPrimary rounded-full absolute bottom-0 right-0">
                                         <Entypo name="plus" size={34} color="white" />
                                     </TouchableOpacity>
@@ -95,7 +141,7 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible}) => {
                                     </TouchableOpacity>
                                     <Image
                                         className="w-48 h-48 rounded-full border-4 border-appColor"
-                                        source={image}
+                                        source={image.uri}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
@@ -106,17 +152,20 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible}) => {
 
 
                         <View className="flex flex-col justify-center items-center mt-2">
-                            <Text className="text-2xl" bold>Natalija Lukic</Text>
+                            <Text className="text-2xl" bold>{userData?.first_name} {userData?.last_name}</Text>
+                            <Text className="text-red-500">{errorMessage}</Text>
                         </View>
                         
 
 
-                        <View className="flex flex-col justify-center items-center mt-16">
-                            <TouchableOpacity 
-                                onPress={() => setIsSuccess(true)}
-                                className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center w-full">
-                                <Text className="text-white text-lg" bold>Potvrdi</Text>
-                            </TouchableOpacity>
+                        <View className="flex flex-col justify-center items-center mt-14">
+                            <CustomButton 
+                                onPress={handleConfirm}
+                                text={'Potvrdi'}
+                                isLoading={isLoading || isLoadingCustom}
+                                isSuccess={isSuccess}
+                                isError={!!errorMessage}
+                            />
                         </View>
                     </View>
                     }

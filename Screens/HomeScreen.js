@@ -11,20 +11,53 @@ import BeginSalonRegisterModal from '../Components/BeginSalonRegisterModal'
 import { useFocusEffect } from '@react-navigation/native'
 import { StatusBar } from 'expo-status-bar'
 import Text from '../Components/CustomComponents/CustomText'
-
-
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import LootieLoader from '../Components/LootieAnimations/Loader'
+import Animated, { FadeInDown, FadeInUp, FadeOutDown } from 'react-native-reanimated'
 
 const HomeScreen = ({route, navigation}) => {
     const params = route.params || {}
-    console.log(params)
     const [isWelcomeModalVisible, setWelcomeModalVisible] = useState(params?.newAccount || false)
     const [isNewSalonCreated, setIsNewSalonCreated] = useState(false)
+    const [isWorkerAccountCreated, setIsWorkerAccountCreated] = useState(false)
     const [isCreateWorkerAccountModalVisible, setIsCreateWorkerAccountModalVisible] = useState(false)
     const [isBeginSalonRegisterModalVisible, setIsBeginSalonRegisterModalVisible] = useState(false)
-    const [haveWorkerAccount, setHaveWorkerAccount] = useState(false)
+    const [userData, setUserData] = useState(null)
+    const [isLoading, setIsLoading] = useState(false)
 
     const scrollViewRef = useRef(null)
     const salonCardRef = useRef(null)
+    const workerCardRef = useRef(null)
+
+    useEffect(()=>{
+        if(isCreateWorkerAccountModalVisible) return
+
+        (async () => {
+            const user = await AsyncStorage.getItem('@userData')
+            const isWorkerAccCreated = await AsyncStorage.getItem('@isWorkerAccCreated')
+            if(!user) return
+
+            setUserData(JSON.parse(user))
+
+            if(!isWorkerAccCreated) return
+
+            setIsWorkerAccountCreated(true)
+
+            setTimeout(async ()=>{
+                setIsWorkerAccountCreated(false)
+                await AsyncStorage.removeItem('@isWorkerAccCreated')
+            }, 3000)
+        })()
+    }, [isCreateWorkerAccountModalVisible])
+
+    useFocusEffect(useCallback(()=>{
+        (async () => {
+            const user = await AsyncStorage.getItem('@userData')
+            if(!user) return
+
+            setUserData(JSON.parse(user))
+        })()
+    }, []))
 
     useFocusEffect(useCallback(()=>{
         if(!params?.newSalonCreated) return
@@ -48,15 +81,21 @@ const HomeScreen = ({route, navigation}) => {
         }
     }, [isNewSalonCreated])
 
+    useEffect(() => {
+        if (isWorkerAccountCreated && scrollViewRef.current) {
+            scrollViewRef.current.scrollTo({ y: 0, animated: true });
+        }
+    }, [isWorkerAccountCreated])
+
   return (
     <SafeAreaView className="bg-bgPrimary h-full relative">
-        <StatusBar style={isNewSalonCreated ? "light" : "dark"} />
-        {isNewSalonCreated && <View className="top-0 bottom-0 left-0 right-0 bg-black absolute opacity-90"></View>}
+        <StatusBar style={isNewSalonCreated || isWorkerAccountCreated ? "light" : "dark"} />
+        {isNewSalonCreated || isWorkerAccountCreated && <View className="top-0 bottom-0 left-0 right-0 bg-black absolute opacity-90"></View>}
         <ScrollView ref={scrollViewRef}>
             <View className="min-h-screen flex flex-col justify-between items-center">
                 <View className="w-full flex flex-row justify-between items-center px-4 mt-4">
                     <View>
-                        <Text className={`${isNewSalonCreated ? 'text-textSecondary' : 'text-textPrimary'} text-3xl`} bold>tiki <Text className="text-textSecondary text-2xl" semi>manager</Text></Text>
+                        <Text className={`${isNewSalonCreated || isWorkerAccountCreated ? 'text-textSecondary' : 'text-textPrimary'} text-3xl`} bold>tiki <Text className="text-textSecondary text-2xl" semi>manager</Text></Text>
                     </View>
 
                     <View className="flex flex-row justify-between items-center">
@@ -69,12 +108,18 @@ const HomeScreen = ({route, navigation}) => {
                     </View>
                 </View>
 
+                {isLoading && 
+                    <View className="flex-1 w-full flex flex-col justify-center items-center mb-20">
+                        <LootieLoader dark={true} d={70} />
+                    </View>
+                }
 
-                <View className="bg-bgSecondary flex-1 w-full min-h-screen mt-8 px-4 relative" style={{borderTopLeftRadius: 50, borderTopRightRadius: 50}}>
-                    {isNewSalonCreated && <View className="top-0 bottom-0 left-0 right-0 bg-textPrimary absolute opacity-50 z-10"></View>}
+                {!isLoading && 
+                <Animated.View entering={FadeInDown} exiting={FadeOutDown} className="bg-bgSecondary flex-1 w-full min-h-screen mt-8 px-4 relative" style={{borderTopLeftRadius: 50, borderTopRightRadius: 50}}>
+                    {isNewSalonCreated || isWorkerAccountCreated && <View className="top-0 bottom-0 left-0 right-0 bg-textPrimary absolute opacity-50 z-10"></View>}
                     <View className="flex flex-row justify-between items-center mt-10">
                         <View>
-                            <Text className="text-textPrimary text-2xl" bold>Natalija Lukic</Text>
+                            <Text className="text-textPrimary text-2xl" bold>{userData?.first_name} {userData?.last_name}</Text>
                             {/* <View className="bg-appColor w-1/2 rounded-2xl flex flex-row justify-center items-center mt-2">
                                 <Text className="text-white font-bold">hdsa</Text>
                             </View> */}
@@ -87,10 +132,17 @@ const HomeScreen = ({route, navigation}) => {
                     </View>
 
                     <View className="flex flex-row flex-wrap justify-between mt-10">
-                        <WorkerCard />
+                        {userData?.haveWorkerAccount && 
+                            <WorkerCard 
+                                userData={userData} 
+                                isJustCreated={isWorkerAccountCreated} 
+                                ref={workerCardRef}
+                            />
+                        }
                         
-                        <SalonCard isJustCreated={false} /> 
-                        <SalonCard ref={salonCardRef} isJustCreated={isNewSalonCreated} /> 
+                        
+                        {/* <SalonCard isJustCreated={false} /> 
+                        <SalonCard ref={salonCardRef} isJustCreated={isNewSalonCreated} /> */}
 
 
                     </View>
@@ -113,7 +165,7 @@ const HomeScreen = ({route, navigation}) => {
                             </View>
                         </TouchableOpacity>
 
-                        {!haveWorkerAccount && 
+                        {!userData?.haveWorkerAccount && 
                         <TouchableOpacity 
                             onPress={() => setIsCreateWorkerAccountModalVisible(true)}
                             className="h-28 w-full bg-bgSecondary border-textSecondary rounded-3xl flex flex-row justify-between items-center px-4 mt-4" style={{borderWidth: 0.5}}>
@@ -133,7 +185,8 @@ const HomeScreen = ({route, navigation}) => {
                     </View>
 
                     <View className="h-28 bg-bgSecondary"></View>
-                </View>
+                </Animated.View>
+                }
             </View>
         </ScrollView>
         
@@ -143,11 +196,13 @@ const HomeScreen = ({route, navigation}) => {
                 setWelcomeModalVisible(false)
                 navigation.setParams({ newAccount: null })
             }}
+            userData={userData}
         />
 
         <CreateWorkerAccountModal 
             isModalVisible={isCreateWorkerAccountModalVisible}
             setIsModalVisible={setIsCreateWorkerAccountModalVisible}
+            userData={userData}
         />
 
         <BeginSalonRegisterModal 
