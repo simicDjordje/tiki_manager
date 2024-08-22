@@ -2,10 +2,10 @@ import { StatusBar } from 'expo-status-bar';
 import Navigation from './Navigation';
 import * as Font from 'expo-font'
 import { useEffect, useState } from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import LootieLoader from './Components/LootieAnimations/Loader';
 import { Provider } from 'react-redux';
-import store from './redux/store'
+import {store} from './redux/store'
 
 const loadFonts = async () => {
   await Font.loadAsync({

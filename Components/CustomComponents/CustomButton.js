@@ -8,6 +8,12 @@ import LootieError from '../LootieAnimations/Error'
 const CustomButton = ({onPress, text, isLoading, isSuccess, isError}) => {
     const [innerError, setInnerError] = useState(isError || false)
 
+    useEffect(() => {
+        if (isError) {
+            setInnerError(true)
+        }
+    }, [isError])
+
     useEffect(()=>{
         if(!innerError) return
 

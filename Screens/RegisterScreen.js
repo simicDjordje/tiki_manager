@@ -1,18 +1,47 @@
 import { View, TouchableOpacity, ScrollView } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import CustomInput from '../Components/CustomComponents/CustomInput'
 import Text from '../Components/CustomComponents/CustomText'
+import Feather from '@expo/vector-icons/Feather'
+import { useSignUpUserMutation } from '../redux/apiCore'
 
 
 const RegisterScreen = ({navigation}) => {
+    const [data, setData] = useState({
+        first_name: '',
+        last_name: '',
+        password: '',
+        confirm_password: ''
+    })
+    const [validation, setValidation] = useState(false)
+    const [isPassVisible, setIsPassVisible] = useState(false)
+    const [isConPassVisible, setIsConfPassVisible] = useState(false)
+    const [signUpUser, {isLoading}] = useSignUpUserMutation()
 
     const handleBack = () => {
         navigation.navigate('AuthTabScreens', {screen: 'AuthScreen'})
     }
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
+        if(!data.first_name || !data.last_name || !data.password || !data.confirm_password){
+            setValidation(true)
+            return
+        }
+
+        if(data.password.length < 6 && data.password.length > 0){
+            setValidation(true)
+            return
+        }
+
+        if(data.password !== data.confirm_password){
+            setValidation(true)
+            return
+        }
+
+
+
         navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newAccount: true}})
     }
 
@@ -43,24 +72,54 @@ const RegisterScreen = ({navigation}) => {
                             <CustomInput 
                                 label="Ime"
                                 placeholder="Ime"
+                                isError={validation && !data.first_name}
+                                errorMessage={'obavezno'}
+                                value={data.first_name}
+                                onChangeText={text => setData({...data, first_name: text})}
                             />
 
                             <CustomInput 
                                 classNameCustom="mt-2"
                                 label="Prezime"
                                 placeholder="Prezime"
+                                isError={validation && !data.last_name}
+                                errorMessage={'obavezno'}
+                                value={data.last_name}
+                                onChangeText={text => setData({...data, last_name: text})}
                             />
 
                             <CustomInput 
                                 classNameCustom="mt-2"
                                 label="Šifra"
                                 placeholder="Šifra"
+                                inputIcon={()=>
+                                    <TouchableOpacity onPress={() => setIsPassVisible(prev => !prev)}>
+                                        <Feather name={`${isPassVisible ? 'eye' : 'eye-off'}`} size={24} color="black" />
+                                    </TouchableOpacity>
+                                }
+                                iconSide={'right'}
+                                secureTextEntry={!isPassVisible}
+                                isError={validation && (!data.password || (data.password.length < 6 && data.password.length > 0))}
+                                errorMessage={!data.password ? 'obavezno' : 'mora sadržati najmanje 6 karaktera'}
+                                value={data.password}
+                                onChangeText={text => setData({...data, password: text})}
                             />
 
                             <CustomInput 
                                 classNameCustom="mt-2"
                                 label="Potvrdi šifru"
                                 placeholder="Potvrdi šifru"
+                                inputIcon={()=>
+                                    <TouchableOpacity onPress={() => setIsConfPassVisible(prev => !prev)}>
+                                        <Feather name={`${isConPassVisible ? 'eye' : 'eye-off'}`} size={24} color="black" />
+                                    </TouchableOpacity>
+                                }
+                                iconSide={'right'}
+                                secureTextEntry={!isConPassVisible}
+                                isError={validation && (!data.confirm_password || (data.confirm_password != data.password && data.confirm_password.length > 0 && data.password.length > 0))}
+                                errorMessage={!data.confirm_password ? 'obavezno' : 'mora biti ista kao prva šifra'}
+                                value={data.confirm_password}
+                                onChangeText={text => setData({...data, confirm_password: text})}
                             />
                         </View>
 
