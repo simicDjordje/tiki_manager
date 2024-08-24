@@ -6,6 +6,7 @@ import { View } from 'react-native';
 import LootieLoader from './Components/LootieAnimations/Loader';
 import { Provider } from 'react-redux';
 import {store} from './redux/store'
+import LoadingComponent from './Components/LoadingComponent';
 
 const loadFonts = async () => {
   await Font.loadAsync({
@@ -24,10 +25,7 @@ export default function App() {
 
   if (!fontsLoaded) {
     return (
-      <View className="h-full bg-appColor flex flex-col justify-center items-center">
-        <StatusBar style={'light'} />
-        <LootieLoader d={70} />
-      </View>
+        <LoadingComponent />
       )
   }
 

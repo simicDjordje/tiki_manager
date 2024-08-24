@@ -14,9 +14,13 @@ import Text from '../Components/CustomComponents/CustomText'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import LootieLoader from '../Components/LootieAnimations/Loader'
 import Animated, { FadeInDown, FadeInUp, FadeOutDown } from 'react-native-reanimated'
+import { useGetUserSalonsMutation } from '../redux/apiCore'
 
 const HomeScreen = ({route, navigation}) => {
+    //params
     const params = route.params || {}
+
+    //states
     const [isWelcomeModalVisible, setWelcomeModalVisible] = useState(params?.newAccount || false)
     const [isNewSalonCreated, setIsNewSalonCreated] = useState(false)
     const [isWorkerAccountCreated, setIsWorkerAccountCreated] = useState(false)
@@ -24,10 +28,62 @@ const HomeScreen = ({route, navigation}) => {
     const [isBeginSalonRegisterModalVisible, setIsBeginSalonRegisterModalVisible] = useState(false)
     const [userData, setUserData] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
+    const [salons, setSalons] = useState([])
 
+    //refs
     const scrollViewRef = useRef(null)
     const salonCardRef = useRef(null)
     const workerCardRef = useRef(null)
+
+    //api
+    const [getUserSalons, {isLoading: isGetUserSalonsLoading}] = useGetUserSalonsMutation()
+
+    //ON FOCUS
+    useFocusEffect(useCallback(()=>{
+        (async () => {
+            try{
+                const {error, data} = await getUserSalons()
+                
+                if(data && data.success){
+                    setSalons(data.result)
+                }
+            }catch(error){
+                console.log(error)
+            }
+        })()
+    }, []))
+
+    useFocusEffect(useCallback(()=>{
+        if(!params.comesFromAuth) return
+
+        navigation.reset({
+            index: 0,
+            routes: [{ name: 'HomeScreen' }]
+          })
+
+          navigation.setParams({ comesFromAuth: null })
+    }, []))
+
+    useFocusEffect(useCallback(()=>{
+        (async () => {
+            const user = await AsyncStorage.getItem('@userData')
+            if(!user) return
+
+            setUserData(JSON.parse(user))
+        })()
+    }, []))
+
+    useFocusEffect(useCallback(()=>{
+        if(!params?.newSalonCreated) return
+        setIsNewSalonCreated(true)
+
+        setTimeout(()=>{
+            setIsNewSalonCreated(false)
+            navigation.setParams({ newSalonCreated: null })
+        }, 3000)
+    }, [params]))
+
+    // ON FOCUS END
 
     useEffect(()=>{
         if(isCreateWorkerAccountModalVisible) return
@@ -49,26 +105,6 @@ const HomeScreen = ({route, navigation}) => {
             }, 3000)
         })()
     }, [isCreateWorkerAccountModalVisible])
-
-    useFocusEffect(useCallback(()=>{
-        (async () => {
-            const user = await AsyncStorage.getItem('@userData')
-            if(!user) return
-
-            setUserData(JSON.parse(user))
-        })()
-    }, []))
-
-    useFocusEffect(useCallback(()=>{
-        if(!params?.newSalonCreated) return
-        setIsNewSalonCreated(true)
-
-        setTimeout(()=>{
-            setIsNewSalonCreated(false)
-            navigation.setParams({ newSalonCreated: null })
-        }, 3000)
-    }, [params]))
-
 
     useEffect(() => {
         if (isNewSalonCreated && salonCardRef.current && scrollViewRef.current) {
@@ -118,9 +154,9 @@ const HomeScreen = ({route, navigation}) => {
                 <Animated.View entering={FadeInDown} exiting={FadeOutDown} className="bg-bgSecondary flex-1 w-full min-h-screen mt-8 px-4 relative" style={{borderTopLeftRadius: 50, borderTopRightRadius: 50}}>
                     {isNewSalonCreated || isWorkerAccountCreated && <View className="top-0 bottom-0 left-0 right-0 bg-textPrimary absolute opacity-50 z-10"></View>}
                     <View className="flex flex-row justify-between items-center mt-10">
-                        <View>
+                        <View className="flex flex-col justify-between items-start">
                             <Text className="text-textPrimary text-2xl" bold>{userData?.first_name} {userData?.last_name}</Text>
-                            <View className="bg-appColor rounded-2xl flex flex-row justify-start items-center mt-2 px-2">
+                            <View className="bg-appColor rounded-2xl mt-2 px-2 py-1">
                                 <Text className="text-white font-bold">Beauty salon PK</Text>
                             </View>
                         </View>
@@ -147,7 +183,7 @@ const HomeScreen = ({route, navigation}) => {
 
                     </View>
 
-                    <View className="mt-4">
+                    <View>
                         <TouchableOpacity 
                         onPress={()=>{setIsBeginSalonRegisterModalVisible(true)}}
                         className="h-28 w-full bg-bgSecondary border-textSecondary rounded-3xl flex flex-row justify-between items-center px-4" style={{borderWidth: 0.5}}>

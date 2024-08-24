@@ -4,8 +4,9 @@ import { textData } from '../constants'
 import AuthComponent from '../Components/AuthComponent'
 import Text from '../Components/CustomComponents/CustomText'
 import { useFocusEffect } from '@react-navigation/native'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import LoadingComponent from '../Components/LoadingComponent'
 
 
 
@@ -13,15 +14,23 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
 const AuthScreen = ({navigation}) => {
+  const [isLoadingScreen, setIsLoadingScreen] = useState(true)
+
+
   useFocusEffect(useCallback(()=>{
     (async () => {
+        setIsLoadingScreen(true)
         const user = await AsyncStorage.getItem('@userData')
-        if(!user) return
+        if(!user){
+          setIsLoadingScreen(false)
+          return
+        }
 
         navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newAccount: false}})
     })()
   }, []))
 
+  if(isLoadingScreen) return <LoadingComponent />
 
   return (
     <SafeAreaView className="bg-appColor h-full">
@@ -34,7 +43,7 @@ const AuthScreen = ({navigation}) => {
 
             
             {/* Auth Component */}
-            <AuthComponent />
+            {!isLoadingScreen && <AuthComponent />}
           
     </View>
 

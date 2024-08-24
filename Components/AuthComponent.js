@@ -9,7 +9,7 @@ const AnimatedComponentView = Animated.createAnimatedComponent(View)
 
 
 const AuthComponent = () => {
-    const [authType, setAuthType] = useState('register')
+    const [authType, setAuthType] = useState('login')
 
   return (
     <AnimatedComponentView layout={SequencedTransition} className="bg-bgPrimary w-full flex-col justify-between items-center relative" style={{borderTopLeftRadius: 50, borderTopRightRadius: 50, height: '75%'}}>

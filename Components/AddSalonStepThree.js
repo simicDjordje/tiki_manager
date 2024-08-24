@@ -11,8 +11,7 @@ const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
-const AddSalonStepThree = ({handleNext}) => {
-    const [image, setImage] = useState(null)
+const AddSalonStepThree = ({logo, setLogo, validation3}) => {
 
     const pickImage = async () => {
         // No permissions request is necessary for launching the image library
@@ -27,7 +26,7 @@ const AddSalonStepThree = ({handleNext}) => {
         console.log(result);
     
         if (!result.canceled) {
-          setImage(result.assets[0].uri)
+            setLogo(result.assets[0].uri)
         }
       }
 
@@ -35,29 +34,29 @@ const AddSalonStepThree = ({handleNext}) => {
   return (
     <View className="h-full">        
         <View className="flex flex-col justify-center items-center">
-            <Text className="text-center text-textMid text-lg" bold>
+            <Text className={`text-center ${validation3 && !logo ? 'text-red-500' : 'text-textMid'} text-lg`} bold>
                 Logo
             </Text>
         </View>
 
         <View className="flex flex-col justify-center items-center w-full mt-2 p-3">
-            {!image && 
-                <View className="w-44 h-44 border-2 border-textSecondary rounded-full relative flex flex-col justify-center items-center">
-                    <Text className="text-textMid">Logo salona je obavezan</Text>
+            {!logo && 
+                <View className={`w-44 h-44 border-2 ${validation3 && !logo ? 'border-red-500' : 'border-textSecondary'} rounded-full relative flex flex-col justify-center items-center`}>
+                    <Text className={`${validation3 && !logo ? 'text-red-500' : 'text-textMid'}`}>Logo salona je obavezan</Text>
                     <TouchableOpacity onPress={pickImage} className="p-3 bg-textPrimary rounded-full absolute bottom-0 right-0">
                         <Entypo name="plus" size={34} color="white" />
                     </TouchableOpacity>
                 </View>
             }
 
-            {image && 
+            {logo && 
                 <View className="w-44 h-44 rounded-full relative">
-                    <TouchableOpacity onPress={() => setImage(null)} className="p-3 bg-textPrimary rounded-full absolute -top-2 right-2 z-10">
+                    <TouchableOpacity onPress={() => setLogo(null)} className="p-3 bg-textPrimary rounded-full absolute -top-2 right-2 z-10">
                         <Ionicons name="close" size={20} color="white" />
                     </TouchableOpacity>
                     <Image
                         className="w-44 h-44 rounded-full border-4 border-appColor"
-                        source={image}
+                        source={logo}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}

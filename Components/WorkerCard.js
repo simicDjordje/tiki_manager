@@ -6,7 +6,7 @@ import Text from './CustomComponents/CustomText'
 import { useNavigation } from '@react-navigation/native'
 import Animated, { BounceInDown, BounceInUp, BounceOut } from 'react-native-reanimated'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
-
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
@@ -26,18 +26,20 @@ const WorkerCard = forwardRef(({userData, isJustCreated}, ref) => {
               <Text className="text-white" bold>Upravljaj lako svojim terminima</Text>
           </Animated.View>
       }
-      <Image
+      {/* <Image
           className="w-16 h-16 rounded-full border-2 border-appColor"
           source={`http://192.168.1.4:5000/photos/profile-photo${userData?._id}.png`}
           placeholder={{ blurhash }}
           contentFit="cover"
           transition={1000}
-      />
+      /> */}
+
+      <FontAwesome6 name="calendar-days" size={24} color="#000" />
 
       <View className="flex-1 h-full p-4">
         <Text className="text-lg" bold>Termini</Text>
         <Text className="text-md" semi>Upravljaj svojim terminima</Text>
-        <Text className="text-md text-textMid">Moraš biti u salonu</Text>
+        <Text className="text-md text-textMid">Moraš biti član nekog salona</Text>
       </View>
 
       <View className="">

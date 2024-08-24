@@ -9,7 +9,7 @@ const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
-const AddSalonStepFour = ({handleNext, images, setImages}) => {
+const AddSalonStepFour = ({images, setImages, validation4}) => {
     
       const removeImage = (indexToRemove) => {
         const updatedImages = images.filter((_, index) => index !== indexToRemove)
@@ -20,7 +20,7 @@ const AddSalonStepFour = ({handleNext, images, setImages}) => {
     <View className="h-full">
         {images.length == 0 && 
             <View className="h-full flex flex-col justify-center items-center">
-                <Text className="text-xl text-textMid" bold>Slike salona su obavezne</Text>
+                <Text className={`text-xl ${validation4 && !images.length ? 'text-red-500' : 'text-textMid'}`} bold>Slike salona su obavezne</Text>
                 <Text className="text-textMid">Slike možeš promeniti kasnije na profilu salona</Text>
             </View>
         }

@@ -9,7 +9,7 @@ import { useSignUpUserMutation } from '../redux/apiCore'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import CustomButton from '../Components/CustomComponents/CustomButton'
 import { useFocusEffect } from '@react-navigation/native'
-
+import LoadingComponent from '../Components/LoadingComponent'
 
 const RegisterScreen = ({navigation}) => {
     const [data, setData] = useState({
@@ -24,11 +24,15 @@ const RegisterScreen = ({navigation}) => {
     const [signUpUser, {isLoading}] = useSignUpUserMutation()
     const [errorMessage, setErrorMessage] = useState(null)
     const [isLoadingCustom, setIsLoadingCustom] = useState(false)
+    const [isLoadingScreen, setIsLoadingScreen] = useState(true)
 
     useFocusEffect(useCallback(()=>{
         (async () => {
             const user = await AsyncStorage.getItem('@userData')
-            if(!user) return
+            if(!user){
+                setIsLoadingScreen(false)
+                return
+            }
 
             navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newAccount: false}})
         })()
@@ -68,7 +72,7 @@ const RegisterScreen = ({navigation}) => {
             if(signUpData.success){
                 await AsyncStorage.removeItem('@register_user_email')
                 await AsyncStorage.setItem('@userData', JSON.stringify(signUpData.result))
-                navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newAccount: true}})
+                navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newAccount: true, comesFromAuth: true}})
             }
         }catch(error){
             console.log(error)
@@ -76,6 +80,8 @@ const RegisterScreen = ({navigation}) => {
             setIsLoadingCustom(false)
         }
     }
+
+    if(isLoadingScreen) return <LoadingComponent />
 
   return (
     <SafeAreaView className="bg-appColor h-full">
@@ -122,8 +128,8 @@ const RegisterScreen = ({navigation}) => {
 
                             <CustomInput 
                                 classNameCustom="mt-2"
-                                label="Šifra"
-                                placeholder="Šifra"
+                                label="Lozinka"
+                                placeholder="Lozinka"
                                 inputIcon={()=>
                                     <TouchableOpacity onPress={() => setIsPassVisible(prev => !prev)}>
                                         <Feather name={`${isPassVisible ? 'eye' : 'eye-off'}`} size={24} color="black" />
@@ -139,8 +145,8 @@ const RegisterScreen = ({navigation}) => {
 
                             <CustomInput 
                                 classNameCustom="mt-2"
-                                label="Potvrdi šifru"
-                                placeholder="Potvrdi šifru"
+                                label="Potvrdi lozinku"
+                                placeholder="Potvrdi lozinku"
                                 inputIcon={()=>
                                     <TouchableOpacity onPress={() => setIsConfPassVisible(prev => !prev)}>
                                         <Feather name={`${isConPassVisible ? 'eye' : 'eye-off'}`} size={24} color="black" />
@@ -149,7 +155,7 @@ const RegisterScreen = ({navigation}) => {
                                 iconSide={'right'}
                                 secureTextEntry={!isConPassVisible}
                                 isError={validation && (!data.confirm_password || (data.confirm_password != data.password && data.confirm_password.length > 0 && data.password.length > 0))}
-                                errorMessage={!data.confirm_password ? 'obavezno' : 'mora biti ista kao prva šifra'}
+                                errorMessage={!data.confirm_password ? 'obavezno' : 'mora biti ista kao prva lozinka'}
                                 value={data.confirm_password}
                                 onChangeText={text => setData({...data, confirm_password: text})}
                             />

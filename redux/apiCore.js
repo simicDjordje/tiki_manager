@@ -45,11 +45,31 @@ export const apiCore = createApi({
 				}
 			}
 		}),
+		signInUser: builder.mutation({
+			query: (data) => {
+				return {
+					url: '/users/login',
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
+		getUserSalons: builder.mutation({
+			query: (data) => {
+				return {
+					url: '/salons/get-user-salons',
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
 	})
 })
 
 export const { 
 	useCheckIfUserExistsMutation,
 	useSignUpUserMutation,
-	useCreateWorkerAccountMutation
+	useCreateWorkerAccountMutation,
+	useSignInUserMutation,
+	useGetUserSalonsMutation,
 } = apiCore;

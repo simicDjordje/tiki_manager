@@ -14,6 +14,7 @@ import AddSalonLastStep from '../Components/AddSalonLastStep'
 import Animated, { FadeIn, SequencedTransition } from 'react-native-reanimated'
 import LootieSuccess from '../Components/LootieAnimations/Success'
 import Text from '../Components/CustomComponents/CustomText'
+import UnsavedChangesModal from '../Components/UnsavedChangesModal'
 
 
 const AnimatedComponentView = Animated.createAnimatedComponent(View)
@@ -22,9 +23,46 @@ const AnimatedComponentView = Animated.createAnimatedComponent(View)
 const AddSalonScreen = () => {
   const [step, setStep] = useState(1)
   const navigation = useNavigation()
+
+  const [validation1, setValidation1] = useState(false)
+  const [validation2, setValidation2] = useState(false)
+  const [validation3, setValidation3] = useState(false)
+  const [validation4, setValidation4] = useState(false)
+
+  const [isUnsavedChangesModalVisible, setIsUnsavedChangesModalVisible] = useState(false)
+
+  //data collection
+  const [name, setName] = useState('')
+  const [description, setDescription] = useState('')
+  const [location, setLocation] = useState(null)
+  const [logo, setLogo] = useState(null)
   const [images, setImages] = useState([])
+
+
   const [isSuccess, setIsSuccess] = useState(false)
   const [showFinishButton, setShowFinishButton] = useState(false)
+  const [shouldLeaveOnScreen, setShouldLeaveOnScreen] = useState(true)
+
+  useEffect(() => {
+    if(name || description || location || logo || images.length > 0){
+      setShouldLeaveOnScreen(false)
+    }
+  }, [name, description, location, logo, images])
+
+  useEffect(() => navigation.addListener('beforeRemove', (e) => {
+        if (shouldLeaveOnScreen) {
+          // If we don't have unsaved changes, then we don't need to do anything
+          return;
+        }
+
+        // Prevent default behavior of leaving the screen
+        e.preventDefault();
+
+        // Prompt the user before leaving the screen
+        setIsUnsavedChangesModalVisible(true)
+      }),
+    [navigation, shouldLeaveOnScreen]
+  );
 
   useEffect(()=>{
     if(!isSuccess) return
@@ -42,6 +80,35 @@ const AddSalonScreen = () => {
   }
 
   const handleNext = () => {
+    if(step === 1){
+      if(!name || !description){
+        setValidation1(true)
+        return
+      }
+    }
+
+    if(step === 2){
+      console.log(!location)
+      if(!location){
+        setValidation2(true)
+        return
+      }
+    }
+
+    if(step === 3){
+      if(!logo){
+        setValidation3(true)
+        return
+      }
+    }
+
+    if(step === 4){
+      if(!images.length){
+        setValidation4(true)
+        return
+      }
+    }
+
     setStep(prev => prev + 1)
   }
 
@@ -114,7 +181,7 @@ const AddSalonScreen = () => {
                     </View>
 
                     {step === 4 && 
-                      <TouchableOpacity onPress={pickMultipleImage} className="p-3 bg-appColorDark rounded-full">
+                      <TouchableOpacity onPress={pickMultipleImage} className="p-3 bg-textPrimary rounded-full">
                         <Entypo name="plus" size={24} color="white" />
                     </TouchableOpacity>
                     }
@@ -140,10 +207,33 @@ const AddSalonScreen = () => {
 
                 {!isSuccess && 
                   <View className="h-96 pt-10">
-                    {step === 1 && <AddSalonStepOne />}
-                    {step === 2 && <AddSalonStepTwo />}
-                    {step === 3 && <AddSalonStepThree />}
-                    {step === 4 && <AddSalonStepFour images={images} setImages={setImages} />}
+                    {step === 1 && 
+                    <AddSalonStepOne 
+                      name={name}
+                      setName={setName}
+                      description={description}
+                      setDescription={setDescription}
+                      validation1={validation1}
+                    />}
+                    {step === 2 && 
+                    <AddSalonStepTwo 
+                      location={location}
+                      setLocation={setLocation}
+                      validation2={validation2}
+                    />}
+                    {step === 3 && 
+                    <AddSalonStepThree 
+                      logo={logo}
+                      setLogo={setLogo}
+                      validation3={validation3}
+                    />}
+                    {step === 4 && 
+                    <AddSalonStepFour 
+                      images={images} 
+                      setImages={setImages} 
+                      validation4={validation4}
+                    />
+                    }
                     {step === 5 && <AddSalonLastStep />}
                   </View>}
 
@@ -181,6 +271,11 @@ const AddSalonScreen = () => {
               </AnimatedComponentView>
 
           </View>
+
+          <UnsavedChangesModal 
+            isModalVisible={isUnsavedChangesModalVisible}
+            setIsModalVisible={setIsUnsavedChangesModalVisible}
+          />
     </SafeAreaView>
   )
 }
