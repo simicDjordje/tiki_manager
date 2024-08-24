@@ -120,9 +120,9 @@ const HomeScreen = ({route, navigation}) => {
                     <View className="flex flex-row justify-between items-center mt-10">
                         <View>
                             <Text className="text-textPrimary text-2xl" bold>{userData?.first_name} {userData?.last_name}</Text>
-                            {/* <View className="bg-appColor w-1/2 rounded-2xl flex flex-row justify-center items-center mt-2">
-                                <Text className="text-white font-bold">hdsa</Text>
-                            </View> */}
+                            <View className="bg-appColor rounded-2xl flex flex-row justify-start items-center mt-2 px-2">
+                                <Text className="text-white font-bold">Beauty salon PK</Text>
+                            </View>
                         </View>
                         <TouchableOpacity 
                         onPress={()=>{setIsBeginSalonRegisterModalVisible(true)}}
@@ -147,7 +147,7 @@ const HomeScreen = ({route, navigation}) => {
 
                     </View>
 
-                    <View className="mt-6">
+                    <View className="mt-4">
                         <TouchableOpacity 
                         onPress={()=>{setIsBeginSalonRegisterModalVisible(true)}}
                         className="h-28 w-full bg-bgSecondary border-textSecondary rounded-3xl flex flex-row justify-between items-center px-4" style={{borderWidth: 0.5}}>
