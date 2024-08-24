@@ -6,7 +6,7 @@ import Text from './CustomComponents/CustomText'
 import { StatusBar } from 'expo-status-bar'
 
 
-const UnsavedChangesModal = ({isModalVisible, setIsModalVisible, userData}) => {
+const UnsavedChangesModal = ({isModalVisible, setIsModalVisible, handleConfirm}) => {
 
   return (
     <Modal 
@@ -15,16 +15,22 @@ const UnsavedChangesModal = ({isModalVisible, setIsModalVisible, userData}) => {
         animationOutTiming={400}
     >
         <View className="flex-1 flex flex-col justify-center items-center">
-            <View className="h-4/6 w-full">
-              <View className="h-full w-full bg-bgPrimary flex flex-col justify-between items-center px-4" style={{borderRadius: 50}}>
+            <View className="h-2/6 w-full">
+              <View className="h-full w-full bg-bgPrimary flex flex-col justify-between items-center px-4 relative" style={{borderRadius: 50}}>
                 <View className="px-4 mt-4">
                   <View className="flex flex-row justify-end items-center">
-                    <TouchableOpacity onPress={()=>setIsModalVisible(false)} className="-mr-4 -mt-1 p-1 bg-textPrimary rounded-full">
-                      <Ionicons name="close" size={20} color="white" />
+                    <TouchableOpacity onPress={()=>setIsModalVisible(false)} className="absolute -top-8 -right-7 p-3 bg-textPrimary rounded-full">
+                      <Ionicons name="close" size={24} color="white" />
                     </TouchableOpacity>
                   </View>
-                  <Text className="mt-4 text-center text-xl text-textPrimary" bold>Svi radnici treba da imaju svoj nalog.</Text>
-                  <Text className="mt-2 text-lg text-textMid text-center" bold>Pronađi idealan tim za tvoj salon i upravljaj rezervacijama efikasno.</Text>
+                  <Text className="mt-4 text-center text-xl text-textPrimary" bold>Imaš nečuvane izmene!</Text>
+                  <Text className="mt-2 text-lg text-textMid text-center" bold>Da li želiš da napustiš stranicu i izgubiš promene?</Text>
+
+                  <TouchableOpacity 
+                      onPress={handleConfirm}
+                      className="bg-textPrimary rounded-3xl p-4 flex flex-row justify-center items-center mt-10">
+                      <Text className="text-white text-lg" bold>Da</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>

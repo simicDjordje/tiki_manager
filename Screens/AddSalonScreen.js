@@ -43,6 +43,18 @@ const AddSalonScreen = () => {
   const [showFinishButton, setShowFinishButton] = useState(false)
   const [shouldLeaveOnScreen, setShouldLeaveOnScreen] = useState(true)
 
+  const handleConfirm = () => {
+    setShouldLeaveOnScreen(true)
+  }
+
+  useEffect(() => {
+    if(isUnsavedChangesModalVisible && shouldLeaveOnScreen){
+      navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
+      return
+    }
+
+  }, [shouldLeaveOnScreen, isUnsavedChangesModalVisible])
+
   useEffect(() => {
     if(name || description || location || logo || images.length > 0){
       setShouldLeaveOnScreen(false)
@@ -275,6 +287,7 @@ const AddSalonScreen = () => {
           <UnsavedChangesModal 
             isModalVisible={isUnsavedChangesModalVisible}
             setIsModalVisible={setIsUnsavedChangesModalVisible}
+            handleConfirm={handleConfirm}
           />
     </SafeAreaView>
   )
