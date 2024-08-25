@@ -63,6 +63,15 @@ export const apiCore = createApi({
 				}
 			}
 		}),
+		createSalon: builder.mutation({
+			query: (data) => {
+				return {
+					url: '/salons/create',
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
 	})
 })
 
@@ -72,4 +81,5 @@ export const {
 	useCreateWorkerAccountMutation,
 	useSignInUserMutation,
 	useGetUserSalonsMutation,
+	useCreateSalonMutation,
 } = apiCore;

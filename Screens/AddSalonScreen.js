@@ -1,4 +1,4 @@
-import { View, TouchableOpacity } from 'react-native'
+import { View, TouchableOpacity, Platform } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
@@ -15,7 +15,7 @@ import Animated, { FadeIn, SequencedTransition } from 'react-native-reanimated'
 import LootieSuccess from '../Components/LootieAnimations/Success'
 import Text from '../Components/CustomComponents/CustomText'
 import UnsavedChangesModal from '../Components/UnsavedChangesModal'
-
+import { useCreateSalonMutation } from '../redux/apiCore'
 
 const AnimatedComponentView = Animated.createAnimatedComponent(View)
 
@@ -37,15 +37,30 @@ const AddSalonScreen = () => {
   const [location, setLocation] = useState(null)
   const [logo, setLogo] = useState(null)
   const [images, setImages] = useState([])
-
+  const [imagesIds, setImagesIds] = useState([])
 
   const [isSuccess, setIsSuccess] = useState(false)
   const [showFinishButton, setShowFinishButton] = useState(false)
   const [shouldLeaveOnScreen, setShouldLeaveOnScreen] = useState(true)
+  const [errorMessage, setErrorMessage] = useState(null)
+
+  //api
+  const [createSalon, {isLoading}] = useCreateSalonMutation()
 
   const handleConfirm = () => {
     setShouldLeaveOnScreen(true)
   }
+
+  useEffect(()=>{
+    if(!images.length){
+      setImagesIds([])
+      return
+    }
+
+    const imagesIdsArray = images.map(() => `${Math.random()}${Date.now()}${Math.random()}${(Math.random() + 1).toString(36).substring(7)}`)
+    
+    setImagesIds(imagesIdsArray)
+  }, [images])
 
   useEffect(() => {
     if(isUnsavedChangesModalVisible && shouldLeaveOnScreen){
@@ -124,9 +139,46 @@ const AddSalonScreen = () => {
     setStep(prev => prev + 1)
   }
 
-  const handleFinish = () => {
-    setIsSuccess(false)
-    navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newSalonCreated: true, salonId: 'djsahdasjdasjkdas'}})
+  const handleCreateSalon = async () => {
+    try{
+      const formData = new FormData()
+    
+      formData.append('name', name)
+      formData.append('description', description)
+      formData.append('salon-logo', {
+        uri: Platform.OS === 'android' ? logo.uri : logo.uri.replace('file://', ''),  // Handle the URI for different platforms
+        type: logo.mimeType,
+        name: logo.fileName
+      })
+      formData.append('logoId', `${Math.random()}${Date.now()}${(Math.random() + 1).toString(36).substring(7)}`)
+      formData.append('address', location.description)
+      formData.append('place_id', location.place_id)
+      formData.append('salonImageIds', JSON.stringify(imagesIds))
+
+      images.forEach((image, index) => {
+        formData.append('salon-photos', {
+          uri: Platform.OS === 'android' ? image.uri : image.uri.replace('file://', ''),
+          name: `salon-photo_${imagesIds[index]}.jpg`,
+          type: image.mimeType
+        })
+      })
+
+      const {error, data} = await createSalon(formData)
+
+      if(error){
+        setErrorMessage('Došlo je do greške')
+        return
+      }
+
+      if(data && data.success){
+        setIsSuccess(true)
+        // navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newSalonCreated: true, salonId: 'djsahdasjdasjkdas'}})
+      }
+
+
+    }catch(error){
+      console.log(error)
+    }
     return
   }
 
@@ -270,7 +322,7 @@ const AddSalonScreen = () => {
                         {showFinishButton && 
                         <AnimatedComponentView entering={FadeIn}>
                             <TouchableOpacity 
-                                onPress={handleFinish}
+                                onPress={handleCreateSalon}
                                 className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center mt-10 w-full">
                                 <Text className="text-white text-lg" bold>Nazad na početnu</Text>
                             </TouchableOpacity> 

@@ -6,6 +6,7 @@ import Text from './CustomComponents/CustomText'
 const AddSalonStepTwo = ({location, setLocation, validation2}) => {
     
     const handlePlaceSelected = (data, details) => {
+        console.log(data)
         setLocation(data)
     }
 

@@ -26,7 +26,7 @@ const AddSalonStepThree = ({logo, setLogo, validation3}) => {
         console.log(result);
     
         if (!result.canceled) {
-            setLogo(result.assets[0].uri)
+            setLogo(result.assets[0])
         }
       }
 
@@ -56,7 +56,7 @@ const AddSalonStepThree = ({logo, setLogo, validation3}) => {
                     </TouchableOpacity>
                     <Image
                         className="w-44 h-44 rounded-full border-4 border-appColor"
-                        source={logo}
+                        source={logo.uri}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}
