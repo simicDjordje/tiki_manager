@@ -16,6 +16,7 @@ import LootieSuccess from '../Components/LootieAnimations/Success'
 import Text from '../Components/CustomComponents/CustomText'
 import UnsavedChangesModal from '../Components/UnsavedChangesModal'
 import { useCreateSalonMutation } from '../redux/apiCore'
+import CustomButton from '../Components/CustomComponents/CustomButton'
 
 const AnimatedComponentView = Animated.createAnimatedComponent(View)
 
@@ -43,6 +44,7 @@ const AddSalonScreen = () => {
   const [showFinishButton, setShowFinishButton] = useState(false)
   const [shouldLeaveOnScreen, setShouldLeaveOnScreen] = useState(true)
   const [errorMessage, setErrorMessage] = useState(null)
+  const [newSalonId, setNewSalonId] = useState(null)
 
   //api
   const [createSalon, {isLoading}] = useCreateSalonMutation()
@@ -104,6 +106,10 @@ const AddSalonScreen = () => {
     }
 
     setStep(prev => prev - 1)
+  }
+
+  const handleFinish = () => {
+    navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newSalonCreated: true, salonId: newSalonId}})
   }
 
   const handleNext = () => {
@@ -172,7 +178,8 @@ const AddSalonScreen = () => {
 
       if(data && data.success){
         setIsSuccess(true)
-        // navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newSalonCreated: true, salonId: 'djsahdasjdasjkdas'}})
+        setNewSalonId(data.result._id)
+        return
       }
 
 
@@ -301,12 +308,22 @@ const AddSalonScreen = () => {
                     {step === 5 && <AddSalonLastStep />}
                   </View>}
 
-                  {!isSuccess && 
-                  <TouchableOpacity 
-                      onPress={step === 5 ? ()=>{setIsSuccess(true)} : handleNext}
-                      className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center mt-10">
-                      <Text className="text-white text-lg" bold>{step === 5 ? 'Potvrdi' : 'Dalje'}</Text>
-                  </TouchableOpacity>
+                  {!isSuccess && step !== 5 && 
+                      <TouchableOpacity 
+                        onPress={handleNext}
+                        className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center mt-10">
+                        <Text className="text-white text-lg" bold>{'Dalje'}</Text>
+                      </TouchableOpacity>
+                  }
+
+                  {!isSuccess && step === 5 && 
+                    <CustomButton 
+                      text={'Potvrdi'}
+                      onPress={handleCreateSalon}
+                      isError={!!errorMessage}
+                      errorMessage={errorMessage}
+                      isLoading={isLoading}
+                    />
                   }
 
                   {isSuccess &&
@@ -322,7 +339,7 @@ const AddSalonScreen = () => {
                         {showFinishButton && 
                         <AnimatedComponentView entering={FadeIn}>
                             <TouchableOpacity 
-                                onPress={handleCreateSalon}
+                                onPress={handleFinish}
                                 className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center mt-10 w-full">
                                 <Text className="text-white text-lg" bold>Nazad na početnu</Text>
                             </TouchableOpacity> 
