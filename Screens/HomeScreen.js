@@ -5,7 +5,6 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import WelcomeModal from '../Components/WelcomeModal'
 import Entypo from '@expo/vector-icons/Entypo'
 import CreateWorkerAccountModal from '../Components/CreateWorkerAccountModal'
-import SalonCard from '../Components/SalonCard'
 import WorkerCard from '../Components/WorkerCard'
 import BeginSalonRegisterModal from '../Components/BeginSalonRegisterModal'
 import { useFocusEffect } from '@react-navigation/native'
@@ -15,6 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import LootieLoader from '../Components/LootieAnimations/Loader'
 import Animated, { FadeInDown, FadeInUp, FadeOutDown } from 'react-native-reanimated'
 import { useGetUserSalonsMutation } from '../redux/apiCore'
+import SalonsPartHomeScreen from '../Components/SalonsPartHomeScreen'
 
 const HomeScreen = ({route, navigation}) => {
     //params
@@ -27,8 +27,9 @@ const HomeScreen = ({route, navigation}) => {
     const [isCreateWorkerAccountModalVisible, setIsCreateWorkerAccountModalVisible] = useState(false)
     const [isBeginSalonRegisterModalVisible, setIsBeginSalonRegisterModalVisible] = useState(false)
     const [userData, setUserData] = useState(null)
-    const [isLoading, setIsLoading] = useState(false)
-    const [salons, setSalons] = useState([])
+    const [salonsActive, setSalonsActive] = useState([])
+    const [salonsInactive, setSalonsInactive] = useState([])
+
 
     //refs
     const scrollViewRef = useRef(null)
@@ -44,8 +45,17 @@ const HomeScreen = ({route, navigation}) => {
             try{
                 const {error, data} = await getUserSalons()
                 
+                const activeSalonsArray = []
+                const inactiveSalonsArray = []
+
                 if(data && data.success){
-                    setSalons(data.result)
+                    const dataReversed = [...data.result].reverse()
+                    dataReversed.forEach(i => {
+                        if(i.isActive) activeSalonsArray.push(i)
+                        if(!i.isActive) inactiveSalonsArray.push(i)
+                    })
+                    setSalonsActive(activeSalonsArray)
+                    setSalonsInactive(inactiveSalonsArray)
                 }
             }catch(error){
                 console.log(error)
@@ -66,10 +76,14 @@ const HomeScreen = ({route, navigation}) => {
 
     useFocusEffect(useCallback(()=>{
         (async () => {
-            const user = await AsyncStorage.getItem('@userData')
-            if(!user) return
+            try{
+                const user = await AsyncStorage.getItem('@userData')
+                if(!user) return
 
-            setUserData(JSON.parse(user))
+                setUserData(JSON.parse(user))
+            }catch(error){
+                console.log(error)
+            }
         })()
     }, []))
 
@@ -79,7 +93,7 @@ const HomeScreen = ({route, navigation}) => {
 
         setTimeout(()=>{
             setIsNewSalonCreated(false)
-            navigation.setParams({ newSalonCreated: null })
+            navigation.setParams({ newSalonCreated: null, salonId: null })
         }, 3000)
     }, [params]))
 
@@ -144,13 +158,13 @@ const HomeScreen = ({route, navigation}) => {
                     </View>
                 </View>
 
-                {isLoading && 
+                {!userData && 
                     <View className="flex-1 w-full flex flex-col justify-center items-center mb-20">
                         <LootieLoader dark={true} d={70} />
                     </View>
                 }
 
-                {!isLoading && 
+                {userData &&
                 <Animated.View entering={FadeInDown} exiting={FadeOutDown} className="bg-bgSecondary flex-1 w-full min-h-screen mt-8 px-4 relative" style={{borderTopLeftRadius: 50, borderTopRightRadius: 50}}>
                     {isNewSalonCreated || isWorkerAccountCreated && <View className="top-0 bottom-0 left-0 right-0 bg-textPrimary absolute opacity-50 z-10"></View>}
                     <View className="flex flex-row justify-between items-center mt-10">
@@ -167,7 +181,7 @@ const HomeScreen = ({route, navigation}) => {
                         </TouchableOpacity>
                     </View>
 
-                    <View className="flex flex-row flex-wrap justify-between mt-10">
+                    <View className="mt-10">
                         {userData?.haveWorkerAccount && 
                             <WorkerCard 
                                 userData={userData} 
@@ -176,11 +190,6 @@ const HomeScreen = ({route, navigation}) => {
                             />
                         }
                         
-                        
-                        {/* <SalonCard isJustCreated={false} /> 
-                        <SalonCard ref={salonCardRef} isJustCreated={isNewSalonCreated} /> */}
-
-
                     </View>
 
                     <View>
@@ -219,6 +228,14 @@ const HomeScreen = ({route, navigation}) => {
                             </View>
                         </TouchableOpacity>}
                     </View>
+                    
+                    <SalonsPartHomeScreen 
+                        salonsActive={salonsActive}
+                        salonsInactive={salonsInactive}
+                        params={params}
+                        ref={salonCardRef}
+                    />
+
 
                     <View className="h-28 bg-bgSecondary"></View>
                 </Animated.View>

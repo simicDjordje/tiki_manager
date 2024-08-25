@@ -79,7 +79,7 @@ const AddSalonScreen = () => {
   }, [name, description, location, logo, images])
 
   useEffect(() => navigation.addListener('beforeRemove', (e) => {
-        if (shouldLeaveOnScreen) {
+        if (shouldLeaveOnScreen || isSuccess) {
           // If we don't have unsaved changes, then we don't need to do anything
           return;
         }
@@ -90,7 +90,7 @@ const AddSalonScreen = () => {
         // Prompt the user before leaving the screen
         setIsUnsavedChangesModalVisible(true)
       }),
-    [navigation, shouldLeaveOnScreen]
+    [navigation, shouldLeaveOnScreen, isSuccess]
   );
 
   useEffect(()=>{
@@ -147,6 +147,8 @@ const AddSalonScreen = () => {
 
   const handleCreateSalon = async () => {
     try{
+      const logoId = `${Math.random()}${Date.now()}${(Math.random() + 1).toString(36).substring(7)}`
+
       const formData = new FormData()
     
       formData.append('name', name)
@@ -154,9 +156,9 @@ const AddSalonScreen = () => {
       formData.append('salon-logo', {
         uri: Platform.OS === 'android' ? logo.uri : logo.uri.replace('file://', ''),  // Handle the URI for different platforms
         type: logo.mimeType,
-        name: logo.fileName
+        name: `salon-logo_${logoId}.png`
       })
-      formData.append('logoId', `${Math.random()}${Date.now()}${(Math.random() + 1).toString(36).substring(7)}`)
+      formData.append('logoId', logoId)
       formData.append('address', location.description)
       formData.append('place_id', location.place_id)
       formData.append('salonImageIds', JSON.stringify(imagesIds))
@@ -164,7 +166,7 @@ const AddSalonScreen = () => {
       images.forEach((image, index) => {
         formData.append('salon-photos', {
           uri: Platform.OS === 'android' ? image.uri : image.uri.replace('file://', ''),
-          name: `salon-photo_${imagesIds[index]}.jpg`,
+          name: `salon-photo_${imagesIds[index]}.png`,
           type: image.mimeType
         })
       })
@@ -305,7 +307,11 @@ const AddSalonScreen = () => {
                       validation4={validation4}
                     />
                     }
-                    {step === 5 && <AddSalonLastStep />}
+                    {step === 5 && 
+                    <AddSalonLastStep
+                      name={name}
+                      address={location?.description}
+                    />}
                   </View>}
 
                   {!isSuccess && step !== 5 && 

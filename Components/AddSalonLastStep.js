@@ -7,7 +7,7 @@ const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
-const AddSalonLastStep = () => {
+const AddSalonLastStep = ({name, address}) => {
   return (
     <View className="h-full flex flex-col justify-center items-center -mt-10">
         <Text className="text-lg" bold>Kako funkcioniše dodavanje salona?</Text>
@@ -38,11 +38,11 @@ const AddSalonLastStep = () => {
 
         <View className="flex flex-row justify-between items-center w-full px-4 mt-3">
             <Text className="text-textMid">Naziv: </Text>
-            <Text className="text-textMid" bold>Beauty salon PK</Text>
+            <Text className="text-textMid" bold>{name}</Text>
         </View>
         <View className="flex flex-row justify-between items-center w-full px-4">
             <Text className="text-textMid">Adresa: </Text>
-            <Text className="text-textMid" bold>Marka Jugovica 1/2</Text>
+            <Text className="text-textMid" bold>{address}</Text>
         </View>
     </View>
   )

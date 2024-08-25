@@ -11,15 +11,15 @@ const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
-const SalonCard = forwardRef(({isJustCreated}, ref) => {
+const SalonCard = forwardRef(({salonData, isJustCreated}, ref) => {
     const navigation = useNavigation()
 
     const handleToSalon = () => {
-        navigation.navigate('StackTabScreens', {screen: 'SalonScreen'})
+        navigation.navigate('StackTabScreens', {screen: 'SalonScreen', params: {salonId: salonData?._id}})
     }
 
   return (
-    <TouchableOpacity onPress={handleToSalon} ref={ref} className={`bg-appColor h-44 w-[48%] rounded-2xl mb-4 flex flex-col justify-between relative ${isJustCreated && 'z-20'}`}>
+    <TouchableOpacity onPress={handleToSalon} ref={ref} className={`${salonData?.isActive ? 'bg-appColor' : 'bg-textPrimary'} h-44 w-[48%] rounded-2xl mb-4 flex flex-col justify-between relative ${isJustCreated && 'z-20'}`}>
             {isJustCreated && 
                 <Animated.View entering={BounceInUp} exiting={BounceOut} className="bg-bgPrimary absolute -top-12 px-4 py-2 rounded-xl">
                     <Text className="text-textPrimary" bold>Pogledaj svoj salon</Text>
@@ -28,8 +28,8 @@ const SalonCard = forwardRef(({isJustCreated}, ref) => {
             <View>
                 <View className="flex flex-row justify-between items-center px-2 pt-2">
                     <Image
-                        className="w-8 h-8 rounded-full border-2 border-appColorDark"
-                        source={require('../assets/salonLogo.jpg')}
+                        className={`w-8 h-8 rounded-full border-2 ${salonData?.isActive ? 'bg-appColorDark' : 'bg-textMid'}`}
+                        source={`http://192.168.1.4:5000/photos/salon-logo_${salonData?.logoId}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}
@@ -40,42 +40,33 @@ const SalonCard = forwardRef(({isJustCreated}, ref) => {
 
 
                 <View className="px-2 mt-2">
-                    <Text className="text-lg text-white" bold>Beauty Studio PK</Text>
+                    <Text className="text-lg text-white" bold>{salonData?.name || ''}</Text>
                 </View>
             </View>
 
 
-            <View className="flex flex-row justify-start items-center p-1 bg-bgPrimary rounded-2xl">
-                <Image
-                        className="w-8 h-8 rounded-full border-2 border-appColorDark"
-                        source={require('../assets/fpp.png')}
-                        placeholder={{ blurhash }}
-                        contentFit="cover"
-                        transition={1000}
-                    />
+            <View className="flex flex-row justify-start items-center p-1 bg-bgPrimary rounded-2xl px-3 h-10">
+                {salonData?.workers.length > 0 && salonData?.workers.slice(0, 5).map((worker, index) => {
+                    return (
+                        <Image
+                            key={index}
+                            className={`w-8 h-8 rounded-full border-2 ${index % 2 === 0 ? 'border-appColorDark' : 'border-appColor'} ${index > 0 && '-ml-2'}`}
+                            source={require('../assets/fpp.png')}
+                            placeholder={{ blurhash }}
+                            contentFit="cover"
+                            transition={1000}
+                        />
+                    )
+                })}
+                {salonData?.workers.length > 5 && (
+                    <View className="w-8 h-8 rounded-full border-2 border-appColorDark bg-textPrimary -ml-2 flex flex-row justify-center items-center">
+                        <Text className="text-white" semi>+{salonData.workers.length - 5}</Text>
+                    </View>
+                )}
 
-                <Image
-                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
-                        source={require('../assets/e2.jpg')}
-                        placeholder={{ blurhash }}
-                        contentFit="cover"
-                        transition={1000}
-                    />
-
-                <Image
-                        className="w-8 h-8 rounded-full border-2 border-appColorDark -ml-2"
-                        source={require('../assets/fpp2.png')}
-                        placeholder={{ blurhash }}
-                        contentFit="cover"
-                        transition={1000}
-                    />
-                <Image
-                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
-                        source={require('../assets/e4.jpg')}
-                        placeholder={{ blurhash }}
-                        contentFit="cover"
-                        transition={1000}
-                    />
+                {salonData?.workers.length === 0 && 
+                    <Text className="text-textPrimary" semi>Aktiviraj salon</Text>
+                }
             </View>
         </TouchableOpacity>
   )
