@@ -234,6 +234,7 @@ const HomeScreen = ({route, navigation}) => {
                         salonsInactive={salonsInactive}
                         params={params}
                         ref={salonCardRef}
+                        isNewSalonCreated={isNewSalonCreated}
                     />
 
 

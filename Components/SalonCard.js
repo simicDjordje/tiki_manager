@@ -15,7 +15,7 @@ const SalonCard = forwardRef(({salonData, isJustCreated}, ref) => {
     const navigation = useNavigation()
 
     const handleToSalon = () => {
-        navigation.navigate('StackTabScreens', {screen: 'SalonScreen', params: {salonId: salonData?._id}})
+        navigation.navigate('StackTabScreens', {screen: 'SalonScreen', params: {salonId: salonData?._id, salonName: salonData?.name}})
     }
 
   return (
