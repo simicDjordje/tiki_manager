@@ -59,7 +59,7 @@ const SalonNameDescScreen = () => {
           <View>
             <TouchableOpacity 
                 onPress={handleSave}
-                className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center mb-24">
+                className="bg-appColorDark rounded-xl p-4 flex flex-row justify-center items-center mb-24">
                 <Text className="text-white text-lg" bold>Sačuvaj</Text>
             </TouchableOpacity>
           </View>

@@ -28,7 +28,7 @@ const UnsavedChangesModal = ({isModalVisible, setIsModalVisible, handleConfirm})
 
                   <TouchableOpacity 
                       onPress={handleConfirm}
-                      className="bg-textPrimary rounded-3xl p-4 flex flex-row justify-center items-center mt-10">
+                      className="bg-textPrimary rounded-xl p-4 flex flex-row justify-center items-center mt-10">
                       <Text className="text-white text-lg" bold>Da</Text>
                   </TouchableOpacity>
                 </View>

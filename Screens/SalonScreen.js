@@ -10,7 +10,7 @@ import Text from '../Components/CustomComponents/CustomText'
 import { useFocusEffect } from '@react-navigation/native'
 import { useGetSalonByIdMutation } from '../redux/apiCore'
 import LootieLoader from '../Components/LootieAnimations/Loader'
-
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
@@ -50,7 +50,7 @@ const SalonScreen = ({route, navigation}) => {
     }
 
     const handleToLogoScreen = () => {
-        navigation.navigate('StackTabScreens', {screen: 'SalonLogoScreen'})
+        navigation.navigate('StackTabScreens', {screen: 'SalonLogoScreen', params: {salonData: salonData}})
     }
 
     const handleToImagesScreen = () => {
@@ -94,10 +94,26 @@ const SalonScreen = ({route, navigation}) => {
         }
 
         {salonData && <ScrollView>
-            <View className="px-4 mt-10">
+            <View className="px-4 mt-4">
+                <View className="flex flex-row justify-between items-center mt-6 w-full">
+                    <Text className="text-2xl" bold>Podešavanja salona</Text>
+                    <Ionicons name="settings-sharp" size={34} color="black" />
+                </View>
+                <View className="bg-textSecondary mt-8 w-full mb-4" style={{height: 0.5}}></View>
+
+                <View>
+                    <Text className="text-textMid mb-3" semi>Moraš dodati usluge i članove salona</Text>
+                    <TouchableOpacity className="bg-textPrimary rounded-xl mb-6 h-14 flex flex-row justify-between items-center w-full px-2">
+                        <View className="flex-1 flex flex-row justify-center items-center">
+                            <Text className="text-white text-lg ml-4" bold>Aktiviraj salon</Text>
+                        </View>
+                        <MaterialIcons name="arrow-forward-ios" size={20} color="#fff" />
+                    </TouchableOpacity>
+                </View>
+
                 <View className="flex flex-row justify-between items-center">
                     <TouchableOpacity onPress={handleToLogoScreen} 
-                        className="flex flex-col justify-center items-center mb-4 bg-bgPrimary py-2 px-2 rounded-xl w-[48%] h-40">
+                        className="flex flex-col justify-center items-center mb-4 bg-bgSecondary border-textSecondary py-2 px-2 rounded-xl w-[48%] h-40" style={{borderWidth: 0.5}}>
                         <View className="flex flex-row justify-start items-center w-full">
                             <Text className="text-textMid" semi>Logo</Text>
                         </View>
@@ -119,7 +135,7 @@ const SalonScreen = ({route, navigation}) => {
 
                     <TouchableOpacity 
                         onPress={handleToImagesScreen}
-                        className="flex flex-col justify-center items-center mb-4 bg-bgPrimary py-2 px-2 rounded-xl w-[48%] h-40">
+                        className="flex flex-col justify-center items-center mb-4 bg-bgSecondary border-textSecondary py-2 px-2 rounded-xl w-[48%] h-40" style={{borderWidth: 0.5}}>
                         <View className="flex flex-row justify-start items-center w-full">
                             <Text className="text-textMid" semi>Slike</Text>
                         </View>
@@ -147,7 +163,7 @@ const SalonScreen = ({route, navigation}) => {
                     </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity onPress={handleToNameDescScreen} className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2">
+                <TouchableOpacity onPress={handleToNameDescScreen} className="flex flex-row justify-between items-center bg-bgSecondary border-textSecondary rounded-xl p-2" style={{borderWidth: 0.5}}>
                     <View className="flex flex-col justify-between items-start">
                         <Text className="text-textMid mb-2" semi>Naziv:</Text>
                         <Text className="text-md text-textPrimary" bold>{salonData?.name}</Text>
@@ -155,7 +171,7 @@ const SalonScreen = ({route, navigation}) => {
                     <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={handleToNameDescScreen} className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
+                <TouchableOpacity onPress={handleToNameDescScreen} className="flex flex-row justify-between items-center bg-bgSecondary border-textSecondary rounded-xl p-2 mt-4" style={{borderWidth: 0.5}}>
                     <View className="flex flex-col justify-between items-start">
                         <Text className="text-textMid mb-2" semi>Opis:</Text>
                         <Text className="text-md text-textPrimary" bold>
@@ -165,7 +181,7 @@ const SalonScreen = ({route, navigation}) => {
                     <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={handleToLocationScreen} className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
+                <TouchableOpacity onPress={handleToLocationScreen} className="flex flex-row justify-between items-center bg-bgSecondary border-textSecondary rounded-xl p-2 mt-4" style={{borderWidth: 0.5}}>
                     <View className="flex flex-col justify-between items-start">
                         <Text className="text-textMid mb-2" semi>Lokacija:</Text>
                         <Text className="text-md text-textPrimary" bold>
@@ -175,7 +191,7 @@ const SalonScreen = ({route, navigation}) => {
                     <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={handleToServicesCategoriesScreen} className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
+                <TouchableOpacity onPress={handleToServicesCategoriesScreen} className="flex flex-row justify-between items-center bg-bgSecondary border-textSecondary rounded-xl p-2 mt-4" style={{borderWidth: 0.5}}>
                     <View className="flex flex-col justify-between items-start">
                         <Text className="text-textMid mb-2" semi>Usluge:</Text>
                         {salonData?.services?.length === 0 && 
@@ -199,12 +215,12 @@ const SalonScreen = ({route, navigation}) => {
 
                 <TouchableOpacity 
                 onPress={handleToSalonWorkersScreen}
-                className="flex flex-row justify-between items-center bg-bgPrimary rounded-xl p-2 mt-4">
+                className="flex flex-row justify-between items-center bg-bgSecondary border-textSecondary rounded-xl p-2 mt-4" style={{borderWidth: 0.5}}>
                     <View className="flex flex-col justify-between items-start">
                         <Text className="text-textMid mb-2" semi>Članovi salona:</Text>
                         {salonData?.workers?.length === 0 && 
                             <Text className="text-md text-red-500" bold>
-                                Kreiraj tim salona
+                                Dodaj članove salona
                             </Text>
                         }
 
@@ -294,6 +310,8 @@ const SalonScreen = ({route, navigation}) => {
                     {salonData?.workers?.length > 0 && <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />}
                 </TouchableOpacity>
             </View>
+
+            <View className="mb-20"></View>
         </ScrollView>}
     </SafeAreaView>
   )

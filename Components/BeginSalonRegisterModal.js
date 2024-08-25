@@ -58,7 +58,7 @@ const BeginSalonRegisterModal = ({isModalVisible, setIsModalVisible}) => {
                         <View className="flex flex-col justify-center items-center mt-44">
                             <TouchableOpacity 
                                 onPress={beginSalonRegister}
-                                className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center w-full">
+                                className="bg-appColorDark rounded-xl p-4 flex flex-row justify-center items-center w-full">
                                 <Text className="text-white text-lg" bold>Započni</Text>
                             </TouchableOpacity>
                         </View>

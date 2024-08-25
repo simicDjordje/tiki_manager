@@ -219,7 +219,7 @@ const ServiceScreen = () => {
 
                     <TouchableOpacity 
                         onPress={handleSave}
-                        className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center mt-20">
+                        className="bg-appColorDark rounded-xl p-4 flex flex-row justify-center items-center mt-20">
                         <Text className="text-white text-lg" bold>Sačuvaj</Text>
                     </TouchableOpacity>
                 </View>

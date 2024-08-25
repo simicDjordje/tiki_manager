@@ -317,7 +317,7 @@ const AddSalonScreen = () => {
                   {!isSuccess && step !== 5 && 
                       <TouchableOpacity 
                         onPress={handleNext}
-                        className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center mt-10">
+                        className="bg-appColorDark rounded-xl p-4 flex flex-row justify-center items-center mt-10">
                         <Text className="text-white text-lg" bold>{'Dalje'}</Text>
                       </TouchableOpacity>
                   }
@@ -346,7 +346,7 @@ const AddSalonScreen = () => {
                         <AnimatedComponentView entering={FadeIn}>
                             <TouchableOpacity 
                                 onPress={handleFinish}
-                                className="bg-appColorDark rounded-3xl p-4 flex flex-row justify-center items-center mt-10 w-full">
+                                className="bg-appColorDark rounded-xl p-4 flex flex-row justify-center items-center mt-10 w-full">
                                 <Text className="text-white text-lg" bold>Nazad na početnu</Text>
                             </TouchableOpacity> 
                           </AnimatedComponentView> 

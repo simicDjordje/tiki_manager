@@ -81,6 +81,15 @@ export const apiCore = createApi({
 				}
 			}
 		}),
+		updateSalon: builder.mutation({
+			query: (data) => {
+				return {
+					url: `/salons/update`,
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
 	})
 })
 
@@ -92,4 +101,5 @@ export const {
 	useGetUserSalonsMutation,
 	useCreateSalonMutation,
 	useGetSalonByIdMutation,
+	useUpdateSalonMutation,
 } = apiCore;
