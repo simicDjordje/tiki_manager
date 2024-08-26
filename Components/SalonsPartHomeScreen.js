@@ -4,7 +4,7 @@ import Text from './CustomComponents/CustomText'
 import SalonCard from './SalonCard'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 
-const SalonsPartHomeScreen = forwardRef(({salonsActive, salonsInactive, params}, ref) => {
+const SalonsPartHomeScreen = forwardRef(({salonsActive, salonsInactive, params, isNewSalonCreated}, ref) => {
     
   
   return (
