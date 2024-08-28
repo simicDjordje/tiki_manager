@@ -7,56 +7,62 @@ import { Image } from 'expo-image'
 import Text from './CustomComponents/CustomText'
 import CustomInput from './CustomComponents/CustomInput'
 import CustomButton from './CustomComponents/CustomButton'
+import { useSelector } from 'react-redux'
+import { useCreateServiceMutation, useGetSalonByIdMutation } from '../redux/apiCore'
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
 const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
+    const {currentSalon: salonData, activeCategory} = useSelector(state => state.general)
+    const [createService, {isLoading}] = useCreateServiceMutation()
+    const [errorMessage, setErrorMessage] = useState('')
     const [isSuccess, setIsSuccess] = useState(false)
-    const [isLoading, setIsLoading] = useState(false)
-    // const [durations, setDurations] = useState([
-    //     { value: 900, label: '15min' },       // 15 minutes
-    //     { value: 1800, label: '30min' },      // 30 minutes
-    //     { value: 3600, label: '1h' },         // 1 hour
-    //     { value: 5400, label: '1h 30min' },   // 1 hour 30 minutes
-    //     { value: 7200, label: '2h' },         // 2 hours
-    //     { value: 9000, label: '2h 30min' },   // 2 hours 30 minutes
-    //     { value: 10800, label: '3h' },        // 3 hours
-    //     { value: 12600, label: '3h 30min' },  // 3 hours 30 minutes
-    //     { value: 14400, label: '4h' },        // 4 hours
-    //     { value: 16200, label: '4h 30min' },  // 4 hours 30 minutes
-    //     { value: 18000, label: '5h' },        // 5 hours
-    //     { value: 21600, label: '6h' },        // 6 hours
-    //     { value: 25200, label: '7h' },        // 7 hours
-    //     { value: 28800, label: '8h' },        // 8 hours
-    //     { value: 32400, label: '9h' },        // 9 hours
-    //     { value: 36000, label: '10h' }        // 10 hours
-    // ])
-    const [selectedDuration, setSelectedDuration] = useState({ value: 1800, label: '30min' })
-    const [workerSetDuration, setWorkerSetDuration] = useState(false)
+    const [inputsData, setInptsData] = useState({
+      name: '',
+      description: '',
+      price: ''
+    })
+    const [validation, setValidation] = useState(false)
+    const [getSalonById] = useGetSalonByIdMutation()
+    
+    const handleCreate = async () => {
+        if(!inputsData.name || !inputsData.description || !inputsData.price){
+            setValidation(true)
+            return
+        }
+
+        try{
+            const {error, data} = await createService({...inputsData, categoryId: activeCategory?._id, salonId: salonData?._id})
+
+            if(error){
+                if(error?.data?.message === 'Service with this name already exists in the selected category'){
+                    setErrorMessage('Već postoji usluga sa ovim imenom')
+                }else{
+                    setErrorMessage('Došlo je do greške')
+                }
+            }
+
+            if(data && data.success){
+                setIsSuccess(true)
+                getSalonById({salonId: salonData?._id})
+
+                setTimeout(()=>{
+                    setIsModalVisible(false)
+                }, 2700)
+            }
+
+        }catch(error){
+            console.log(error)
+        }
+    }
 
     const closeModal = () => {
         setIsModalVisible(false)
         setIsSuccess(false)
     }
 
-    const handleSave = () => {
-        setIsLoading(true)
-
-        setTimeout(()=>{
-            setIsLoading(false)
-            setIsSuccess(true)
-        }, 2500)
-    }
-
-    useEffect(()=>{
-        if(!isSuccess) return
-
-        setTimeout(()=>{
-            setIsModalVisible(false)
-        }, 3000)
-    }, [isSuccess])
 
     return (
       <Modal 
@@ -66,6 +72,12 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
           style={{margin: 0}}
           onModalHide={()=>{
             setIsSuccess(false)
+            setInptsData({
+                name: '',
+                description: '',
+                price: ''
+              })
+            setErrorMessage('')
           }}
       >
           <View className="flex-1 flex flex-col justify-end items-center w-full">
@@ -89,15 +101,24 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                 label={'Naziv usluge'}
                                 placeholder={'Unesi naziv usluge'}
                                 classNameCustom="mt-4"
+                                value={inputsData.name}
+                                onChangeText={text => setInptsData({...inputsData, name: text})}
+                                isError={validation && !inputsData.name}
+                                errorMessage={'obavezno'}
                             />
 
                             <CustomInput 
                                 label={'Opis usluge'}
                                 placeholder={'Unesi kratak opis usluge'}
                                 classNameCustom='mt-3'
+                                value={inputsData.description}
+                                onChangeText={text => setInptsData({...inputsData, description: text})}
+                                isError={validation && !inputsData.description}
+                                errorMessage={'obavezno'}
                             />
 
                             <CustomInput 
+                                keyboardType="numeric"
                                 label={'Cena usluge'}
                                 placeholder={'Unesi cenu usluge'}
                                 classNameCustom='mt-3'
@@ -107,36 +128,28 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                     </View>
                                 )}
                                 iconSide='right'
+                                value={inputsData.price}
+                                onChangeText={text => setInptsData({...inputsData, price: text})}
+                                isError={validation && !inputsData.price}
+                                errorMessage={'obavezno'}
                             />
 
-                            {/* <View className="flex flex-row justify-between items-center">
-                                <Text className={`mb-1 text-md mt-4`} semi>Vreme trajanja usluge</Text>
-                                <Text className={`mb-1 text-xs mt-4`}>Skroluj desno za još</Text>
-                            </View> */}
-                            {/* <ScrollView 
-                                className="mb-2 -mr-10"
-                                horizontal={true}
-                                showsHorizontalScrollIndicator={false}
-                                contentContainerStyle={{
-                                    paddingLeft: 5,
-                                    paddingVertical: 20
-                            }}>
-                                {durations.map((duration, index) => {
-                                    const indexPlusOne = index + 1
-                                    const lastItem = durations.length == indexPlusOne
-                                    const isSelected = selectedDuration.value === duration.value
-                                    return (
-                                        <TouchableOpacity key={index} onPress={()=>{setSelectedDuration(duration)}} className={`w-24
-                                         h-14 ${isSelected ? 'bg-appColor' : 'bg-bgPrimary'} ml-2 rounded-xl flex flex-row justify-center items-center ${lastItem && 'mr-20'}`}>
-                                            <Text semi className={`${isSelected ? 'text-white' : 'text-textPrimary'}`}>{duration.label}</Text>
-                                        </TouchableOpacity>
-                                    )
-                                })}
-                            </ScrollView> */}
+                            {salonData?.workers.length > 0 &&
+                                <View className="flex flex-row justify-between items-center mt-8">
+                                    <View>
+                                        <Text className={`text-md`} semi>Ovde možeš dodeliti uslugu članovima</Text>
+                                        <Text className={`mb-1 text-md text-textMid`} semi>ili kasnije u podešavanjima usluge</Text>
+                                    </View>
 
-                            <Text className={`text-md mt-8`} semi>Ovde možeš dodeliti uslugu članovima</Text>
-                            <Text className={`mb-1 text-md text-textMid`} semi>ili kasnije u podešavanjima usluge</Text>
-                            <ScrollView 
+                                    <View className="w-7 h-7 rounded-full bg-appColor flex flex-row justify-center items-center">
+                                        <Text className="text-white" semi>0</Text>
+                                    </View>
+                                </View>
+                            }
+
+                           
+
+                            {salonData?.workers.length > 0 && <ScrollView 
                                 className="mb-2 -mr-10"
                                 horizontal={true}
                                 showsHorizontalScrollIndicator={false}
@@ -236,17 +249,21 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                 </TouchableOpacity>
 
                                 
-                            </ScrollView>
+                            </ScrollView>}
                         </View>
                         
 
+                        <View className="flex flex-row justify-center items-center h-6 mb-4">
+                            <Text className="text-red-700">{errorMessage}</Text>
+                        </View>
 
                         <View className="flex flex-col justify-center items-center">
                             <CustomButton 
-                                onPress={handleSave}
+                                onPress={handleCreate}
                                 text={'Potvrdi'}
                                 isSuccess={isSuccess}
                                 isLoading={isLoading}
+                                isError={!!errorMessage}
                             />
                         </View>
                     </View>
@@ -258,3 +275,24 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
   }
   
   export default CreateServiceModal
+
+
+
+  // const [durations, setDurations] = useState([
+    //     { value: 900, label: '15min' },       // 15 minutes
+    //     { value: 1800, label: '30min' },      // 30 minutes
+    //     { value: 3600, label: '1h' },         // 1 hour
+    //     { value: 5400, label: '1h 30min' },   // 1 hour 30 minutes
+    //     { value: 7200, label: '2h' },         // 2 hours
+    //     { value: 9000, label: '2h 30min' },   // 2 hours 30 minutes
+    //     { value: 10800, label: '3h' },        // 3 hours
+    //     { value: 12600, label: '3h 30min' },  // 3 hours 30 minutes
+    //     { value: 14400, label: '4h' },        // 4 hours
+    //     { value: 16200, label: '4h 30min' },  // 4 hours 30 minutes
+    //     { value: 18000, label: '5h' },        // 5 hours
+    //     { value: 21600, label: '6h' },        // 6 hours
+    //     { value: 25200, label: '7h' },        // 7 hours
+    //     { value: 28800, label: '8h' },        // 8 hours
+    //     { value: 32400, label: '9h' },        // 9 hours
+    //     { value: 36000, label: '10h' }        // 10 hours
+    // ])

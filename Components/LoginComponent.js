@@ -64,7 +64,7 @@ const LoginComponent = ({setAuthType}) => {
         <View className="bg-textSecondary w-full h-0.5 mt-2"></View>
 
         <View className="h-7 w-full flex flex-row justify-center items-center">
-            <Text className="text-red-500">{errorMessage}</Text>
+            <Text className="text-red-700">{errorMessage}</Text>
         </View>
 
         <View className="mt-2">

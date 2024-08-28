@@ -12,7 +12,8 @@ import Feather from '@expo/vector-icons/Feather'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
 import CreateServicesCategoryModal from '../Components/CreateServicesCategoryModal'
 import {useCreateCategoryMutation, useGetSalonByIdMutation} from '../redux/apiCore'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { setActiveCategory } from '../redux/generalSlice'
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
@@ -26,12 +27,14 @@ const SalonServicesCategoriesScreen = ({navigation}) => {
   const [categoryName, setCategoryName] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [isCategoryAddedSuccess, setIsCategoryAddedSuccess] = useState(false)
+  const dispatch = useDispatch()
 
   const handleBack = () => {
     navigation.navigate('StackTabScreens', {screen: 'SalonScreen'})
   }
 
-  const handleToServices = () => {
+  const handleToServices = (category) => {
+    dispatch(setActiveCategory(category))
     navigation.navigate('StackTabScreens', {screen: 'SalonServicesScreen'})
   }
 
@@ -133,7 +136,7 @@ const SalonServicesCategoriesScreen = ({navigation}) => {
                     <View className="min-h-screen">
                         {salonData?.categories.map(({category}, index) => {
                             return (
-                                <TouchableOpacity key={index} onPress={handleToServices} className="bg-bgPrimary w-full h-28 mt-4 rounded-xl p-4 flex flex-col justify-between">
+                                <TouchableOpacity key={index} onPress={() => {handleToServices(category)}} className="bg-bgPrimary w-full h-28 mt-4 rounded-xl p-4 flex flex-col justify-between">
                                     <View className="flex flex-row justify-between items-center">
                                         <Text className="text-textPrimary text-xl" bold>{category?.name}</Text>
                                         <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />

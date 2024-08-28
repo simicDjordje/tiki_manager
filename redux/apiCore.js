@@ -99,6 +99,24 @@ export const apiCore = createApi({
 				}
 			}
 		}),
+		createService: builder.mutation({
+			query: (data) => {
+				return {
+					url: `/services/create-service`,
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
+		updateService: builder.mutation({
+			query: (data) => {
+				return {
+					url: `/services/update-service`,
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
 	})
 })
 
@@ -112,4 +130,6 @@ export const {
 	useGetSalonByIdMutation,
 	useUpdateSalonMutation,
 	useCreateCategoryMutation,
+	useCreateServiceMutation,
+	useUpdateServiceMutation,
 } = apiCore;

@@ -72,7 +72,7 @@ const RegisterComponent = ({setAuthType}) => {
         </View>
 
         <View className="h-5 flex flex-row justify-start items-center">
-            {errorMessage && <Text className="text-red-500">Ova email adresa je već registrovana</Text>}
+            {errorMessage && <Text className="text-red-700">Ova email adresa je već registrovana</Text>}
         </View>
 
         <View className="mt-6">

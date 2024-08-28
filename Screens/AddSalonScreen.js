@@ -327,7 +327,7 @@ const AddSalonScreen = () => {
                   }
 
                   <View className="h-5 flex flex-row justify-center items-center -mt-5 mb-10">
-                    {errorMessage && step === 5 && <Text className="text-red-500">{errorMessage}</Text>}
+                    {errorMessage && step === 5 && <Text className="text-red-700">{errorMessage}</Text>}
                   </View>
                   {!isSuccess && step === 5 && 
                     <CustomButton 

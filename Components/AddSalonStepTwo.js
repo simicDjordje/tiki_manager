@@ -12,7 +12,7 @@ const AddSalonStepTwo = ({location, setLocation, validation2}) => {
 
   return (
     <View className="min-h-full">
-        <Text className={`mb-1 text-md ${validation2 && !location && 'text-red-500'}`} semi>Lokacija salona {validation2 && !location && ' / obavezno'}</Text>
+        <Text className={`mb-1 text-md ${validation2 && !location && 'text-red-700'}`} semi>Lokacija salona {validation2 && !location && ' / obavezno'}</Text>
         <GooglePlacesAutocomplete
             placeholder={location ? location.description : 'Pretraži adresu'}
             query={{

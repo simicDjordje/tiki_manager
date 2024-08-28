@@ -81,7 +81,7 @@ const CreateServicesCategoryModal = ({
                         />
                         
                         <View className="flex flex-row justify-center items-center h-5">
-                            <Text className="text-red-500">{errorMessage}</Text>
+                            <Text className="text-red-700">{errorMessage}</Text>
                         </View>
 
                         <View className="mb-3">

@@ -17,9 +17,9 @@ const CustomInput = (props) => {
 
   return (
     <View className={`w-full ${classNameCustom}`}>
-        <Text className={`mb-1 text-md ${isError ? 'text-red-500' : isFocused ? 'text-appColor' : ''}`} semi>
+        <Text className={`mb-1 text-md ${isError ? 'text-red-700' : isFocused ? 'text-appColor' : ''}`} semi>
           {label || 'No Label'}
-          <Text className="text-red-500">{isError ? !errorMessage ? ' *' : ` / ${errorMessage}` : ''}</Text>
+          <Text className="text-red-700">{isError ? !errorMessage ? ' *' : ` / ${errorMessage}` : ''}</Text>
         </Text>
         <View className={`
                 p-4 rounded-lg w-full border 

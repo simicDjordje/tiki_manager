@@ -17,6 +17,7 @@ const initialState = {
   },
   comesFrom: null,
   activeCategory: null,
+  activeService: null,
 }
 
 
@@ -58,7 +59,11 @@ const generalSlice = createSlice({
 
     setActiveCategory: (state, action) => {
         state.activeCategory = action.payload
-    }
+    },
+    
+    setActiveService: (state, action) => {
+        state.activeService = action.payload
+    },
 
   },
   extraReducers: (builder) => {
@@ -76,14 +81,39 @@ const generalSlice = createSlice({
 
     builder.addMatcher(
         apiCore.endpoints.getSalonById.matchFulfilled,
-        (state, action) => {  
-        //   console.log('########')
-        //   console.log(action?.payload?.result?.categories[0].category)
-        //   console.log('########')
-
-          state.currentSalon = action?.payload?.result ? action?.payload?.result : state.currentSalon
+        (state, action) => {
+          if (action?.payload?.result) {
+            // Reverse categories and services within them
+            const reversedCategories = action.payload.result.categories.map(category => {
+              const reversedServices = [...category.category.services].reverse()
+      
+              return {
+                ...category,
+                category: {
+                  ...category.category,
+                  services: reversedServices
+                }
+              }
+            }).reverse();
+      
+            // Set the reversed data to state
+            state.currentSalon = {
+              ...action.payload.result,
+              categories: reversedCategories
+            }
+      
+            if (state.activeCategory) {
+              const foundedActiveCategory = reversedCategories.find(i =>
+                String(i.category._id) === String(state.activeCategory._id)
+              );
+      
+              if (foundedActiveCategory) {
+                state.activeCategory = foundedActiveCategory.category;
+              }
+            }
+          }
         }
-    )
+      );      
   },
 })
 
@@ -98,7 +128,8 @@ export const {
         setUserSalons,
         setSignUpFirstScreenData,
         setComesFrom,
-        setActiveCategory
+        setActiveCategory,
+        setActiveService
     } = generalSlice.actions
 
 export default generalSlice.reducer

@@ -184,7 +184,7 @@ const SalonScreen = ({navigation}) => {
                     <View className="flex flex-col justify-between items-start">
                         <Text className="text-textMid mb-2" semi>Usluge:</Text>
                         {services?.length === 0 && 
-                            <Text className="text-md text-red-500" bold>
+                            <Text className="text-md text-red-700" bold>
                                 Dodaj usluge
                             </Text>
                         }
@@ -208,7 +208,7 @@ const SalonScreen = ({navigation}) => {
                     <View className="flex flex-col justify-between items-start">
                         <Text className="text-textMid mb-2" semi>Članovi salona:</Text>
                         {salonData?.workers?.length === 0 && 
-                            <Text className="text-md text-red-500" bold>
+                            <Text className="text-md text-red-700" bold>
                                 Dodaj članove salona
                             </Text>
                         }

@@ -123,13 +123,13 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible, userData})
                         </View>
 
                         <View className="flex flex-row justify-center items-center mt-6">
-                            {image ? <Text>Slika uspešno dodata</Text> : <Text className={`${validation && !image && 'text-red-500'}`}>Dodaj profilnu sliku</Text>}
+                            {image ? <Text>Slika uspešno dodata</Text> : <Text className={`${validation && !image && 'text-red-700'}`}>Dodaj profilnu sliku</Text>}
                         </View>
 
                         <View className="flex flex-col justify-center items-center w-full mt-2 p-3">
                             {!image && 
                                 <View className={`w-44 h-44 border-2 border-dashed ${validation && !image ? 'border-red-500' : 'border-textSecondary'} rounded-full relative flex flex-col justify-center items-center`}>
-                                    <Text className={`${validation && !image ? 'text-red-500' : 'text-textMid'}`}>Profilna slika je obavezna</Text>
+                                    <Text className={`${validation && !image ? 'text-red-700' : 'text-textMid'}`}>Profilna slika je obavezna</Text>
                                     <TouchableOpacity onPress={pickImage} className="p-3 bg-textPrimary rounded-full absolute bottom-0 right-0">
                                         <Entypo name="plus" size={34} color="white" />
                                     </TouchableOpacity>
@@ -155,7 +155,7 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible, userData})
 
                         <View className="flex flex-col justify-center items-center mt-2">
                             <Text className="text-2xl" bold>{userData?.first_name} {userData?.last_name}</Text>
-                            <Text className="text-red-500">{errorMessage}</Text>
+                            <Text className="text-red-700">{errorMessage}</Text>
                         </View>
                         
 

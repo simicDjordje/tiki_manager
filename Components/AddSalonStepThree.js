@@ -34,7 +34,7 @@ const AddSalonStepThree = ({logo, setLogo, validation3}) => {
   return (
     <View className="h-full">        
         <View className="flex flex-col justify-center items-center">
-            <Text className={`text-center ${validation3 && !logo ? 'text-red-500' : 'text-textMid'} text-lg`} bold>
+            <Text className={`text-center ${validation3 && !logo ? 'text-red-700' : 'text-textMid'} text-lg`} bold>
                 Logo
             </Text>
         </View>
@@ -42,7 +42,7 @@ const AddSalonStepThree = ({logo, setLogo, validation3}) => {
         <View className="flex flex-col justify-center items-center w-full mt-2 p-3">
             {!logo && 
                 <View className={`w-44 h-44 border-2 ${validation3 && !logo ? 'border-red-500' : 'border-textSecondary'} rounded-full relative flex flex-col justify-center items-center`}>
-                    <Text className={`${validation3 && !logo ? 'text-red-500' : 'text-textMid'}`}>Logo salona je obavezan</Text>
+                    <Text className={`${validation3 && !logo ? 'text-red-700' : 'text-textMid'}`}>Logo salona je obavezan</Text>
                     <TouchableOpacity onPress={pickImage} className="p-3 bg-textPrimary rounded-full absolute bottom-0 right-0">
                         <Entypo name="plus" size={34} color="white" />
                     </TouchableOpacity>

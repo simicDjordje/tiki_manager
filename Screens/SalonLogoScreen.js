@@ -95,7 +95,7 @@ const SalonLogoScreen = ({navigation}) => {
             <View className="bg-textSecondary mt-8 w-full mb-20" style={{height: 0.5}}></View>
 
             <View className="flex flex-row justify-center items-center h-6">
-              <Text className="mb-4 -mt-4 text-red-500" semi>{errorMessage}</Text>
+              <Text className="mb-4 -mt-4 text-red-700" semi>{errorMessage}</Text>
             </View>
 
             <View className="w-44 h-44 rounded-full relative">
