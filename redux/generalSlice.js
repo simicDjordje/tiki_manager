@@ -15,7 +15,8 @@ const initialState = {
   signUpFirstScreenData: {
     email: ''
   },
-  comesFrom: null
+  comesFrom: null,
+  activeCategory: null,
 }
 
 
@@ -53,10 +54,15 @@ const generalSlice = createSlice({
 
     setComesFrom: (state, action) => {
         state.comesFrom = action.payload
+    },
+
+    setActiveCategory: (state, action) => {
+        state.activeCategory = action.payload
     }
 
   },
   extraReducers: (builder) => {
+
     builder.addMatcher(
       apiCore.endpoints.getUserSalons.matchFulfilled,
       (state, action) => {
@@ -66,6 +72,17 @@ const generalSlice = createSlice({
         state.userSalons.salonsInactive = dataReversed.filter(i => !i.isActive)
 
       }
+    )
+
+    builder.addMatcher(
+        apiCore.endpoints.getSalonById.matchFulfilled,
+        (state, action) => {  
+        //   console.log('########')
+        //   console.log(action?.payload?.result?.categories[0].category)
+        //   console.log('########')
+
+          state.currentSalon = action?.payload?.result ? action?.payload?.result : state.currentSalon
+        }
     )
   },
 })
@@ -81,6 +98,7 @@ export const {
         setUserSalons,
         setSignUpFirstScreenData,
         setComesFrom,
+        setActiveCategory
     } = generalSlice.actions
 
 export default generalSlice.reducer

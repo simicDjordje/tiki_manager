@@ -25,28 +25,13 @@ const SalonScreen = ({navigation}) => {
     const dispatch = useDispatch()
 
     useFocusEffect(useCallback(()=>{
-        (async () => {
-            try{
-                const {error, data} = await getSalonById({salonId: salonData?._id})
-
-                if(error){
-                    console.log('Došlo je do greške')
-                }
-
-                if(data && data.success){
-                    dispatch(setCurrentSalon(data?.result))
-                }
-
-            }catch(error){
-                console.log(error)
-            }
-        })()
+        getSalonById({salonId: salonData?._id})
     }, []))
 
     useEffect(()=>{
         if(!salonData) return
 
-        const servicesArray = salonData?.categories?.map(i => i.services).flat()
+        const servicesArray = salonData?.categories?.map(i => i.category.services).flat()
         setServices(servicesArray)
     }, [salonData])
 

@@ -11,7 +11,7 @@ import Text from '../Components/CustomComponents/CustomText'
 import Feather from '@expo/vector-icons/Feather'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
 import CreateServicesCategoryModal from '../Components/CreateServicesCategoryModal'
-import {useCreateCategoryMutation} from '../redux/apiCore'
+import {useCreateCategoryMutation, useGetSalonByIdMutation} from '../redux/apiCore'
 import { useSelector } from 'react-redux'
 
 const blurhash =
@@ -20,9 +20,9 @@ const blurhash =
 
 const SalonServicesCategoriesScreen = ({navigation}) => {
   const {currentSalon: salonData} = useSelector(state => state.general)
-  const [categories, setCategories] = useState(salonData?.categories || [])
   const [isCreateCategoryModalVisible, setIsCreateCategoryModalVisible] = useState(false)
   const [createCategory, {isLoading: isCreateCategoryLoading}] = useCreateCategoryMutation()
+  const [getSalonById] = useGetSalonByIdMutation()
   const [categoryName, setCategoryName] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [isCategoryAddedSuccess, setIsCategoryAddedSuccess] = useState(false)
@@ -44,7 +44,6 @@ const SalonServicesCategoriesScreen = ({navigation}) => {
     
     try{
         const {error, data} = await createCategory({salonId: salonData?._id, name: categoryName})
-
         if(error){
             if(error?.data?.message == 'A category with this name already exists in this salon'){
                 setErrorMessage('U salonu već postoji kategorija sa ovim imenom')
@@ -56,8 +55,8 @@ const SalonServicesCategoriesScreen = ({navigation}) => {
         }
 
         if(data && data.success){
-            console.log(data)
             setIsCategoryAddedSuccess(true)
+            getSalonById({salonId: salonData?._id})
 
             setTimeout(()=>{
                 setIsCreateCategoryModalVisible(false)
@@ -91,13 +90,13 @@ const SalonServicesCategoriesScreen = ({navigation}) => {
             </View>
             <View className="bg-textSecondary mt-8 w-full mb-5" style={{height: 0.5}}></View>
             
-            {categories.length === 0 && <View>
+            {salonData?.categories.length === 0 && <View>
                 <Text className="text-center text-textMid" bold>Kreiraj kategorije u kojima možeš dodavati usluge</Text>
                 <Text className="text-center text-textMid">Nemaš još uvek nijednu kategoriju</Text>
             </View>}
 
             <View className="flex-1 w-full mb-3 mt-10">
-                {categories.length === 0 && 
+                {salonData?.categories.length === 0 && 
                     <View className="flex flex-col justify-center items-center mt-10">
                         <Text className="text-lg mb-3" bold>Kreiraj kategoriju</Text>
                         <TouchableOpacity onPress={beginAddCategory} className="p-4 bg-textPrimary rounded-full">
@@ -106,13 +105,13 @@ const SalonServicesCategoriesScreen = ({navigation}) => {
                     </View>
                 }
                 
-                {/* {categories.length === 0 && 
+                {/* {salonData?.categories.length === 0 && 
                     <View className="px-12">
                         <View className="bg-textSecondary mt-5 w-full" style={{height: 0.5}}></View>
                     </View>
                 }
 
-                {categories.length === 0 && 
+                {salonData?.categories.length === 0 && 
                     <View className="flex flex-col justify-center items-center mt-5">
                         <Text className="text-lg mb-3" bold>Kopiraj iz jednog od svojih salona</Text>
                         <TouchableOpacity onPress={beginAddCategory} className="p-5 bg-textPrimary rounded-full">
@@ -123,44 +122,34 @@ const SalonServicesCategoriesScreen = ({navigation}) => {
             </View>
               
             
-             {categories.length > 0 && 
+             {salonData?.categories.length > 0 && 
                 <View className="flex flex-row justify-start items-center w-full -mt-10">
                     <Text className="text-textMid" semi>Kategorije usluga</Text>
                 </View>
              }
 
-              {categories.length > 0 && 
+              {salonData?.categories.length > 0 && 
                 <ScrollView className="w-full">
                     <View className="min-h-screen">
-                        <TouchableOpacity onPress={handleToServices} className="bg-bgPrimary w-full h-28 mt-4 rounded-xl p-4 flex flex-col justify-between">
-                            <View className="flex flex-row justify-between items-center">
-                                <Text className="text-textPrimary text-xl" bold>Trepavice</Text>
-                                <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
-                            </View>
-                            <View className="bg-textSecondary mt-3 w-full" style={{height: 0.5}}></View>
+                        {salonData?.categories.map(({category}, index) => {
+                            return (
+                                <TouchableOpacity key={index} onPress={handleToServices} className="bg-bgPrimary w-full h-28 mt-4 rounded-xl p-4 flex flex-col justify-between">
+                                    <View className="flex flex-row justify-between items-center">
+                                        <Text className="text-textPrimary text-xl" bold>{category?.name}</Text>
+                                        <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
+                                    </View>
+                                    <View className="bg-textSecondary mt-3 w-full" style={{height: 0.5}}></View>
 
-                            <View className="flex-1">
-                                <View className="flex flex-row justify-between items-center mt-2">
-                                    <Text>Ukupno usluga u ovoj kategoriji: </Text>
-                                    <Text semi>9</Text>
-                                </View>
-                            </View>
-                        </TouchableOpacity>
+                                    <View className="flex-1">
+                                        <View className="flex flex-row justify-between items-center mt-2">
+                                            <Text>Ukupno usluga u ovoj kategoriji: </Text>
+                                            <Text semi>{category?.services?.length}</Text>
+                                        </View>
+                                    </View>
+                                </TouchableOpacity>
+                            )
+                        })}
 
-                        <TouchableOpacity onPress={handleToServices} className="bg-bgPrimary w-full h-28 mt-4 rounded-xl p-4 flex flex-col justify-between">
-                            <View className="flex flex-row justify-between items-center">
-                                <Text className="text-textPrimary text-xl" bold>Trajna šminka</Text>
-                                <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
-                            </View>
-                            <View className="bg-textSecondary mt-3 w-full" style={{height: 0.5}}></View>
-
-                            <View className="flex-1">
-                                <View className="flex flex-row justify-between items-center mt-2">
-                                    <Text>Ukupno usluga u ovoj kategoriji: </Text>
-                                    <Text semi>4</Text>
-                                </View>
-                            </View>
-                        </TouchableOpacity>
                         <View className="mb-44"></View>
                     </View>
                 </ScrollView>
