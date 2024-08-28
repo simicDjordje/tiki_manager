@@ -10,15 +10,15 @@ import Entypo from '@expo/vector-icons/Entypo'
 import Text from '../Components/CustomComponents/CustomText'
 import CustomButton from '../Components/CustomComponents/CustomButton'
 import { useUpdateSalonMutation } from '../redux/apiCore'
+import { useSelector } from 'react-redux'
 
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
-const SalonLogoScreen = ({route, navigation}) => {
-  const params = route.params || {}
-  const salonData = params?.salonData || null
+const SalonLogoScreen = ({navigation}) => {
+  const {currentSalon: salonData} = useSelector(state => state.general)
   const [image, setImage] = useState(null)
   const [updateSalon, {isLoading}] = useUpdateSalonMutation()
   const [errorMessage, setErrorMessage] = useState(null)
@@ -54,8 +54,8 @@ const SalonLogoScreen = ({route, navigation}) => {
       if(data && data.success){
         setIsSuccess(true)
         setTimeout(()=>{
-          navigation.navigate('StackTabScreens', {screen: 'SalonScreen', params: {salonId: salonData?._id, salonName: salonData?.name}})
-        }, 2500)
+          navigation.navigate('StackTabScreens', {screen: 'SalonScreen'})
+        }, 2700)
       }
 
     }catch(error){
@@ -72,9 +72,7 @@ const SalonLogoScreen = ({route, navigation}) => {
           quality: 1,
           
         })
-    
-        console.log(result);
-    
+        
         if (!result.canceled) {
             setImage(result.assets[0])
         }
@@ -110,7 +108,7 @@ const SalonLogoScreen = ({route, navigation}) => {
 
                     <Image
                         className="w-44 h-44 rounded-full border-2 border-textPrimary"
-                        source={image ? image.uri : `http://192.168.1.4:5000/photos/salon-logo_${salonData?.logoId}.png`}
+                        source={image ? image.uri : `http://192.168.0.102:5000/photos/salon-logo_${salonData?.logoId}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}
@@ -122,7 +120,7 @@ const SalonLogoScreen = ({route, navigation}) => {
               <View className="w-full flex flex-row justify-between items-center px-8 mt-10 bg-bgPrimary py-2 rounded-xl">
                   <Image
                         className="w-8 h-8 rounded-full border-2 border-appColorDark"
-                        source={image ? image.uri : `http://192.168.1.4:5000/photos/salon-logo_${salonData?.logoId}.png`}
+                        source={image ? image.uri : `http://192.168.0.102:5000/photos/salon-logo_${salonData?.logoId}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}
@@ -130,7 +128,7 @@ const SalonLogoScreen = ({route, navigation}) => {
 
                   <Image
                         className="w-12 h-12 rounded-full border-2 border-textPrimary"
-                        source={image ? image.uri : `http://192.168.1.4:5000/photos/salon-logo_${salonData?.logoId}.png`}
+                        source={image ? image.uri : `http://192.168.0.102:5000/photos/salon-logo_${salonData?.logoId}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}
@@ -138,7 +136,7 @@ const SalonLogoScreen = ({route, navigation}) => {
 
                   <Image
                         className="w-16 h-16 rounded-full border-2 border-appColor"
-                        source={image ? image.uri : `http://192.168.1.4:5000/photos/salon-logo_${salonData?.logoId}.png`}
+                        source={image ? image.uri : `http://192.168.0.102:5000/photos/salon-logo_${salonData?.logoId}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}
@@ -146,7 +144,7 @@ const SalonLogoScreen = ({route, navigation}) => {
 
                   <Image
                         className="w-20 h-20 rounded-full border-2 border-textPrimary"
-                        source={image ? image.uri : `http://192.168.1.4:5000/photos/salon-logo_${salonData?.logoId}.png`}
+                        source={image ? image.uri : `http://192.168.0.102:5000/photos/salon-logo_${salonData?.logoId}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}

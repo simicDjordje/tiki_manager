@@ -12,42 +12,23 @@ const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
-const CreateServicesCategoryModal = ({isModalVisible, setIsModalVisible}) => {
-    const [isSuccess, setIsSuccess] = useState(false)
-    const [isLoading, setIsLoading] = useState(false)
-    const [durations, setDurations] = useState([
-        { value: 900, label: '15min' },       // 15 minutes
-        { value: 1800, label: '30min' },      // 30 minutes
-        { value: 3600, label: '1h' },         // 1 hour
-        { value: 5400, label: '1h 30min' },   // 1 hour 30 minutes
-        { value: 7200, label: '2h' },         // 2 hours
-        { value: 9000, label: '2h 30min' },   // 2 hours 30 minutes
-        { value: 10800, label: '3h' },        // 3 hours
-        { value: 12600, label: '3h 30min' },  // 3 hours 30 minutes
-        { value: 14400, label: '4h' },        // 4 hours
-        { value: 16200, label: '4h 30min' },  // 4 hours 30 minutes
-        { value: 18000, label: '5h' },        // 5 hours
-        { value: 21600, label: '6h' },        // 6 hours
-        { value: 25200, label: '7h' },        // 7 hours
-        { value: 28800, label: '8h' },        // 8 hours
-        { value: 32400, label: '9h' },        // 9 hours
-        { value: 36000, label: '10h' }        // 10 hours
-    ])
-    const [selectedDuration, setSelectedDuration] = useState({ value: 1800, label: '30min' })
-    const [workerSetDuration, setWorkerSetDuration] = useState(false)
+const CreateServicesCategoryModal = ({
+    isModalVisible, 
+    setIsModalVisible, 
+    handleAddCategory, 
+    name, 
+    setName, 
+    isSuccess,
+    setIsSuccess, 
+    isLoading,
+    errorMessage,
+    setErrorMessage,
+}) => {
+
+    const [validation, setValidation] = useState(false)
 
     const closeModal = () => {
         setIsModalVisible(false)
-        setIsSuccess(false)
-    }
-
-    const handleSave = () => {
-        setIsLoading(true)
-
-        setTimeout(()=>{
-            setIsLoading(false)
-            setIsSuccess(true)
-        }, 2500)
     }
 
     useEffect(()=>{
@@ -65,12 +46,15 @@ const CreateServicesCategoryModal = ({isModalVisible, setIsModalVisible}) => {
           animationOutTiming={300}
           style={{margin: 0}}
           onModalHide={()=>{
+            setValidation(false)
+            setName('')
+            setErrorMessage('')
             setIsSuccess(false)
           }}
       >
           <View className="flex-1 flex flex-col justify-end items-center w-full">
                 <View 
-                    className="h-3/6 w-full bg-bgSecondary px-4 flex flex-col justify-between"
+                    className="h-4/6 w-full bg-bgSecondary px-4 flex flex-col justify-between"
                     style={{borderTopRightRadius: 50, borderTopLeftRadius: 50}}
                 >
                     <View className="mt-6">
@@ -90,14 +74,25 @@ const CreateServicesCategoryModal = ({isModalVisible, setIsModalVisible}) => {
                             label={'Naziv kategorije'}
                             placeholder={'Primer: Trepavice'}
                             classNameCustom="mt-4"
+                            errorMessage={'obavezno'}
+                            isError={validation}
+                            value={name}
+                            onChangeText={(text) => setName(text)}
                         />
-                          
-                        <CustomButton 
-                            onPress={handleSave}
-                            text={'Potvrdi'}
-                            isSuccess={isSuccess}
-                            isLoading={isLoading}
-                        />
+                        
+                        <View className="flex flex-row justify-center items-center h-5">
+                            <Text className="text-red-500">{errorMessage}</Text>
+                        </View>
+
+                        <View className="mb-3">
+                            <CustomButton 
+                                onPress={name ? handleAddCategory : () => {setValidation(true)}}
+                                text={'Potvrdi'}
+                                isSuccess={isSuccess}
+                                isLoading={isLoading}
+                                isError={!!errorMessage}
+                            />
+                        </View>
                     </View>
                 </View>
           </View>
@@ -106,3 +101,25 @@ const CreateServicesCategoryModal = ({isModalVisible, setIsModalVisible}) => {
   }
   
   export default CreateServicesCategoryModal
+
+
+
+
+//   const [durations, setDurations] = useState([
+//     { value: 900, label: '15min' },       // 15 minutes
+//     { value: 1800, label: '30min' },      // 30 minutes
+//     { value: 3600, label: '1h' },         // 1 hour
+//     { value: 5400, label: '1h 30min' },   // 1 hour 30 minutes
+//     { value: 7200, label: '2h' },         // 2 hours
+//     { value: 9000, label: '2h 30min' },   // 2 hours 30 minutes
+//     { value: 10800, label: '3h' },        // 3 hours
+//     { value: 12600, label: '3h 30min' },  // 3 hours 30 minutes
+//     { value: 14400, label: '4h' },        // 4 hours
+//     { value: 16200, label: '4h 30min' },  // 4 hours 30 minutes
+//     { value: 18000, label: '5h' },        // 5 hours
+//     { value: 21600, label: '6h' },        // 6 hours
+//     { value: 25200, label: '7h' },        // 7 hours
+//     { value: 28800, label: '8h' },        // 8 hours
+//     { value: 32400, label: '9h' },        // 9 hours
+//     { value: 36000, label: '10h' }        // 10 hours
+// ])

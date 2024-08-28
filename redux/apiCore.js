@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const apiCore = createApi({
 	reducerPath: 'apiCore',
 	baseQuery: fetchBaseQuery({
-		baseUrl: 'http://192.168.1.4:5000/api/v1',
+		baseUrl: 'http://192.168.0.102:5000/api/v1',
 		prepareHeaders: async (headers) => {
 			let user = await AsyncStorage.getItem('@userData')
 			user = JSON.parse(user)
@@ -90,6 +90,15 @@ export const apiCore = createApi({
 				}
 			}
 		}),
+		createCategory: builder.mutation({
+			query: (data) => {
+				return {
+					url: `/services/create-category`,
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
 	})
 })
 
@@ -102,4 +111,5 @@ export const {
 	useCreateSalonMutation,
 	useGetSalonByIdMutation,
 	useUpdateSalonMutation,
+	useCreateCategoryMutation,
 } = apiCore;

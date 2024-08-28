@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import { StatusBar } from 'expo-status-bar'
@@ -11,31 +11,30 @@ import { useFocusEffect } from '@react-navigation/native'
 import { useGetSalonByIdMutation } from '../redux/apiCore'
 import LootieLoader from '../Components/LootieAnimations/Loader'
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useDispatch, useSelector } from 'react-redux'
+import { setCurrentSalon } from '../redux/generalSlice'
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
-const SalonScreen = ({route, navigation}) => {
-    const [salonData, setSalonData] = useState(null)
+const SalonScreen = ({navigation}) => {
+    const {currentSalon: salonData} = useSelector(state => state.general)
     const [getSalonById, {isLoading}] = useGetSalonByIdMutation()
-    const params = route.params || {}
-    const salonName = params?.salonName || ''
+    const [services, setServices] = useState([])
+    const dispatch = useDispatch()
 
     useFocusEffect(useCallback(()=>{
         (async () => {
             try{
-                const salonId = params?.salonId || null
-                
-                const {error, data} = await getSalonById({salonId})
+                const {error, data} = await getSalonById({salonId: salonData?._id})
 
                 if(error){
                     console.log('Došlo je do greške')
                 }
 
                 if(data && data.success){
-                    console.log(data.result)
-                    setSalonData(data.result)
+                    dispatch(setCurrentSalon(data?.result))
                 }
 
             }catch(error){
@@ -44,13 +43,20 @@ const SalonScreen = ({route, navigation}) => {
         })()
     }, []))
 
+    useEffect(()=>{
+        if(!salonData) return
+
+        const servicesArray = salonData?.categories?.map(i => i.services).flat()
+        setServices(servicesArray)
+    }, [salonData])
+
 
     const handleBack = () => {
         navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
     }
 
     const handleToLogoScreen = () => {
-        navigation.navigate('StackTabScreens', {screen: 'SalonLogoScreen', params: {salonData: salonData}})
+        navigation.navigate('StackTabScreens', {screen: 'SalonLogoScreen'})
     }
 
     const handleToImagesScreen = () => {
@@ -82,8 +88,6 @@ const SalonScreen = ({route, navigation}) => {
             <TouchableOpacity onPress={handleBack}>
                 <MaterialIcons name="arrow-back-ios-new" size={24} color="#232323" />
             </TouchableOpacity>
-
-            {!salonData && <Text className="text-textPrimary text-lg" bold>{salonName && salonName.length > 34 ? `${salonName.substring(0, 34)}...` : salonName}</Text>}
             {salonData && <Text className="text-textPrimary text-lg" bold>{salonData?.name && salonData?.name.length > 34 ? `${salonData?.name.substring(0, 34)}...` : salonData?.name}</Text>}
         </View>
         
@@ -121,7 +125,7 @@ const SalonScreen = ({route, navigation}) => {
                         <View className="flex flex-row justify-center items-center w-full flex-1">
                             <Image
                                 className="w-20 h-20 rounded-full border-2 border-textPrimary mb-2"
-                                source={`http://192.168.1.4:5000/photos/salon-logo_${salonData?.logoId}.png`}
+                                source={`http://192.168.0.102:5000/photos/salon-logo_${salonData?.logoId}.png`}
                                 placeholder={{ blurhash }}
                                 contentFit="cover"
                                 transition={1000}
@@ -147,7 +151,7 @@ const SalonScreen = ({route, navigation}) => {
                                         key={index}
                                         className="w-9 h-9 border-textPrimary rounded-lg mx-1 my-0.5"
                                         style={{borderWidth: 0.5}}
-                                        source={`http://192.168.1.4:5000/photos/salon-photo_${imageId}.png`}
+                                        source={`http://192.168.0.102:5000/photos/salon-photo_${imageId}.png`}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
@@ -194,23 +198,23 @@ const SalonScreen = ({route, navigation}) => {
                 <TouchableOpacity onPress={handleToServicesCategoriesScreen} className="flex flex-row justify-between items-center bg-bgSecondary border-textSecondary rounded-xl p-2 mt-4" style={{borderWidth: 0.5}}>
                     <View className="flex flex-col justify-between items-start">
                         <Text className="text-textMid mb-2" semi>Usluge:</Text>
-                        {salonData?.services?.length === 0 && 
+                        {services?.length === 0 && 
                             <Text className="text-md text-red-500" bold>
                                 Dodaj usluge
                             </Text>
                         }
 
-                        {salonData?.services?.length > 0 && 
+                        {services?.length > 0 && 
                             <Text className="text-md text-textPrimary" bold>
-                                Pogledaj / Izmeni usluge ({salonData?.services?.length})
+                                Pogledaj / Izmeni usluge ({services?.length})
                             </Text>
                         }
                     </View>
-                    {salonData?.services?.length === 0 && 
+                    {services?.length === 0 && 
                     <View className="p-1 bg-textPrimary rounded-full">
                         <Entypo name="plus" size={20} color="white" />
                     </View>}
-                    {salonData?.services?.length > 0 &&   <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />}
+                    {services?.length > 0 &&   <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />}
                 </TouchableOpacity>
 
                 <TouchableOpacity 

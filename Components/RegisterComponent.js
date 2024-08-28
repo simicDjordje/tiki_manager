@@ -6,31 +6,25 @@ import Text from './CustomComponents/CustomText'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useCheckIfUserExistsMutation } from '../redux/apiCore'
 import CustomButton from './CustomComponents/CustomButton'
+import { useSelector, useDispatch } from 'react-redux'
+import { setSignUpFirstScreenData } from '../redux/generalSlice'
 
 const RegisterComponent = ({setAuthType}) => {
-    const [email, setEmail] = useState('')
+    const {signUpFirstScreenData} = useSelector(state => state.general)
     const [validation, setValidation] = useState(false)
     const navigation = useNavigation()
     const [checkIfUserExists, {isLoading, isError}] = useCheckIfUserExistsMutation()
     const [errorMessage, setErrorMessage] = useState(null)
-
-    useFocusEffect(useCallback(()=>{
-        (
-            async () => {
-                const emailStorage = await AsyncStorage.getItem('@register_user_email')
-                if(emailStorage) AsyncStorage.removeItem('@register_user_email')
-            }
-        )()
-    }, []))
+    const dispatch = useDispatch()
 
     const handleNext = async () => {
-        if(!email){
+        if(!signUpFirstScreenData.email){
             setValidation(true)
             return
         }
 
         try{
-            const {error, data} = await checkIfUserExists({email: email.toLowerCase()})
+            const {error, data} = await checkIfUserExists({email: signUpFirstScreenData.email.toLowerCase()})
             
             if(error){
                 if(error?.data?.message === 'User already exists'){
@@ -43,7 +37,6 @@ const RegisterComponent = ({setAuthType}) => {
             }
 
             setErrorMessage(null)
-            await AsyncStorage.setItem('@register_user_email', email.toLocaleLowerCase())
             navigation.navigate('AuthTabScreens', {screen: 'RegisterScreen'})
         }catch(error){
             console.log(error)
@@ -70,9 +63,9 @@ const RegisterComponent = ({setAuthType}) => {
             <CustomInput 
                 label={'Email'}
                 placeholder={'Unesi email'}
-                value={email}
-                onChangeText={text => setEmail(text)}
-                isError={validation && !email}
+                value={signUpFirstScreenData.email}
+                onChangeText={text => dispatch(setSignUpFirstScreenData({...signUpFirstScreenData, email: text}))}
+                isError={validation && !signUpFirstScreenData.email}
                 errorMessage={'obavezno'}
             />
 

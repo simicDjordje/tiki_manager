@@ -1,9 +1,6 @@
-import { StatusBar } from 'expo-status-bar';
 import Navigation from './Navigation';
 import * as Font from 'expo-font'
 import { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import LootieLoader from './Components/LootieAnimations/Loader';
 import { Provider } from 'react-redux';
 import {store} from './redux/store'
 import LoadingComponent from './Components/LoadingComponent';

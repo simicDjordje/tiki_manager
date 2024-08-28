@@ -10,6 +10,8 @@ import Text from './CustomComponents/CustomText'
 import CustomButton from './CustomComponents/CustomButton'
 import { useCreateWorkerAccountMutation } from '../redux/apiCore'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useDispatch } from 'react-redux'
+import { setJustCreatedWorkerAccount, setUser } from '../redux/generalSlice'
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
@@ -23,6 +25,8 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible, userData})
     const [errorMessage, setErrorMessage] = useState(null)
     const [isLoadingCustom, setIsLoadingCustom] = useState(false)
 
+    const dispatch = useDispatch()
+
     const pickImage = async () => {
         // No permissions request is necessary for launching the image library
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -32,7 +36,6 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible, userData})
           quality: 1,
         })
     
-        console.log(result);
     
         if (!result.canceled) {
           setImage(result.assets[0])
@@ -74,8 +77,7 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible, userData})
             }
 
             if(data.success){
-                await AsyncStorage.setItem('@userData', JSON.stringify(data.result))
-                await AsyncStorage.setItem('@isWorkerAccCreated', 'yes')
+                dispatch(setUser(data.result))
                 setIsSuccess(true)
             }
         }catch(error){
@@ -101,9 +103,9 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible, userData})
                     <View className="flex flex-row justify-between items-center w-full mt-6">
                         <Text className="text-xl ml-2" bold>Postani deo salona</Text>
 
-                        <TouchableOpacity onPress={closeModal} className="p-1 bg-textPrimary rounded-full">
+                        {!isSuccess && <TouchableOpacity onPress={closeModal} className="p-1 bg-textPrimary rounded-full">
                             <Ionicons name="close" size={20} color="white" />
-                        </TouchableOpacity>
+                        </TouchableOpacity> }
                     </View>
 
                     <View className="bg-textSecondary w-full h-0.5 mt-4"></View>
@@ -177,6 +179,16 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible, userData})
                                 <Text className="text-lg text-center">Sačekaj da te menadžer salona doda i započni svoju karijeru uz <Text className="text-appColorDark" semi>tiki</Text></Text>
 
                                 <LootieSuccess d={250} />
+
+                                <View className="flex flex-col justify-center items-center mt-14 w-full">
+                                    <CustomButton 
+                                        onPress={()=> {
+                                            dispatch(setJustCreatedWorkerAccount(true))
+                                            setIsModalVisible(false)
+                                        }}
+                                        text={'Nazad na početnu'}
+                                    />
+                                </View>
                             </View>
                         </View>
                     }

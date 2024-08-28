@@ -11,17 +11,21 @@ import Text from '../Components/CustomComponents/CustomText'
 import Feather from '@expo/vector-icons/Feather'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
 import CreateServicesCategoryModal from '../Components/CreateServicesCategoryModal'
-
+import {useCreateCategoryMutation} from '../redux/apiCore'
+import { useSelector } from 'react-redux'
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
-const SalonServicesCategoriesScreen = () => {
-  const [categories, setCategories] = useState([1])
+const SalonServicesCategoriesScreen = ({navigation}) => {
+  const {currentSalon: salonData} = useSelector(state => state.general)
+  const [categories, setCategories] = useState(salonData?.categories || [])
   const [isCreateCategoryModalVisible, setIsCreateCategoryModalVisible] = useState(false)
-  const navigation = useNavigation()
-  const salonName = 'Beauty salon PK'
+  const [createCategory, {isLoading: isCreateCategoryLoading}] = useCreateCategoryMutation()
+  const [categoryName, setCategoryName] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
+  const [isCategoryAddedSuccess, setIsCategoryAddedSuccess] = useState(false)
 
   const handleBack = () => {
     navigation.navigate('StackTabScreens', {screen: 'SalonScreen'})
@@ -35,7 +39,34 @@ const SalonServicesCategoriesScreen = () => {
     setIsCreateCategoryModalVisible(true)
   }
 
+  const handleAddCategory = async () => {
+    if(!categoryName) return
+    
+    try{
+        const {error, data} = await createCategory({salonId: salonData?._id, name: categoryName})
 
+        if(error){
+            if(error?.data?.message == 'A category with this name already exists in this salon'){
+                setErrorMessage('U salonu već postoji kategorija sa ovim imenom')
+            }else{
+                setErrorMessage('Došlo je do greške')
+            }
+
+            return
+        }
+
+        if(data && data.success){
+            console.log(data)
+            setIsCategoryAddedSuccess(true)
+
+            setTimeout(()=>{
+                setIsCreateCategoryModalVisible(false)
+            }, 2700)
+        }
+    }catch(error){
+        console.log(error)
+    }
+  }
 
 
 
@@ -46,13 +77,13 @@ const SalonServicesCategoriesScreen = () => {
             <TouchableOpacity onPress={handleBack}>
                 <MaterialIcons name="arrow-back-ios-new" size={24} color="#232323" />
             </TouchableOpacity>
-            <Text className="text-textPrimary text-lg" bold>{salonName.length > 34 ? `${salonName.substring(0, 34)}...` : salonName}</Text>
+            <Text className="text-textPrimary text-lg" bold>{salonData?.name && salonData?.name.length > 34 ? `${salonData?.name.substring(0, 34)}...` : salonData?.name}</Text>
         </View>
         <View className="h-full flex flex-col justify-between px-4">
           <View className="flex-1 flex flex-col justify-start items-center">
             <View className="w-full flex flex-row justify-between items-center mt-6">
                 <View>
-                  <Text className="text-2xl" bold>Usluge salona</Text>
+                  <Text className="text-2xl" bold>Kategorije usluga</Text>
                 </View>
                 <TouchableOpacity onPress={beginAddCategory} className="p-3 bg-textPrimary rounded-full">
                     <Entypo name="plus" size={24} color="white" />
@@ -140,6 +171,14 @@ const SalonServicesCategoriesScreen = () => {
         <CreateServicesCategoryModal 
             isModalVisible={isCreateCategoryModalVisible}
             setIsModalVisible={setIsCreateCategoryModalVisible}
+            handleAddCategory={handleAddCategory}
+            name={categoryName}
+            setName={setCategoryName}
+            isSuccess={isCategoryAddedSuccess}
+            setIsSuccess={setIsCategoryAddedSuccess}
+            isLoading={isCreateCategoryLoading}
+            errorMessage={errorMessage}
+            setErrorMessage={setErrorMessage}
         />
     </SafeAreaView>
   )

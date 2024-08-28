@@ -10,6 +10,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import CustomButton from '../Components/CustomComponents/CustomButton'
 import { useFocusEffect } from '@react-navigation/native'
 import LoadingComponent from '../Components/LoadingComponent'
+import { useDispatch, useSelector } from 'react-redux'
+import { setComesFrom, setJustSignedUp, setSignUpFirstScreenData, setUser } from '../redux/generalSlice'
 
 const RegisterScreen = ({navigation}) => {
     const [data, setData] = useState({
@@ -24,19 +26,9 @@ const RegisterScreen = ({navigation}) => {
     const [signUpUser, {isLoading}] = useSignUpUserMutation()
     const [errorMessage, setErrorMessage] = useState(null)
     const [isLoadingCustom, setIsLoadingCustom] = useState(false)
-    const [isLoadingScreen, setIsLoadingScreen] = useState(true)
-
-    useFocusEffect(useCallback(()=>{
-        (async () => {
-            const user = await AsyncStorage.getItem('@userData')
-            if(!user){
-                setIsLoadingScreen(false)
-                return
-            }
-
-            navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newAccount: false}})
-        })()
-    }, []))
+    const [isLoadingScreen, setIsLoadingScreen] = useState(false) //check later for coming from home screen
+    const dispatch = useDispatch()
+    const {signUpFirstScreenData} = useSelector(state => state.general)
 
     const handleBack = () => {
         navigation.navigate('AuthTabScreens', {screen: 'AuthScreen'})
@@ -61,8 +53,7 @@ const RegisterScreen = ({navigation}) => {
         setIsLoadingCustom(true)
 
         try{
-            const email = await AsyncStorage.getItem('@register_user_email')
-            const {error, data: signUpData} = await signUpUser({...data, email: email})
+            const {error, data: signUpData} = await signUpUser({...data, email: signUpFirstScreenData?.email})
             
             if(error){
                 setErrorMessage('Došlo je do greške')
@@ -70,9 +61,11 @@ const RegisterScreen = ({navigation}) => {
             }
 
             if(signUpData.success){
-                await AsyncStorage.removeItem('@register_user_email')
-                await AsyncStorage.setItem('@userData', JSON.stringify(signUpData.result))
-                navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newAccount: true, comesFromAuth: true}})
+                dispatch(setSignUpFirstScreenData({...signUpFirstScreenData, email: ''}))
+                dispatch(setJustSignedUp(true))
+                dispatch(setUser(signUpData.result))
+                dispatch(setComesFrom('auth'))
+                navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
             }
         }catch(error){
             console.log(error)

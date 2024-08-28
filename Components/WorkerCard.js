@@ -20,7 +20,7 @@ const WorkerCard = forwardRef(({userData, isJustCreated}, ref) => {
   }
 
   return (
-    <TouchableOpacity ref={ref} onPress={handleToWorkerScreen} className={`bg-bgPrimary h-28 w-full rounded-3xl mb-4 flex flex-row justify-between items-center px-4 relative ${isJustCreated && 'z-20'}`}>
+    <TouchableOpacity ref={ref} onPress={handleToWorkerScreen} className={`bg-bgPrimary h-28 w-full rounded-3xl mb-4 flex flex-row justify-between items-center px-4 relative z-10 ${isJustCreated && 'z-20'}`}>
       {isJustCreated && 
           <Animated.View entering={BounceInDown} exiting={BounceOut} className="bg-appColor absolute -top-12 px-4 py-2 rounded-xl w-full">
               <Text className="text-white" bold>Upravljaj lako svojim terminima</Text>
@@ -28,7 +28,7 @@ const WorkerCard = forwardRef(({userData, isJustCreated}, ref) => {
       }
       {/* <Image
           className="w-16 h-16 rounded-full border-2 border-appColor"
-          source={`http://192.168.1.4:5000/photos/profile-photo${userData?._id}.png`}
+          source={`http://192.168.0.102:5000/photos/profile-photo${userData?._id}.png`}
           placeholder={{ blurhash }}
           contentFit="cover"
           transition={1000}

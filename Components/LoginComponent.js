@@ -7,6 +7,8 @@ import { useSignInUserMutation } from '../redux/apiCore'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import CustomButton from './CustomComponents/CustomButton'
 import { useNavigation } from '@react-navigation/native'
+import { useDispatch } from 'react-redux'
+import { setComesFrom, setUser } from '../redux/generalSlice'
 
 const LoginComponent = ({setAuthType}) => {
     const navigation = useNavigation()
@@ -16,7 +18,7 @@ const LoginComponent = ({setAuthType}) => {
     const [validation, setValidation] = useState(false)
     const [errorMessage, setErrorMessage] = useState(null)
     const [signInUser, {isLoading}] = useSignInUserMutation()
-
+    const dispatch = useDispatch()
 
 
     const handleLogin = async () => {
@@ -29,7 +31,8 @@ const LoginComponent = ({setAuthType}) => {
             const {error, data} = await signInUser({email, password})
             
             if(error){
-                if(error.data.message === 'Invalid email or password'){
+                console.log(error)
+                if(error?.data?.message === 'Invalid email or password'){
                     setErrorMessage('Neispravna email adresa ili lozinka')
                 }else{
                     setErrorMessage('Došlo je do greške')
@@ -38,13 +41,14 @@ const LoginComponent = ({setAuthType}) => {
             }
 
             if(data.success){
-                await AsyncStorage.setItem('@userData', JSON.stringify(data.result))
+                dispatch(setUser(data.result))
                 setEmail('')
                 setPassword('')
                 setValidation(false)
                 setErrorMessage('')
                 setPasswordVisible(false)
-                navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {comesFromAuth: true}})
+                dispatch(setComesFrom('auth'))
+                navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
             }
         }catch(error){
             console.log(error)

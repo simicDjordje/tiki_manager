@@ -5,6 +5,8 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import Animated, {BounceInUp, BounceOut} from 'react-native-reanimated'
 import { useNavigation } from '@react-navigation/native'
 import Text from './CustomComponents/CustomText'
+import { useDispatch } from 'react-redux'
+import { setCurrentSalon } from '../redux/generalSlice'
 
 
 const blurhash =
@@ -13,9 +15,11 @@ const blurhash =
 
 const SalonCard = forwardRef(({salonData, isJustCreated}, ref) => {
     const navigation = useNavigation()
+    const dispatch = useDispatch()
 
     const handleToSalon = () => {
-        navigation.navigate('StackTabScreens', {screen: 'SalonScreen', params: {salonId: salonData?._id, salonName: salonData?.name}})
+        dispatch(setCurrentSalon(salonData))
+        navigation.navigate('StackTabScreens', {screen: 'SalonScreen'})
     }
 
   return (
@@ -29,7 +33,7 @@ const SalonCard = forwardRef(({salonData, isJustCreated}, ref) => {
                 <View className="flex flex-row justify-between items-center px-2 pt-2">
                     <Image
                         className={`w-8 h-8 rounded-full border-2 ${salonData?.isActive ? 'bg-appColorDark' : 'bg-textMid'}`}
-                        source={`http://192.168.1.4:5000/photos/salon-logo_${salonData?.logoId}.png`}
+                        source={`http://192.168.0.102:5000/photos/salon-logo_${salonData?.logoId}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}

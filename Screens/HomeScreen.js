@@ -15,21 +15,24 @@ import LootieLoader from '../Components/LootieAnimations/Loader'
 import Animated, { FadeInDown, FadeInUp, FadeOutDown } from 'react-native-reanimated'
 import { useGetUserSalonsMutation } from '../redux/apiCore'
 import SalonsPartHomeScreen from '../Components/SalonsPartHomeScreen'
+import { useDispatch, useSelector } from 'react-redux'
+import { setJustCreatedSalon, setJustCreatedWorkerAccount, setJustSignedUp, setUser } from '../redux/generalSlice'
 
 const HomeScreen = ({route, navigation}) => {
-    //params
-    const params = route.params || {}
+    //redux 
+    const {
+        userData, 
+        justCreatedSalon, 
+        justCreatedWorkerAccount, 
+        justSignedUp,
+        userSalons,
+        comesFrom,
+    } = useSelector(state => state.general)
+    const dispatch = useDispatch()
 
     //states
-    const [isWelcomeModalVisible, setWelcomeModalVisible] = useState(params?.newAccount || false)
-    const [isNewSalonCreated, setIsNewSalonCreated] = useState(false)
-    const [isWorkerAccountCreated, setIsWorkerAccountCreated] = useState(false)
     const [isCreateWorkerAccountModalVisible, setIsCreateWorkerAccountModalVisible] = useState(false)
     const [isBeginSalonRegisterModalVisible, setIsBeginSalonRegisterModalVisible] = useState(false)
-    const [userData, setUserData] = useState(null)
-    const [salonsActive, setSalonsActive] = useState([])
-    const [salonsInactive, setSalonsInactive] = useState([])
-
 
     //refs
     const scrollViewRef = useRef(null)
@@ -41,87 +44,14 @@ const HomeScreen = ({route, navigation}) => {
 
     //ON FOCUS
     useFocusEffect(useCallback(()=>{
-        (async () => {
-            try{
-                const {error, data} = await getUserSalons()
-                
-                const activeSalonsArray = []
-                const inactiveSalonsArray = []
-
-                if(data && data.success){
-                    const dataReversed = [...data.result].reverse()
-                    dataReversed.forEach(i => {
-                        if(i.isActive) activeSalonsArray.push(i)
-                        if(!i.isActive) inactiveSalonsArray.push(i)
-                    })
-                    setSalonsActive(activeSalonsArray)
-                    setSalonsInactive(inactiveSalonsArray)
-                }
-            }catch(error){
-                console.log(error)
-            }
-        })()
+        getUserSalons()
     }, []))
 
-    useFocusEffect(useCallback(()=>{
-        if(!params.comesFromAuth) return
-
-        navigation.reset({
-            index: 0,
-            routes: [{ name: 'HomeScreen' }]
-          })
-
-          navigation.setParams({ comesFromAuth: null })
-    }, []))
 
     useFocusEffect(useCallback(()=>{
-        (async () => {
-            try{
-                const user = await AsyncStorage.getItem('@userData')
-                if(!user) return
+        if(isGetUserSalonsLoading || !userSalons?.salonsInactive.length || !justCreatedSalon) return
 
-                setUserData(JSON.parse(user))
-            }catch(error){
-                console.log(error)
-            }
-        })()
-    }, []))
-
-    useFocusEffect(useCallback(()=>{
-        if(!params?.newSalonCreated) return
-        setIsNewSalonCreated(true)
-
-        setTimeout(()=>{
-            setIsNewSalonCreated(false)
-            navigation.setParams({ newSalonCreated: null, salonId: null })
-        }, 3000)
-    }, [params]))
-
-    // ON FOCUS END
-
-    useEffect(()=>{
-        if(isCreateWorkerAccountModalVisible) return
-
-        (async () => {
-            const user = await AsyncStorage.getItem('@userData')
-            const isWorkerAccCreated = await AsyncStorage.getItem('@isWorkerAccCreated')
-            if(!user) return
-
-            setUserData(JSON.parse(user))
-
-            if(!isWorkerAccCreated) return
-
-            setIsWorkerAccountCreated(true)
-
-            setTimeout(async ()=>{
-                setIsWorkerAccountCreated(false)
-                await AsyncStorage.removeItem('@isWorkerAccCreated')
-            }, 3000)
-        })()
-    }, [isCreateWorkerAccountModalVisible])
-
-    useEffect(() => {
-        if (isNewSalonCreated && salonCardRef.current && scrollViewRef.current) {
+        if (salonCardRef.current && scrollViewRef.current) {
             salonCardRef.current.measureLayout(
                 scrollViewRef.current.getScrollableNode(),
                 (x, y) => {
@@ -129,23 +59,42 @@ const HomeScreen = ({route, navigation}) => {
                 }
             );
         }
-    }, [isNewSalonCreated])
+        
+        setTimeout(()=>{
+            dispatch(setJustCreatedSalon(null))
+        }, 3000)
+    }, [isGetUserSalonsLoading, justCreatedSalon, userSalons?.salonsInactive]))
 
-    useEffect(() => {
-        if (isWorkerAccountCreated && scrollViewRef.current) {
-            scrollViewRef.current.scrollTo({ y: 0, animated: true });
-        }
-    }, [isWorkerAccountCreated])
+    // ON FOCUS END
+
+    useEffect(()=>{
+        if(!justCreatedWorkerAccount) return
+
+        if(scrollViewRef.current) scrollViewRef.current.scrollTo({ y: 0, animated: true })
+
+        setTimeout(async ()=>{
+            dispatch(setJustCreatedWorkerAccount(null))
+        }, 3000)
+    }, [justCreatedWorkerAccount])
+
+
+    useEffect(() => navigation.addListener('beforeRemove', (e) => {
+        if (comesFrom !== 'auth') return
+        e.preventDefault()
+
+      }),
+    [navigation, comesFrom]
+  );
 
   return (
     <SafeAreaView className="bg-bgPrimary h-full relative">
-        <StatusBar style={isNewSalonCreated || isWorkerAccountCreated ? "light" : "dark"} />
-        {isNewSalonCreated || isWorkerAccountCreated && <View className="top-0 bottom-0 left-0 right-0 bg-black absolute opacity-90"></View>}
+        <StatusBar style={(justCreatedSalon || justCreatedWorkerAccount) ? "light" : "dark"} />
+        {(justCreatedSalon || justCreatedWorkerAccount) && <View className="top-0 bottom-0 left-0 right-0 bg-black absolute opacity-90"></View>}
         <ScrollView ref={scrollViewRef}>
             <View className="min-h-screen flex flex-col justify-between items-center">
                 <View className="w-full flex flex-row justify-between items-center px-4 mt-4">
                     <View>
-                        <Text className={`${isNewSalonCreated || isWorkerAccountCreated ? 'text-textSecondary' : 'text-textPrimary'} text-3xl`} bold>tiki <Text className="text-textSecondary text-2xl" semi>manager</Text></Text>
+                        <Text className={`${(justCreatedSalon || justCreatedWorkerAccount) ? 'text-textSecondary' : 'text-textPrimary'} text-3xl`} bold>tiki <Text className="text-textSecondary text-2xl" semi>manager</Text></Text>
                     </View>
 
                     <View className="flex flex-row justify-between items-center">
@@ -166,7 +115,7 @@ const HomeScreen = ({route, navigation}) => {
 
                 {userData &&
                 <Animated.View entering={FadeInDown} exiting={FadeOutDown} className="bg-bgSecondary flex-1 w-full min-h-screen mt-8 px-4 relative" style={{borderTopLeftRadius: 50, borderTopRightRadius: 50}}>
-                    {isNewSalonCreated || isWorkerAccountCreated && <View className="top-0 bottom-0 left-0 right-0 bg-textPrimary absolute opacity-50 z-10"></View>}
+                    {(justCreatedSalon || justCreatedWorkerAccount) && <View className="top-0 bottom-0 left-0 right-0 bg-textPrimary absolute opacity-50 z-10"></View>}
                     <View className="flex flex-row justify-between items-center mt-10">
                         <View className="flex flex-col justify-between items-start">
                             <Text className="text-textPrimary text-2xl" bold>{userData?.first_name} {userData?.last_name}</Text>
@@ -185,7 +134,7 @@ const HomeScreen = ({route, navigation}) => {
                         {userData?.haveWorkerAccount && 
                             <WorkerCard 
                                 userData={userData} 
-                                isJustCreated={isWorkerAccountCreated} 
+                                isJustCreated={justCreatedWorkerAccount} 
                                 ref={workerCardRef}
                             />
                         }
@@ -230,11 +179,7 @@ const HomeScreen = ({route, navigation}) => {
                     </View>
                     
                     <SalonsPartHomeScreen 
-                        salonsActive={salonsActive}
-                        salonsInactive={salonsInactive}
-                        params={params}
                         ref={salonCardRef}
-                        isNewSalonCreated={isNewSalonCreated}
                     />
 
 
@@ -245,11 +190,8 @@ const HomeScreen = ({route, navigation}) => {
         </ScrollView>
         
         <WelcomeModal 
-            isModalVisible={isWelcomeModalVisible}
-            setIsModalVisible={() => {
-                setWelcomeModalVisible(false)
-                navigation.setParams({ newAccount: null })
-            }}
+            isModalVisible={justSignedUp || false}
+            setIsModalVisible={() => {dispatch(setJustSignedUp(false))}}
             userData={userData}
         />
 

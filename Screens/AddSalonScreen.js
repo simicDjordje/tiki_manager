@@ -54,6 +54,10 @@ const AddSalonScreen = () => {
   }
 
   useEffect(()=>{
+    setErrorMessage(null)
+  }, [step])
+
+  useEffect(()=>{
     if(!images.length){
       setImagesIds([])
       return
@@ -172,7 +176,7 @@ const AddSalonScreen = () => {
       })
 
       const {error, data} = await createSalon(formData)
-
+      console.log(error)
       if(error){
         setErrorMessage('Došlo je do greške')
         return
@@ -322,6 +326,9 @@ const AddSalonScreen = () => {
                       </TouchableOpacity>
                   }
 
+                  <View className="h-5 flex flex-row justify-center items-center -mt-5 mb-10">
+                    {errorMessage && step === 5 && <Text className="text-red-500">{errorMessage}</Text>}
+                  </View>
                   {!isSuccess && step === 5 && 
                     <CustomButton 
                       text={'Potvrdi'}

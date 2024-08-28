@@ -4,9 +4,10 @@ import { textData } from '../constants'
 import AuthComponent from '../Components/AuthComponent'
 import Text from '../Components/CustomComponents/CustomText'
 import { useFocusEffect } from '@react-navigation/native'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import LoadingComponent from '../Components/LoadingComponent'
+import { useSelector } from 'react-redux'
 
 
 
@@ -15,20 +16,22 @@ import LoadingComponent from '../Components/LoadingComponent'
 
 const AuthScreen = ({navigation}) => {
   const [isLoadingScreen, setIsLoadingScreen] = useState(true)
+  const {userData} = useSelector(state => state.general)
 
-
-  useFocusEffect(useCallback(()=>{
-    (async () => {
-        setIsLoadingScreen(true)
-        const user = await AsyncStorage.getItem('@userData')
-        if(!user){
-          setIsLoadingScreen(false)
-          return
-        }
-
-        navigation.navigate('MainTabScreens', {screen: 'HomeScreen', params: {newAccount: false}})
-    })()
-  }, []))
+  useEffect(()=>{
+    console.log(1)
+    setIsLoadingScreen(true)
+    console.log(2)
+    if(userData === 'loading') return
+    console.log(3)
+    if(!userData){
+      console.log(3.1)
+      setIsLoadingScreen(false)
+      return
+    }
+    console.log(4)
+    navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
+  }, [userData])
 
   if(isLoadingScreen) return <LoadingComponent />
 
