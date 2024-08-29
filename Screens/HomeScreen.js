@@ -120,7 +120,7 @@ const HomeScreen = ({route, navigation}) => {
                         <View className="flex flex-col justify-between items-start">
                             <Text className="text-textPrimary text-2xl" bold>{userData?.first_name} {userData?.last_name}</Text>
                             <View className="bg-appColor rounded-2xl mt-2 px-2 py-1">
-                                <Text className="text-white font-bold">Beauty salon PK</Text>
+                                <Text className="text-white" bold>Beauty salon PK</Text>
                             </View>
                         </View>
                         <TouchableOpacity 
@@ -198,7 +198,6 @@ const HomeScreen = ({route, navigation}) => {
         <CreateWorkerAccountModal 
             isModalVisible={isCreateWorkerAccountModalVisible}
             setIsModalVisible={setIsCreateWorkerAccountModalVisible}
-            userData={userData}
         />
 
         <BeginSalonRegisterModal 

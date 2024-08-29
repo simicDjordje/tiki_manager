@@ -83,6 +83,7 @@ const generalSlice = createSlice({
         apiCore.endpoints.getSalonById.matchFulfilled,
         (state, action) => {
           if (action?.payload?.result) {
+            console.log(action?.payload?.result.workers)
             // Reverse categories and services within them
             const reversedCategories = action.payload.result.categories.map(category => {
               const reversedServices = [...category.category.services].reverse()

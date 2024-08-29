@@ -85,7 +85,12 @@ const SalonScreen = ({navigation}) => {
         {salonData && <ScrollView>
             <View className="px-4 mt-4">
                 <View className="flex flex-row justify-between items-center mt-6 w-full">
-                    <Text className="text-2xl" bold>Podešavanja salona</Text>
+                    <View className="flex flex-col justify-between items-start">
+                        <Text className="text-2xl" bold>Podešavanja salona</Text>
+                        <View className="bg-red-700 py-1 px-2 rounded-2xl">
+                            <Text className="text-white text-xs" bold>Neaktivan</Text>
+                        </View>
+                    </View>
                     <Ionicons name="settings-sharp" size={34} color="black" />
                 </View>
                 <View className="bg-textSecondary mt-8 w-full mb-4" style={{height: 0.5}}></View>

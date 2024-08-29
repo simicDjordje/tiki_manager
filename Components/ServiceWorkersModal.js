@@ -6,13 +6,15 @@ import Entypo from '@expo/vector-icons/Entypo'
 import { Image } from 'expo-image'
 import Text from './CustomComponents/CustomText'
 import AntDesign from '@expo/vector-icons/AntDesign'
-import CustomButton from './CustomComponents/CustomButton'
+import { useSelector } from 'react-redux'
+// import LootieTwoPeople from './LootieAnimations/TwoPeople'
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
 const ServiceWorkersModal = ({isModalVisible, setIsModalVisible}) => {
+    const {currentSalon: salonData, activeCategory, activeService} = useSelector(state => state.general)
 
 
     const closeModal = () => {
@@ -41,6 +43,19 @@ const ServiceWorkersModal = ({isModalVisible, setIsModalVisible}) => {
                     </View>
 
                     <View className="bg-textSecondary w-full h-0.5 mt-4"></View>
+
+                    {activeService?.users.length === 0 && 
+                        <View className="mt-20">
+                            <Text className="text-center text-textPrimary text-lg" bold>Tvoj salon još uvek nema članova.</Text>
+                            <Text className="text-center text-textMid">Dodaj članove u podešavanjima salona i ovde im dodeli uslugu.</Text>
+
+                            {/* <View>
+                                <LootieTwoPeople d={100} />
+                            </View> */}
+                        </View>
+                    }
+
+                    {activeService?.users.length > 0 && 
                     <ScrollView>
                         <View className="min-h-full">
                             <View className="flex flex-col justify-center items-center mt-4">
@@ -88,106 +103,12 @@ const ServiceWorkersModal = ({isModalVisible, setIsModalVisible}) => {
                                     <AntDesign name="checksquare" size={24} color="#5F9EA0" />
                                 </TouchableOpacity>
 
-                                <TouchableOpacity 
-                                    className="w-full h-20 flex flex-row justify-between items-center bg-bgPrimary rounded-xl px-2 mt-2"
-                                    >
-                                    <Image
-                                        className="w-16 h-16 rounded-full border-2 border-appColorDark"
-                                        source={require('../assets/e2.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-
-                                    <View className="flex-1 px-4">
-                                        <Text semi>Milana Milenkovic</Text>
-                                        <Text>Nail tehnician</Text>
-                                    </View>
-
-                                    <AntDesign name="checksquareo" size={24} color="#232323" />
-                                </TouchableOpacity>
-
-                                <TouchableOpacity 
-                                    className="w-full h-20 flex flex-row justify-between items-center bg-bgPrimary rounded-xl px-2 mt-2"
-                                    >
-                                    <Image
-                                        className="w-16 h-16 rounded-full border-2 border-appColorDark"
-                                        source={require('../assets/fpp2.png')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-
-                                    <View className="flex-1 px-4">
-                                        <Text semi>Snezana Snezanovic</Text>
-                                        <Text>Nail tehnician</Text>
-                                    </View>
-
-                                    <AntDesign name="checksquare" size={24} color="#5F9EA0" />
-                                </TouchableOpacity>
                                 
-
-                                <TouchableOpacity 
-                                    className="w-full h-20 flex flex-row justify-between items-center bg-bgPrimary rounded-xl px-2 mt-2"
-                                    >
-                                    <Image
-                                        className="w-16 h-16 rounded-full border-2 border-appColorDark"
-                                        source={require('../assets/fpp.png')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-
-                                    <View className="flex-1 px-4">
-                                        <Text semi>Jovana Jorgovankovic</Text>
-                                        <Text>Nail tehnician</Text>
-                                    </View>
-
-                                    <AntDesign name="checksquareo" size={24} color="#232323" />
-                                </TouchableOpacity>
-
-                                <TouchableOpacity 
-                                    className="w-full h-20 flex flex-row justify-between items-center bg-bgPrimary rounded-xl px-2 mt-2"
-                                    >
-                                    <Image
-                                        className="w-16 h-16 rounded-full border-2 border-appColorDark"
-                                        source={require('../assets/fpp2.png')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-
-                                    <View className="flex-1 px-4">
-                                        <Text semi>Snezana Snezanovic</Text>
-                                        <Text>Nail tehnician</Text>
-                                    </View>
-
-                                    <AntDesign name="checksquare" size={24} color="#5F9EA0" />
-                                </TouchableOpacity>
-
-                                <TouchableOpacity 
-                                    className="w-full h-20 flex flex-row justify-between items-center bg-bgPrimary rounded-xl px-2 mt-2"
-                                    >
-                                    <Image
-                                        className="w-16 h-16 rounded-full border-2 border-appColorDark"
-                                        source={require('../assets/e2.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-
-                                    <View className="flex-1 px-4">
-                                        <Text semi>Milana Milenkovic</Text>
-                                        <Text>Nail tehnician</Text>
-                                    </View>
-
-                                    <AntDesign name="checksquare" size={24} color="#5F9EA0" />
-                                </TouchableOpacity>
                             </View>
 
                             <View className="mb-12"></View>
                         </View>
-                    </ScrollView>
+                    </ScrollView>}
                 </View>
               </View>
           </View>

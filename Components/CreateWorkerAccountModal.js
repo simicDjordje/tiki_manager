@@ -10,14 +10,15 @@ import Text from './CustomComponents/CustomText'
 import CustomButton from './CustomComponents/CustomButton'
 import { useCreateWorkerAccountMutation } from '../redux/apiCore'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { setJustCreatedWorkerAccount, setUser } from '../redux/generalSlice'
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
-const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible, userData}) => {
+const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible}) => {
+    const {userData} = useSelector(state => state.general)
     const [image, setImage] = useState(null)
     const [isSuccess, setIsSuccess] = useState(false)
     const [validation, setValidation] = useState(false)

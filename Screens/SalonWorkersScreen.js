@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
@@ -14,18 +14,44 @@ import CreateServicesCategoryModal from '../Components/CreateServicesCategoryMod
 import AddWorkerToSalonModal from '../Components/AddWorkerToSalonModal'
 import CustomInput from '../Components/CustomComponents/CustomInput'
 import SalonWorkerDetailsModal from '../Components/SalonWorkerDetailsModal'
+import { useSelector } from 'react-redux'
+import CreateWorkerAccountModal from '../Components/CreateWorkerAccountModal'
+import { useUpdateSalonMutation } from '../redux/apiCore'
+import AddYourselfInSalonModal from '../Components/AddYourselfInSalonModal'
 
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
-const SalonWorkersScreen = () => {
-  const [workers, setWorkers] = useState([1])
+const SalonWorkersScreen = ({navigation}) => {
+  const {userData, currentSalon: salonData} = useSelector(state => state.general)
+  const [sortedWorkers, setSortedWorkers] = useState([])
+  const [workers, setWorkers] = useState([])
   const [isAddWorkerToSalonModalVisible, setIsAddWorkerToSalonModalVisible] = useState(false)
   const [isSalonWorkerDetailsModalVisible, setIsSalonWorkerDetailsModalVisible] = useState(false)
-  const navigation = useNavigation()
-  const salonName = 'Beauty salon PK'
+  const [isCreateWorkerAccountModalVisible, setIsCreateWorkerAccountModalVisible] = useState(false)
+  const [isAddYourselfModalVisible, setIsAddYourselfModalVisible] = useState(false)
+
+  const [updateSalon, {isLoading}] = useUpdateSalonMutation()
+  const [errorMessage, setErrorMessage] = useState('')
+
+  useEffect(() => {
+    if (salonData?.workers) {
+        const sortedWorkersArray = [...salonData.workers];
+        const currentUserIndex = sortedWorkersArray.findIndex(worker => worker._id === userData?._id);
+
+        if (currentUserIndex > -1) {
+            const [currentUser] = sortedWorkersArray.splice(currentUserIndex, 1);
+            sortedWorkersArray.unshift(currentUser);
+        }
+
+        // Only update the state if the sorted workers array has changed
+        if (JSON.stringify(sortedWorkersArray) !== JSON.stringify(sortedWorkers)) {
+            setSortedWorkers(sortedWorkersArray);
+        }
+    }
+}, [salonData?.workers, userData])
 
   const handleBack = () => {
     navigation.navigate('StackTabScreens', {screen: 'SalonScreen'})
@@ -39,7 +65,14 @@ const SalonWorkersScreen = () => {
     setIsAddWorkerToSalonModalVisible(true)
   }
 
+  const handeAddYourself = () => {
+    setIsAddYourselfModalVisible(true)
+  }
 
+
+  const handleCreateYourWorkerAccount = () => {
+
+  }
 
 
 
@@ -50,7 +83,7 @@ const SalonWorkersScreen = () => {
             <TouchableOpacity onPress={handleBack}>
                 <MaterialIcons name="arrow-back-ios-new" size={24} color="#232323" />
             </TouchableOpacity>
-            <Text className="text-textPrimary text-lg" bold>{salonName.length > 34 ? `${salonName.substring(0, 34)}...` : salonName}</Text>
+            <Text className="text-textPrimary text-lg" bold>{salonData?.name.length > 34 ? `${salonData?.name.substring(0, 34)}...` : salonData?.name}</Text>
         </View>
         <View className="h-full flex flex-col justify-between px-4">
           <View className="flex-1 flex flex-col justify-start items-center">
@@ -64,14 +97,14 @@ const SalonWorkersScreen = () => {
             </View>
             <View className="bg-textSecondary mt-8 w-full mb-5" style={{height: 0.5}}></View>
             
-            {workers.length === 0 && <View>
-                <Text className="text-center text-textMid" bold>Dodaj članove salona</Text>
+            {sortedWorkers.length === 0 && <View>
+                <Text className="text-center text-textPrimary" bold>Dodaj članove salona</Text>
                 <Text className="text-center text-textMid">Dodeli članovima salona usluge kako bi mogli da primaju rezervacije</Text>
-                <Text className="text-center text-textMid">Član salona će sam kreirati slobodne termine za usluge u svom profilu radnika</Text>
+                <Text className="text-center text-textMid">Član salona će sam kreirati svoje slobodne termine</Text>
             </View>}
 
             <View className="flex-1 w-full mb-3 mt-10">
-                {workers.length === 0 && 
+                {sortedWorkers.length === 0 && 
                     <View className="flex flex-col justify-center items-center mt-10">
                         <Text className="text-lg mb-3" bold>Dodaj novog člana</Text>
                         <TouchableOpacity onPress={beginAddWorker} className="p-4 bg-textPrimary rounded-full">
@@ -80,13 +113,35 @@ const SalonWorkersScreen = () => {
                     </View>
                 }
                 
-                {/* {workers.length === 0 && 
+                {sortedWorkers.length === 0 && userData.haveWorkerAccount && 
                     <View className="px-12">
                         <View className="bg-textSecondary mt-5 w-full" style={{height: 0.5}}></View>
                     </View>
                 }
 
-                {workers.length === 0 && 
+                {sortedWorkers.length === 0 &&  
+                    <View className="flex flex-col justify-center items-center mt-5">
+                        <Text className="text-center text-textPrimary" bold>Radiš u svom salonu?</Text>
+                        <Text className="text-center text-textMid" bold>Dodaj sebe kao člana</Text>
+
+                        <View className="w-full flex flex-row justify-center items-center mt-8">
+                            {userData.haveWorkerAccount &&
+                                <Image
+                                    className="w-20 h-20 rounded-full border-2 border-appColorDark"
+                                    source={`http://192.168.0.102:5000/photos/profile-photo${userData?._id}.png`}
+                                    placeholder={{ blurhash }}
+                                    contentFit="cover"
+                                    transition={1000}
+                                />
+                            }
+                            <TouchableOpacity onPress={userData?.haveWorkerAccount ? handeAddYourself : handleCreateYourWorkerAccount} className={`p-4 bg-textPrimary rounded-full ${userData?.haveWorkerAccount && '-ml-3'}`}>
+                                <Entypo name="plus" size={48} color="white" />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                }
+
+                {/* {sortedWorkers.length === 0 && 
                     <View className="flex flex-col justify-center items-center mt-5">
                         <Text className="text-lg mb-3" bold>Kopiraj iz jednog od svojih salona</Text>
                         <TouchableOpacity onPress={beginAddCategory} className="p-5 bg-textPrimary rounded-full">
@@ -97,96 +152,60 @@ const SalonWorkersScreen = () => {
             </View>
               
             
-              {workers.length > 0 && 
+              {sortedWorkers.length > 0 && 
                 <ScrollView className="w-full -mt-16">
                     <View className="min-h-screen">
-                        <TouchableOpacity onPress={seeWorkerDetails} className="bg-bgPrimary w-full mt-4 rounded-xl p-4 flex flex-col justify-between">
-                            <View className="flex flex-row justify-between items-center pb-2">
-                                <Image
-                                    className="w-16 h-16 rounded-full border-2 border-appColorDark"
-                                    source={require('../assets/fpp.png')}
-                                    placeholder={{ blurhash }}
-                                    contentFit="cover"
-                                    transition={1000}
-                                />
-                                <View className="flex flex-col justify-between flex-1 pl-2">
-                                    <View className="flex flex-row justify-between items-center">
-                                        <Text className="text-textPrimary text-lg" bold>Jovanka Jovankovic</Text>
-                                        <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
-                                    </View>
-                                    <View className="bg-textSecondary mt-3 w-full" style={{height: 0.5}}></View>
+                        {sortedWorkers.map((worker, index) => {
+                            const isYou = worker?._id === userData?._id
 
-                                    <View className="flex-1">
-                                        <View className="flex flex-row justify-between items-center mt-2">
-                                            <Text>Ukupno dodeljenih usluga: </Text>
-                                            <Text semi>9</Text>
+                            return (
+                                <TouchableOpacity key={index} onPress={()=>{}} className="bg-bgPrimary w-full mt-4 rounded-xl p-4 flex flex-col justify-between">
+                                    <View className="flex flex-row justify-between items-center pb-2">
+                                        <Image
+                                            className="w-16 h-16 rounded-full border-2 border-appColorDark"
+                                            source={`http://192.168.0.102:5000/photos/profile-photo${worker?._id}.png`}
+                                            placeholder={{ blurhash }}
+                                            contentFit="cover"
+                                            transition={1000}
+                                        />
+                                        <View className="flex flex-col justify-between flex-1 pl-2">
+                                            <View className="flex flex-row justify-between items-center">
+                                                <Text className="text-textPrimary text-lg" bold>{worker?.first_name} {worker?.last_name} {isYou && '(Ti)'}</Text>
+                                                <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
+                                            </View>
+                                            <View className="bg-textSecondary mt-3 w-full" style={{height: 0.5}}></View>
+
+                                            <View className="flex-1">
+                                                <View className="flex flex-row justify-between items-center mt-2">
+                                                    <Text>Ukupno dodeljenih usluga: </Text>
+                                                    <Text semi>{worker?.services?.length}</Text>
+                                                </View>
+                                            </View>
                                         </View>
                                     </View>
-                                </View>
-                            </View>
 
-                            <View className="bg-textSecondary mt-3 mb-3 w-full" style={{height: 0.5}}></View>
+                                    {/* <View className="bg-textSecondary mt-3 mb-3 w-full" style={{height: 0.5}}></View> */}
 
-                            <View className="flex flex-row justify-start flex-wrap gap-2">
-                                <View className="p-2 bg-appColor rounded-xl">
-                                    <Text className="text-white" semi>Trepavice</Text>
-                                </View>
-
-                                <View className="p-2 bg-appColor rounded-xl">
-                                    <Text className="text-white" semi>Trajna sminka</Text>
-                                </View>
-
-                                <View className="p-2 bg-appColor rounded-xl">
-                                    <Text className="text-white" semi>Trepavice</Text>
-                                </View>
-
-                                <View className="p-2 bg-appColor rounded-xl">
-                                    <Text className="text-white" semi>Trajna sminka</Text>
-                                </View>
-                            </View>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity onPress={seeWorkerDetails} className="bg-bgPrimary w-full mt-4 rounded-xl p-4 flex flex-col justify-between">
-                            <View className="flex flex-row justify-between items-center pb-2">
-                                <Image
-                                    className="w-16 h-16 rounded-full border-2 border-appColorDark"
-                                    source={require('../assets/fpp2.png')}
-                                    placeholder={{ blurhash }}
-                                    contentFit="cover"
-                                    transition={1000}
-                                />
-                                <View className="flex flex-col justify-between flex-1 pl-2">
-                                    <View className="flex flex-row justify-between items-center">
-                                        <Text className="text-textPrimary text-lg" bold>Milanka Milankovic</Text>
-                                        <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
-                                    </View>
-                                    <View className="bg-textSecondary mt-3 w-full" style={{height: 0.5}}></View>
-
-                                    <View className="flex-1">
-                                        <View className="flex flex-row justify-between items-center mt-2">
-                                            <Text>Ukupno dodeljenih usluga: </Text>
-                                            <Text semi>9</Text>
+                                    {/* <View className="flex flex-row justify-start flex-wrap gap-2">
+                                        <View className="p-2 bg-appColor rounded-xl">
+                                            <Text className="text-white" semi>Trepavice</Text>
                                         </View>
-                                    </View>
-                                </View>
-                            </View>
 
-                            <View className="bg-textSecondary mt-3 mb-3 w-full" style={{height: 0.5}}></View>
+                                        <View className="p-2 bg-appColor rounded-xl">
+                                            <Text className="text-white" semi>Trajna sminka</Text>
+                                        </View>
 
-                            <View className="flex flex-row justify-start flex-wrap gap-2">
-                                <View className="p-2 bg-appColor rounded-xl">
-                                    <Text className="text-white" semi>Trepavice</Text>
-                                </View>
+                                        <View className="p-2 bg-appColor rounded-xl">
+                                            <Text className="text-white" semi>Trepavice</Text>
+                                        </View>
 
-                                <View className="p-2 bg-appColor rounded-xl">
-                                    <Text className="text-white" semi>Trajna sminka</Text>
-                                </View>
-
-                                <View className="p-2 bg-appColor rounded-xl">
-                                    <Text className="text-white" semi>Trajna sminka</Text>
-                                </View>
-                            </View>
-                        </TouchableOpacity>
+                                        <View className="p-2 bg-appColor rounded-xl">
+                                            <Text className="text-white" semi>Trajna sminka</Text>
+                                        </View>
+                                    </View> */}
+                                </TouchableOpacity>
+                            )
+                        })}
                         
                         <View className="mb-44"></View>
                     </View>
@@ -203,6 +222,16 @@ const SalonWorkersScreen = () => {
         <SalonWorkerDetailsModal 
             isModalVisible={isSalonWorkerDetailsModalVisible}
             setIsModalVisible={setIsSalonWorkerDetailsModalVisible}
+        />
+
+        <CreateWorkerAccountModal 
+            isModalVisible={isCreateWorkerAccountModalVisible}
+            setIsModalVisible={setIsCreateWorkerAccountModalVisible}
+        />
+
+        <AddYourselfInSalonModal 
+            isModalVisible={isAddYourselfModalVisible}
+            setIsModalVisible={setIsAddYourselfModalVisible}
         />
     </SafeAreaView>
   )
