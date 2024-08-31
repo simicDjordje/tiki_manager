@@ -9,6 +9,7 @@ import CustomInput from './CustomComponents/CustomInput'
 import CustomButton from './CustomComponents/CustomButton'
 import { useSelector } from 'react-redux'
 import { useCreateServiceMutation, useGetSalonByIdMutation } from '../redux/apiCore'
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
@@ -26,7 +27,8 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
     })
     const [validation, setValidation] = useState(false)
     const [getSalonById] = useGetSalonByIdMutation()
-    
+    const [workers, setWorkers] = useState([])
+
     const handleCreate = async () => {
         if(!inputsData.name || !inputsData.description || !inputsData.price){
             setValidation(true)
@@ -61,6 +63,16 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
     const closeModal = () => {
         setIsModalVisible(false)
         setIsSuccess(false)
+    }
+
+    const addWorkerToArray = (workerId) => {
+        setWorkers((prevWorkers) => {
+            if (prevWorkers.includes(workerId)) {
+                return prevWorkers.filter((id) => id !== workerId)
+            } else {
+                return [...prevWorkers, workerId]
+            }
+        })
     }
 
 
@@ -157,97 +169,27 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                     paddingLeft: 5,
                                     paddingVertical: 20
                             }}>
-                                <TouchableOpacity className="flex flex-col justify-start items-center ml-2">
-                                    <Image
-                                        className={`rounded-full border-4 ${'border-appColor'}`}
-                                        source={require(`../assets/e1.jpg`)}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                        style={{width: 68, height: 68}}
-                                    />
+                                {salonData?.workers.map((worker, index) => {
+                                    return (
+                                        <TouchableOpacity onPress={()=>{addWorkerToArray(worker?._id)}} key={index} className="flex flex-col justify-start items-center ml-2 relative">
+                                            {workers.includes(worker?._id) && 
+                                                <View className="absolute z-10 rounded-full bg-white top-0 right-0">
+                                                    <AntDesign name="checkcircle" size={18} color="#5f9ea0" />
+                                                </View>
+                                            }
+                                            <Image
+                                                className={`rounded-full border-4 ${workers.includes(worker?._id) ? 'border-appColor' : 'border-transparent'}`}
+                                                source={`http://192.168.0.72:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
+                                                placeholder={{ blurhash }}
+                                                contentFit="cover"
+                                                transition={1000}
+                                                style={{width: 68, height: 68}}
+                                            />
 
-                                    <Text className="text-xs mt-2 text-appColorDark" semi>Marko</Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity className="flex flex-col justify-start items-center ml-2">
-                                    <Image
-                                        className={`rounded-full border-4 ${'border-appColor'}`}
-                                        source={require(`../assets/e5.jpg`)}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                        style={{width: 68, height: 68}}
-                                    />
-
-                                    <Text className="text-xs mt-2 text-appColorDark" semi>Dragan</Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity className="flex flex-col justify-start items-center ml-2">
-                                    <Image
-                                        className={`rounded-full border-2 ${'border-textPrimary'}`}
-                                        source={require(`../assets/fpp.png`)}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                        style={{width: 68, height: 68}}
-                                    />
-
-                                    <Text className="text-xs mt-2">Jovanka</Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity className="flex flex-col justify-start items-center ml-2">
-                                    <Image
-                                        className={`rounded-full border-4 ${'border-appColor'}`}
-                                        source={require(`../assets/fpp2.png`)}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                        style={{width: 68, height: 68}}
-                                    />
-
-                                    <Text className="text-xs mt-2 text-appColorDark" semi>Katarina</Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity className="flex flex-col justify-start items-center ml-2">
-                                    <Image
-                                        className={`rounded-full border-2 ${'border-textPrimary'}`}
-                                        source={require(`../assets/e4.jpg`)}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                        style={{width: 68, height: 68}}
-                                    />
-
-                                    <Text className="text-xs mt-2">Jorgovan</Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity className="flex flex-col justify-start items-center ml-2">
-                                    <Image
-                                        className={`rounded-full border-2 ${'border-textPrimary'}`}
-                                        source={require(`../assets/e1.jpg`)}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                        style={{width: 68, height: 68}}
-                                    />
-
-                                    <Text className="text-xs mt-2">Natalija</Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity className="flex flex-col justify-start items-center ml-2 mr-20">
-                                    <Image
-                                        className={`rounded-full border-2 ${'border-textPrimary'}`}
-                                        source={require(`../assets/e1.jpg`)}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                        style={{width: 68, height: 68}}
-                                    />
-
-                                    <Text className="text-xs mt-2">Natalija</Text>
-                                </TouchableOpacity>
-
+                                            <Text className="text-xs mt-2 text-appColorDark" semi>{worker?.first_name}</Text>
+                                        </TouchableOpacity>
+                                    )
+                                })}
                                 
                             </ScrollView>}
                         </View>

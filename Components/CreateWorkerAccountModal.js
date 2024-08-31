@@ -8,25 +8,30 @@ import { Image } from 'expo-image'
 import LootieSuccess from '../Components/LootieAnimations/Success'
 import Text from './CustomComponents/CustomText'
 import CustomButton from './CustomComponents/CustomButton'
-import { useCreateWorkerAccountMutation } from '../redux/apiCore'
+import { useCreateWorkerAccountMutation, useGetSalonByIdMutation, useUpdateSalonMutation } from '../redux/apiCore'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useDispatch, useSelector } from 'react-redux'
 import { setJustCreatedWorkerAccount, setUser } from '../redux/generalSlice'
+import { useNavigation } from '@react-navigation/native'
+import CustomInput from './CustomComponents/CustomInput'
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
-const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible}) => {
-    const {userData} = useSelector(state => state.general)
+const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible, addingYourself}) => {
+    const {currentSalon: salonData, userData} = useSelector(state => state.general)
     const [image, setImage] = useState(null)
     const [isSuccess, setIsSuccess] = useState(false)
     const [validation, setValidation] = useState(false)
     const [createWorkerAccount, {isLoading}] = useCreateWorkerAccountMutation()
     const [errorMessage, setErrorMessage] = useState(null)
     const [isLoadingCustom, setIsLoadingCustom] = useState(false)
-
+    const [updateSalon, {isLoading: isUpdateSalonLoading}] = useUpdateSalonMutation()
+    const [getSalonById] = useGetSalonByIdMutation()
+    const navigation = useNavigation()
     const dispatch = useDispatch()
+    const [description, setDescription] = useState('')
 
     const pickImage = async () => {
         // No permissions request is necessary for launching the image library
@@ -79,7 +84,20 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible}) => {
 
             if(data.success){
                 dispatch(setUser(data.result))
-                setIsSuccess(true)
+                if(addingYourself){
+                    const {error: errorUpdate, data: dataUpdate} = await updateSalon({salonId: salonData?._id, workers: [userData?._id]})
+    
+                    if(dataUpdate && dataUpdate.success){
+                        setIsSuccess(true)
+                        const {data: getSalonByIdData, isLoading: getSalonByIdLoading} = await getSalonById({salonId: salonData?._id})
+
+                        if(getSalonByIdData && !getSalonByIdLoading){
+                            navigation.navigate('StackTabScreens', {screen: 'SalonWorkersScreen'})
+                        }
+                    }
+                }else{
+                    setIsSuccess(true)
+                }
             }
         }catch(error){
             console.log(error)
@@ -87,6 +105,7 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible}) => {
             setIsLoadingCustom(false)
         }
     }
+
 
     return (
       <Modal 
@@ -159,7 +178,7 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible}) => {
                             <Text className="text-red-700">{errorMessage}</Text>
                         </View>
                         
-
+                        
 
                         <View className="flex flex-col justify-center items-center mt-14">
                             <CustomButton 
@@ -180,6 +199,16 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible}) => {
                                 <Text className="text-lg text-center">Sačekaj da te menadžer salona doda i započni svoju karijeru uz <Text className="text-appColorDark" semi>tiki</Text></Text>
 
                                 <LootieSuccess d={250} />
+
+                                {/* <View>
+                                    <CustomInput 
+                                        label={'Kratak opis'}
+                                        placeholder={'Primer: Nail Tehnician'}    
+                                        classNameCustom='mt-4'
+                                        value={description}
+                                        onChangeText={text => setDescription(text)}
+                                    />
+                                </View> */}
 
                                 <View className="flex flex-col justify-center items-center mt-14 w-full">
                                     <CustomButton 

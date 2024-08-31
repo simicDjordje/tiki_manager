@@ -16,7 +16,7 @@ import CustomInput from '../Components/CustomComponents/CustomInput'
 import SalonWorkerDetailsModal from '../Components/SalonWorkerDetailsModal'
 import { useSelector } from 'react-redux'
 import CreateWorkerAccountModal from '../Components/CreateWorkerAccountModal'
-import { useUpdateSalonMutation } from '../redux/apiCore'
+import { useGetUserDataMutation, useUpdateSalonMutation } from '../redux/apiCore'
 import AddYourselfInSalonModal from '../Components/AddYourselfInSalonModal'
 
 
@@ -35,6 +35,8 @@ const SalonWorkersScreen = ({navigation}) => {
 
   const [updateSalon, {isLoading}] = useUpdateSalonMutation()
   const [errorMessage, setErrorMessage] = useState('')
+
+  const [getUserData] = useGetUserDataMutation()
 
   useEffect(() => {
     if (salonData?.workers) {
@@ -57,7 +59,9 @@ const SalonWorkersScreen = ({navigation}) => {
     navigation.navigate('StackTabScreens', {screen: 'SalonScreen'})
   }
 
-  const seeWorkerDetails = () => {
+  const seeWorkerDetails = (workerId) => {
+    getUserData({userId: workerId})
+
     setIsSalonWorkerDetailsModalVisible(true)
   }
 
@@ -71,7 +75,7 @@ const SalonWorkersScreen = ({navigation}) => {
 
 
   const handleCreateYourWorkerAccount = () => {
-
+     setIsCreateWorkerAccountModalVisible(true)
   }
 
 
@@ -113,7 +117,7 @@ const SalonWorkersScreen = ({navigation}) => {
                     </View>
                 }
                 
-                {sortedWorkers.length === 0 && userData.haveWorkerAccount && 
+                {sortedWorkers.length === 0  && 
                     <View className="px-12">
                         <View className="bg-textSecondary mt-5 w-full" style={{height: 0.5}}></View>
                     </View>
@@ -128,7 +132,7 @@ const SalonWorkersScreen = ({navigation}) => {
                             {userData.haveWorkerAccount &&
                                 <Image
                                     className="w-20 h-20 rounded-full border-2 border-appColorDark"
-                                    source={`http://192.168.0.102:5000/photos/profile-photo${userData?._id}.png`}
+                                    source={`http://192.168.0.72:5000/photos/profile-photo${userData?._id}.png`}
                                     placeholder={{ blurhash }}
                                     contentFit="cover"
                                     transition={1000}
@@ -159,11 +163,11 @@ const SalonWorkersScreen = ({navigation}) => {
                             const isYou = worker?._id === userData?._id
 
                             return (
-                                <TouchableOpacity key={index} onPress={()=>{}} className="bg-bgPrimary w-full mt-4 rounded-xl p-4 flex flex-col justify-between">
+                                <TouchableOpacity key={index} onPress={() => seeWorkerDetails(worker?._id)} className="bg-bgPrimary w-full mt-4 rounded-xl p-4 flex flex-col justify-between">
                                     <View className="flex flex-row justify-between items-center pb-2">
                                         <Image
                                             className="w-16 h-16 rounded-full border-2 border-appColorDark"
-                                            source={`http://192.168.0.102:5000/photos/profile-photo${worker?._id}.png`}
+                                            source={`http://192.168.0.72:5000/photos/profile-photo${worker?._id}.png`}
                                             placeholder={{ blurhash }}
                                             contentFit="cover"
                                             transition={1000}
@@ -227,6 +231,7 @@ const SalonWorkersScreen = ({navigation}) => {
         <CreateWorkerAccountModal 
             isModalVisible={isCreateWorkerAccountModalVisible}
             setIsModalVisible={setIsCreateWorkerAccountModalVisible}
+            addingYourself
         />
 
         <AddYourselfInSalonModal 

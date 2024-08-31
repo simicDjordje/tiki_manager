@@ -18,6 +18,7 @@ const initialState = {
   comesFrom: null,
   activeCategory: null,
   activeService: null,
+  activeWorkerDetails: null
 }
 
 
@@ -65,6 +66,9 @@ const generalSlice = createSlice({
         state.activeService = action.payload
     },
 
+    setActiveWorkerDetails: (state, action) => {
+      state.activeWorkerDetails = action.payload
+    }
   },
   extraReducers: (builder) => {
 
@@ -114,7 +118,14 @@ const generalSlice = createSlice({
             }
           }
         }
-      );      
+      );     
+      
+      builder.addMatcher(
+        apiCore.endpoints.getUserData.matchFulfilled,
+        (state, action) => {
+          state.activeWorkerDetails = action?.payload?.result ? action?.payload?.result : null
+        }
+      )
   },
 })
 
@@ -130,7 +141,8 @@ export const {
         setSignUpFirstScreenData,
         setComesFrom,
         setActiveCategory,
-        setActiveService
+        setActiveService,
+        setActiveWorkerDetails,
     } = generalSlice.actions
 
 export default generalSlice.reducer

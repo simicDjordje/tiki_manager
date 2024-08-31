@@ -115,7 +115,7 @@ const SalonScreen = ({navigation}) => {
                         <View className="flex flex-row justify-center items-center w-full flex-1">
                             <Image
                                 className="w-20 h-20 rounded-full border-2 border-textPrimary mb-2"
-                                source={`http://192.168.0.102:5000/photos/salon-logo_${salonData?.logoId}.png`}
+                                source={`http://192.168.0.72:5000/photos/salon-logo_${salonData?.logoId}.png`}
                                 placeholder={{ blurhash }}
                                 contentFit="cover"
                                 transition={1000}
@@ -141,7 +141,7 @@ const SalonScreen = ({navigation}) => {
                                         key={index}
                                         className="w-9 h-9 border-textPrimary rounded-lg mx-1 my-0.5"
                                         style={{borderWidth: 0.5}}
-                                        source={`http://192.168.0.102:5000/photos/salon-photo_${imageId}.png`}
+                                        source={`http://192.168.0.72:5000/photos/salon-photo_${imageId}.png`}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
@@ -222,78 +222,24 @@ const SalonScreen = ({navigation}) => {
 
                         {salonData?.workers?.length > 0 && 
                             <View className="flex flex-row justify-start items-center p-1 bg-bgPrimary rounded-2xl">
-                                <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColorDark"
-                                        source={require('../assets/fpp.png')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                
-                                <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
-                                        source={require('../assets/e2.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                
-                                <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColorDark -ml-2"
-                                        source={require('../assets/fpp2.png')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                                <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
-                                        source={require('../assets/e4.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                                <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
-                                        source={require('../assets/e4.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                />
-                                <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
-                                        source={require('../assets/e2.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                
-                                <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColorDark -ml-2"
-                                        source={require('../assets/fpp2.png')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                                <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
-                                        source={require('../assets/e4.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                                <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
-                                        source={require('../assets/e4.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                />
+                                {salonData?.workers.length > 0 && salonData?.workers.slice(0, 9).map((worker, index) => {
+                                    return (
+                                        <Image
+                                            key={index}
+                                            className="w-8 h-8 rounded-full border-2 border-appColorDark"
+                                            source={`http://192.168.0.72:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
+                                            placeholder={{ blurhash }}
+                                            contentFit="cover"
+                                            transition={1000}
+                                        />
+                                    )
+                                })}
                                 
-                                <View className="w-8 h-8 rounded-full border-2 border-textMid bg-textPrimary -ml-2 flex flex-row justify-center items-center">
-                                    <Text className="text-white">+4</Text>
-                                </View>
-                                
-                
+                                {salonData?.workers.length > 9 && 
+                                    <View className="w-8 h-8 rounded-full border-2 border-textMid bg-textPrimary -ml-2 flex flex-row justify-center items-center">
+                                        <Text className="text-white">+{salonData?.workers.length - 9}</Text>
+                                    </View>
+                                }
                             </View>
                         }
                     </View>

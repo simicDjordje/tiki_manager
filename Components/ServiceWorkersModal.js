@@ -7,6 +7,7 @@ import { Image } from 'expo-image'
 import Text from './CustomComponents/CustomText'
 import AntDesign from '@expo/vector-icons/AntDesign'
 import { useSelector } from 'react-redux'
+import { useNavigation } from '@react-navigation/native'
 // import LootieTwoPeople from './LootieAnimations/TwoPeople'
 
 const blurhash =
@@ -15,7 +16,12 @@ const blurhash =
 
 const ServiceWorkersModal = ({isModalVisible, setIsModalVisible}) => {
     const {currentSalon: salonData, activeCategory, activeService} = useSelector(state => state.general)
+    const navigation = useNavigation()
 
+    const handleToWorkersScreen = () => {
+        setIsModalVisible(false)
+        navigation.navigate('StackTabScreens', {screen: 'SalonWorkersScreen'})    
+    }
 
     const closeModal = () => {
         setIsModalVisible(false)
@@ -49,6 +55,12 @@ const ServiceWorkersModal = ({isModalVisible, setIsModalVisible}) => {
                             <Text className="text-center text-textPrimary text-lg" bold>Tvoj salon još uvek nema članova.</Text>
                             <Text className="text-center text-textMid">Dodaj članove u podešavanjima salona i ovde im dodeli uslugu.</Text>
 
+                            <View className="flex flex-col justify-center items-center mt-10">
+                                <Text className="text-lg mb-3" bold>Dodaj novog člana</Text>
+                                <TouchableOpacity onPress={handleToWorkersScreen} className="p-4 bg-textPrimary rounded-full">
+                                    <Entypo name="plus" size={64} color="white" />
+                                </TouchableOpacity>
+                            </View>
                             {/* <View>
                                 <LootieTwoPeople d={100} />
                             </View> */}
