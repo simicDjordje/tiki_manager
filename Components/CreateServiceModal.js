@@ -36,7 +36,7 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
         }
 
         try{
-            const {error, data} = await createService({...inputsData, categoryId: activeCategory?._id, salonId: salonData?._id})
+            const {error, data} = await createService({...inputsData, categoryId: activeCategory?._id, salonId: salonData?._id, workers})
 
             if(error){
                 if(error?.data?.message === 'Service with this name already exists in the selected category'){
@@ -154,7 +154,7 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                     </View>
 
                                     <View className="w-7 h-7 rounded-full bg-appColor flex flex-row justify-center items-center">
-                                        <Text className="text-white" semi>0</Text>
+                                        <Text className="text-white" semi>{workers.length}</Text>
                                     </View>
                                 </View>
                             }

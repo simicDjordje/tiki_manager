@@ -119,7 +119,7 @@ const SalonServicesScreen = ({navigation}) => {
                         
                         {servicesFiltered.map((service, index) => {
                             return (
-                                <TouchableOpacity key={index} onPress={() => handleToService(service)} className="bg-bgPrimary w-full mt-4 h-48 rounded-xl p-4">
+                                <TouchableOpacity key={index} onPress={() => handleToService(service)} className={`bg-bgPrimary w-full mt-4 ${service?.users?.length > 0 ? 'h-56' : 'h-48'} rounded-xl p-4`}>
                                     <View className="flex flex-row justify-between items-center">
                                         <Text className="text-textPrimary text-xl" bold>{service?.name}</Text>
                                         <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
@@ -144,55 +144,34 @@ const SalonServicesScreen = ({navigation}) => {
                                         </View> */}
 
                                         <View className="bg-textSecondary mt-3 w-full" style={{height: 0.5}}></View>
-
+                                        
+                                        {service?.users?.length > 0 && 
+                                            <View className="flex flex-row justify-start items-center mt-2">
+                                                <Text>Članovi sa ovom uslugom: </Text>
+                                            </View>
+                                        }
                                         <View className="flex flex-row justify-start items-center mt-2">
                                             {service?.users.length === 0 && <Text semi className="text-red-700">Usluga nije dodeljena nijednom članu</Text>}
-                                            {/* <Image
-                                                className="w-10 h-10 rounded-full border-2 border-appColorDark"
-                                                source={require('../assets/fpp.png')}
-                                                placeholder={{ blurhash }}
-                                                contentFit="cover"
-                                                transition={1000}
-                                            />
-                                            <Image
-                                                className="w-10 h-10 rounded-full border-2 border-appColorDark -ml-2"
-                                                source={require('../assets/fpp2.png')}
-                                                placeholder={{ blurhash }}
-                                                contentFit="cover"
-                                                transition={1000}
-                                            />
-                                            <Image
-                                                className="w-10 h-10 rounded-full border-2 border-appColorDark -ml-2"
-                                                source={require('../assets/e1.jpg')}
-                                                placeholder={{ blurhash }}
-                                                contentFit="cover"
-                                                transition={1000}
-                                            />
-                                            <Image
-                                                className="w-10 h-10 rounded-full border-2 border-appColorDark -ml-2"
-                                                source={require('../assets/e4.jpg')}
-                                                placeholder={{ blurhash }}
-                                                contentFit="cover"
-                                                transition={1000}
-                                            />
-                                            <Image
-                                                className="w-10 h-10 rounded-full border-2 border-appColorDark"
-                                                source={require('../assets/fpp.png')}
-                                                placeholder={{ blurhash }}
-                                                contentFit="cover"
-                                                transition={1000}
-                                            />
-                                            <Image
-                                                className="w-10 h-10 rounded-full border-2 border-appColorDark -ml-2"
-                                                source={require('../assets/fpp2.png')}
-                                                placeholder={{ blurhash }}
-                                                contentFit="cover"
-                                                transition={1000}
-                                            />
-
-                                            <View className="w-10 h-10 rounded-full border-2 border-textMid bg-textPrimary -ml-2 flex flex-row justify-center items-center">
-                                                <Text className="text-white">+4</Text>
-                                            </View> */}
+                                            {service?.users.length > 0 && service?.users.slice(0, 8).map((user, indec) => {
+                                                return (
+                                                    <Image
+                                                        key={index}
+                                                        className="w-10 h-10 rounded-full border-2 border-appColorDark"
+                                                        source={`http://192.168.0.72:5000/photos/profile-photo${user?._id ? user?._id : user}.png`}
+                                                        placeholder={{ blurhash }}
+                                                        contentFit="cover"
+                                                        transition={1000}
+                                                    />
+                                                )
+                                            })
+                                                
+                                            }
+                                                 
+                                            {service?.users.length > 8 && 
+                                                <View className="w-10 h-10 rounded-full border-2 border-textMid bg-textPrimary -ml-2 flex flex-row justify-center items-center">
+                                                    <Text className="text-white">+{service?.users.length - 8}</Text>
+                                                </View>
+                                            }
                                         </View>
                                     </View>
                                 </TouchableOpacity>

@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
@@ -12,13 +12,14 @@ import ServiceWorkersModal from '../Components/ServiceWorkersModal'
 import { useSelector } from 'react-redux'
 import { useGetSalonByIdMutation, useUpdateServiceMutation } from '../redux/apiCore'
 import CustomButton from '../Components/CustomComponents/CustomButton'
+import UnsavedChangesModal from '../Components/UnsavedChangesModal'
 
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
-const ServiceScreen = ({navigation}) => {
+const ServiceScreen = () => {
   const [isServiceWorkerModalVisible, setIsServiceWorkerModalVisible] = useState(false)
   const {currentSalon: salonData, activeCategory, activeService} = useSelector(state => state.general)
   const [updateService, {isLoading}] = useUpdateServiceMutation()
@@ -28,10 +29,87 @@ const ServiceScreen = ({navigation}) => {
     description: activeService?.description || '',
     price: activeService?.price || ''
   })
+  const [originalInputsData, setOriginalInputsData] = useState({
+    name: activeService?.name || '',
+    description: activeService?.description || '',
+    price: activeService?.price || ''
+  })
   const [workers, setWorkers] = useState(activeService?.users || [])
+  const [originalWorkers, setOriginalWorkers] = useState(activeService?.users || [])
   const [validation, setValidation] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
+  const [shouldLeaveOnScreen, setShouldLeaveOnScreen] = useState(true)
+  const [isUnsavedChangesModalVisible, setIsUnsavedChangesModalVisible] = useState(false)
+  const navigation = useNavigation()
+
+  const compareWorkerArrays = useCallback(() => {
+    // Check if the lengths are different
+    if (workers.length !== originalWorkers.length) {
+      return false;
+    }
+  
+    // Create sets of worker IDs for easy comparison
+    const workerSet = new Set(workers.map(worker => worker));
+    const originalWorkerSet = new Set(originalWorkers.map(worker => worker?._id));
+  
+    // Check if every ID in workers is in originalWorkers and vice versa
+    for (let workerId of workerSet) {
+      if (!originalWorkerSet.has(workerId)) {
+        return false;
+      }
+    }
+  
+    for (let workerId of originalWorkerSet) {
+      if (!workerSet.has(workerId)) {
+        return false;
+      }
+    }
+  
+    // If no differences are found
+    return true;
+  },[workers, originalWorkers])
+
+  useEffect(()=>{
+    const areWorkersSame = compareWorkerArrays()
+
+    if(
+        inputsData.name != originalInputsData?.name 
+        || inputsData?.description != originalInputsData?.description 
+        || inputsData?.price != originalInputsData?.price
+        || !areWorkersSame
+    ){
+        setShouldLeaveOnScreen(false)
+    }else{
+        setShouldLeaveOnScreen(true)
+    }
+    
+
+  }, [inputsData, originalInputsData, workers, originalWorkers])
+
+  useEffect(() => {
+    if(isUnsavedChangesModalVisible && shouldLeaveOnScreen){
+      navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
+      return
+    }
+
+  }, [shouldLeaveOnScreen, isUnsavedChangesModalVisible])
+
+  useEffect(() => navigation.addListener('beforeRemove', (e) => {
+    console.log(shouldLeaveOnScreen)
+    // if (shouldLeaveOnScreen || isSuccess) {
+    //   // If we don't have unsaved changes, then we don't need to do anything
+    //   return;
+    // }
+
+    // Prevent default behavior of leaving the screen
+    e.preventDefault();
+
+    // Prompt the user before leaving the screen
+    setIsUnsavedChangesModalVisible(true)
+  }),
+[navigation, shouldLeaveOnScreen, isSuccess]
+);
 
   const handleBack = () => {
     navigation.navigate('StackTabScreens', {screen: 'SalonServicesScreen'})
@@ -117,7 +195,7 @@ const ServiceScreen = ({navigation}) => {
                         onChangeText={text => setInputsData({...inputsData, price: text})}
                     />
                     
-                    <Text className={`mb-1 text-md mt-4`} semi>Dodeli ili ukloni uslugu</Text>
+                    <Text className={`mb-1 text-md mt-4`} semi>Članovi sa ovom uslugom</Text>
                     <TouchableOpacity 
                         onPress={() => setIsServiceWorkerModalVisible(true)}
                         className="w-full h-16 border-textSecondary flex flex-row justify-between items-center rounded-xl border p-2">
@@ -125,81 +203,24 @@ const ServiceScreen = ({navigation}) => {
                             {workers.length === 0 && <Text className="text-red-700" semi>Usluga nije dodeljena nijednom članu</Text>}
                             {workers.length > 0 && 
                                 <View className="flex flex-row justify-start items-center">
-                                    <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColorDark"
-                                        source={require('../assets/fpp.png')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
+                                    {workers?.slice(0, 10).map((worker, index) => {
+                                        return (
+                                            <Image
+                                                key={index}
+                                                className="w-8 h-8 rounded-full border-2 border-appColorDark"
+                                                source={`http://192.168.0.72:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
+                                                placeholder={{ blurhash }}
+                                                contentFit="cover"
+                                                transition={1000}
+                                            />
+                                        )
+                                    })}
 
-                                    <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
-                                        source={require('../assets/e2.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-
-                                    <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColorDark -ml-2"
-                                        source={require('../assets/fpp2.png')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                                    <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
-                                        source={require('../assets/e4.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                                    <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
-                                        source={require('../assets/e4.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                                    <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
-                                        source={require('../assets/e4.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                                    <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
-                                        source={require('../assets/e4.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                                    <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
-                                        source={require('../assets/e4.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                                    <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
-                                        source={require('../assets/e4.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                                    <Image
-                                        className="w-8 h-8 rounded-full border-2 border-appColor -ml-2"
-                                        source={require('../assets/e4.jpg')}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
-                                        transition={1000}
-                                    />
-                                    <View className="w-8 h-8 rounded-full border-2 border-textMid bg-textPrimary -ml-2 flex flex-row justify-center items-center">
-                                        <Text className="text-white">+4</Text>
-                                    </View>
+                                    {workers?.length > 10 && 
+                                        <View className="w-8 h-8 rounded-full border-2 border-textMid bg-textPrimary -ml-2 flex flex-row justify-center items-center">
+                                            <Text className="text-white">+{workers.length - 10}</Text>
+                                        </View>
+                                    }
                                 </View>
                             }
                         </View>
@@ -229,7 +250,17 @@ const ServiceScreen = ({navigation}) => {
             <ServiceWorkersModal 
                 isModalVisible={isServiceWorkerModalVisible}
                 setIsModalVisible={setIsServiceWorkerModalVisible}
+                workers={workers}
+                setWorkers={setWorkers}
             />
+
+        <UnsavedChangesModal 
+            isModalVisible={isUnsavedChangesModalVisible}
+            setIsModalVisible={setIsUnsavedChangesModalVisible}
+            handleConfirm={() => {
+                setShouldLeaveOnScreen(true)
+              }}
+          />   
           </View>
         </View>
     </SafeAreaView>

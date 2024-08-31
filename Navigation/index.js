@@ -1,4 +1,4 @@
-import { NavigationContainer, useFocusEffect } from "@react-navigation/native"
+import { NavigationContainer, useFocusEffect, useNavigation } from "@react-navigation/native"
 import MainTab from "./MainTab"
 import StackTab from './StackTab'
 import AuthTab from "./AuthTab"
@@ -13,6 +13,7 @@ const Stack = createNativeStackNavigator()
 const StackNavigator = () => {
   const {userData} = useSelector(state => state.general)
   const dispatch = useDispatch()
+  const navigation = useNavigation()
 
   useFocusEffect(useCallback(()=>{
     (async () => {
@@ -34,6 +35,9 @@ const StackNavigator = () => {
       console.log('setting user data')
       console.log('setting: ', userData)
       await AsyncStorage.setItem('@userData', JSON.stringify(userData))
+      if(!userData){
+        navigation.navigate('AuthTabScreens')
+      }
       console.log('end user data')
     })()
   }, [userData])

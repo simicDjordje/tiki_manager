@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, Platform } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Modal from 'react-native-modal'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import Entypo from '@expo/vector-icons/Entypo'
@@ -91,9 +91,9 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible, addingYour
                         setIsSuccess(true)
                         const {data: getSalonByIdData, isLoading: getSalonByIdLoading} = await getSalonById({salonId: salonData?._id})
 
-                        if(getSalonByIdData && !getSalonByIdLoading){
-                            navigation.navigate('StackTabScreens', {screen: 'SalonWorkersScreen'})
-                        }
+                        // if(getSalonByIdData && !getSalonByIdLoading){
+                        //     //navigation.navigate('StackTabScreens', {screen: 'SalonWorkersScreen'})
+                        // }
                     }
                 }else{
                     setIsSuccess(true)
@@ -105,6 +105,21 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible, addingYour
             setIsLoadingCustom(false)
         }
     }
+
+    useEffect(() => navigation.addListener('beforeRemove', (e) => {
+        if (!isModalVisible) {
+          // If we don't have unsaved changes, then we don't need to do anything
+          return;
+        }
+
+            // Prevent default behavior of leaving the screen
+            e.preventDefault();
+
+            // Prompt the user before leaving the screen
+            setIsModalVisible(false)
+        }),
+        [navigation, isModalVisible]
+    );
 
 
     return (
