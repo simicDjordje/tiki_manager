@@ -157,7 +157,7 @@ const SalonServicesScreen = ({navigation}) => {
                                                     <Image
                                                         key={index}
                                                         className="w-10 h-10 rounded-full border-2 border-appColorDark"
-                                                        source={`http://192.168.0.72:5000/photos/profile-photo${user?._id ? user?._id : user}.png`}
+                                                        source={`http://192.168.1.13:5000/photos/profile-photo${user?._id ? user?._id : user}.png`}
                                                         placeholder={{ blurhash }}
                                                         contentFit="cover"
                                                         transition={1000}

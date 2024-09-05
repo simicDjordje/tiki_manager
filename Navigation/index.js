@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { useCallback, useEffect } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { setUser } from "../redux/generalSlice"
+// import { usePushNotifications } from "../usePushNotifications"
 
 const Stack = createNativeStackNavigator()
 
@@ -14,12 +15,15 @@ const StackNavigator = () => {
   const {userData} = useSelector(state => state.general)
   const dispatch = useDispatch()
   const navigation = useNavigation()
+  // const {expoPushToken, notification} = usePushNotifications()
+
+  
 
   useFocusEffect(useCallback(()=>{
     (async () => {
       try{
         const user = await AsyncStorage.getItem('@userData')
-        console.log(user)
+        // console.log(user)
         dispatch(setUser(user ? JSON.parse(user) : null))
           
       }catch(error){
@@ -32,13 +36,13 @@ const StackNavigator = () => {
   useEffect(()=>{
     (async () => {
       if(userData === 'loading') return
-      console.log('setting user data')
-      console.log('setting: ', userData)
+      // console.log('setting user data')
+      // console.log('setting: ', userData)
       await AsyncStorage.setItem('@userData', JSON.stringify(userData))
       if(!userData){
         navigation.navigate('AuthTabScreens')
       }
-      console.log('end user data')
+      // console.log('end user data')
     })()
   }, [userData])
 

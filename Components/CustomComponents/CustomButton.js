@@ -24,7 +24,7 @@ const CustomButton = ({onPress, text, isLoading, isSuccess, isError}) => {
 
     if(innerError) return (
         <TouchableOpacity 
-            className="bg-appColorDark rounded-xl h-14 flex flex-row justify-center items-center w-full">
+            className="bg-textPrimary rounded-xl h-14 flex flex-row justify-center items-center w-full">
             <LootieError d={40} />
         </TouchableOpacity>
     )
@@ -39,7 +39,7 @@ const CustomButton = ({onPress, text, isLoading, isSuccess, isError}) => {
 
     if(isSuccess) return (
         <TouchableOpacity 
-            className="bg-appColorDark rounded-xl h-14 flex flex-row justify-center items-center w-full">
+            className="bg-textPrimary rounded-xl h-14 flex flex-row justify-center items-center w-full">
            <LootieSuccess d={150} />
         </TouchableOpacity>
     )
@@ -47,7 +47,7 @@ const CustomButton = ({onPress, text, isLoading, isSuccess, isError}) => {
   return (
     <TouchableOpacity 
         onPress={onPress}
-        className="bg-appColorDark rounded-xl h-14 flex flex-row justify-center items-center w-full">
+        className="bg-textPrimary rounded-xl h-14 flex flex-row justify-center items-center w-full">
         <Text className="text-white text-lg" bold>{text}</Text>
     </TouchableOpacity>
   )

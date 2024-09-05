@@ -14,12 +14,9 @@ const MainTab = () => {
     screenOptions={{
         headerShown: false,
         tabBarHideOnKeyborad: true,
-        // tabBarStyle: {
-        //   backgroundColor: ThemeColors['dark'].color5, 
-        //   borderTopWidth: 0, 
-        //   paddingBottom: 2,
-        //   paddingTop: 4
-        // },
+        tabBarStyle: {
+          marginTop: -50
+        },
     }}
     >
         <Tab.Screen name="HomeScreen" component={HomeScreen} options={{

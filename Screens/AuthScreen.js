@@ -19,17 +19,17 @@ const AuthScreen = ({navigation}) => {
   const {userData} = useSelector(state => state.general)
 
   useEffect(()=>{
-    console.log(1)
+    //console.log(1)
     setIsLoadingScreen(true)
-    console.log(2)
+    //console.log(2)
     if(userData === 'loading') return
-    console.log(3)
+    //console.log(3)
     if(!userData){
-      console.log(3.1)
+      //console.log(3.1)
       setIsLoadingScreen(false)
       return
     }
-    console.log(4)
+    //console.log(4)
     navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
   }, [userData])
 

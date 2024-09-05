@@ -1,5 +1,5 @@
-import { View, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useState } from 'react'
+import { View, TouchableOpacity, ScrollView, FlatList } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import Modal from 'react-native-modal'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import Entypo from '@expo/vector-icons/Entypo'
@@ -9,17 +9,114 @@ import CustomInput from './CustomComponents/CustomInput'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
 import { useNavigation } from '@react-navigation/native'
+import { useGetUserDataMutation, useSearchForWorkerMutation } from '../redux/apiCore'
+import LootieLoader from './LootieAnimations/Loader'
+import Animated, { BounceInDown, BounceInUp, FadeInDown } from 'react-native-reanimated'
+import { useDispatch, useSelector } from 'react-redux'
+import { setActiveWorkerDetails } from '../redux/generalSlice'
+import CustomButton from './CustomComponents/CustomButton'
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
+  const WorkerItem = React.memo(({ item, index, setSelectedWorker }) => {
+    // const bounceInDown = BounceInDown
+    // .duration(500) // Duration of the animation
+    // .delay(index * 100) // Delay for each item based on index
+
+    const indexPlusOne = Number(index) + 1 
+    const fadeInDown = FadeInDown//.delay(indexPlusOne * 100)
+
+    return (
+    <Animated.View entering={fadeInDown}>
+        <TouchableOpacity
+            onPress={() => setSelectedWorker(item)}
+            className="w-full h-20 flex flex-row justify-between items-center bg-bgPrimary rounded-xl px-2 mt-5"
+        >
+            <Image
+                className="w-16 h-16 rounded-full border-2 border-textPrimary"
+                source={`http://192.168.1.13:5000/photos/profile-photo${item?._id ? item?._id : item}.png`}
+                placeholder={{ blurhash }}
+                contentFit="cover"
+                transition={1000}
+            />
+
+            <View className="flex-1 px-4">
+                <Text className="text-textPrimary" semi>{item?.first_name} {item?.last_name}</Text>
+                <Text className="text-textPrimary">{item?.workerDescription || 'Nema opis'}</Text>
+            </View>
+
+            <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
+        </TouchableOpacity>
+    </Animated.View>
+)})
+
 
 const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
-    const navigation = useNavigation()
+    const [selectedWorker, setSelectedWorker] = useState(null)
+    const [searchText, setSearchText] = useState('')
+    const [debouncedSearchText, setDebouncedSearchText] = useState('')
+    const [searchForWorker, {isLoading}] = useSearchForWorkerMutation()
+    const [workersFound, setWorkersFound] = useState([])
+    const [emptyResponse, setEmptyResponse] = useState(false)
+    const [getUserData, {isLoading: isGetUserDataLoading}] = useGetUserDataMutation()
+    const {activeWorkerDetails} = useSelector(state => state.general)
+    const dispatch = useDispatch()
+    useEffect(()=>{console.log(workersFound)}, [workersFound])
+    useEffect(()=>{
+        if(!selectedWorker){
+            dispatch(setActiveWorkerDetails(null))
+            return
+        }
 
-    const handleToSingleWorkerScreen = () => {
-        navigation.navigate('StackTabScreens', {screen: 'SalonSingleWorkerScreen'})
-    }
+        try{
+            getUserData({userId: selectedWorker?._id})
+
+        }catch(error){
+            console.log(error)
+        }
+    }, [selectedWorker])
+
+    useEffect(() => {
+        if(searchText.length <= 3){
+            setWorkersFound([])
+            return
+        }
+        const handler = setTimeout(() => {
+          setDebouncedSearchText(searchText)
+        }, 300) // Adjust the delay as needed (e.g., 300ms)
+    
+        // Cleanup the timeout if the component is unmounted or if searchText changes
+        return () => {
+          clearTimeout(handler)
+        }
+    }, [searchText])
+
+    useEffect(() => {
+        if (!debouncedSearchText) return
+            
+        (async () => {
+            const {error, data} = await searchForWorker({search_text: debouncedSearchText})
+
+            if(error){
+                console.log(error)
+                return
+            }
+
+            if(data && data.success){
+                setWorkersFound(data?.result)
+
+                if(data?.result.length === 0){
+                    setTimeout(()=>{
+                        setEmptyResponse(true)
+                    }, 300)
+                }else{
+                    setEmptyResponse(false)
+                }
+            }
+        })()
+    }, [debouncedSearchText])
+
 
     const closeModal = () => {
         setIsModalVisible(false)
@@ -31,15 +128,28 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
           animationInTiming={300}
           animationOutTiming={300}
           style={{margin: 0}}
+          onModalHide={()=>{
+            setSearchText('')
+            setDebouncedSearchText('')
+            setEmptyResponse(false)
+            setWorkersFound([])
+            setSelectedWorker(null)
+            dispatch(setActiveWorkerDetails(null))
+          }}
       >
           <View className="flex-1 flex flex-col justify-end items-center w-full">
-              <View className="h-5/6 w-full">
+              <View className={`${selectedWorker ? 'h-5/6' : 'h-5/6'} w-full`}>
                 <View 
                     className="h-full w-full bg-bgSecondary px-4"
                     style={{borderTopRightRadius: 50, borderTopLeftRadius: 50}}
                 >
                     <View className="flex flex-row justify-between items-center w-full mt-6">
-                        <Text className="text-xl ml-2" bold>Dodaj novog člana</Text>
+                        {!selectedWorker && <Text className="text-xl ml-2" bold>Dodaj novog člana</Text>}
+                        {selectedWorker && 
+                            <TouchableOpacity onPress={() => setSelectedWorker(null)}>
+                                <MaterialIcons name="arrow-back-ios-new" size={24} color="#232323" />
+                            </TouchableOpacity>
+                        }
 
                         <TouchableOpacity onPress={closeModal} className="p-1 bg-textPrimary rounded-full">
                             <Ionicons name="close" size={20} color="white" />
@@ -47,39 +157,95 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
                     </View>
 
                     <View className="bg-textSecondary w-full h-0.5 mt-4"></View>
-                    
-                    <View className="mt-4">
-                        <CustomInput 
-                            label={'Pretraga'}
-                            placeholder='Pretraži po imenu i prezimenu'
-                            inputIcon={()=>(<FontAwesome name="search" size={24} color="black" />)}
-                            iconSide='right'
-                        />
-                    </View>
-                    
-                    <ScrollView>
-                        <View className="min-h-full">
-                        <TouchableOpacity onPress={handleToSingleWorkerScreen}
-                            className="w-full h-20 flex flex-row justify-between items-center bg-bgPrimary rounded-xl px-2 mt-5"
-                            >
-                            <Image
-                                className="w-16 h-16 rounded-full border-2 border-appColorDark"
-                                source={require('../assets/fpp.png')}
-                                placeholder={{ blurhash }}
-                                contentFit="cover"
-                                transition={1000}
-                            />
+                    {selectedWorker && 
+                        <View className="mt-4">
+                            {(!activeWorkerDetails || isGetUserDataLoading) && 
+                                <View className="h-5/6 flex flex-col justify-center items-center">
+                                    <LootieLoader dark={true} d={70} />
+                                </View>
+                            }
 
-                            <View className="flex-1 px-4">
-                                <Text semi>Jovana Jorgovankovic</Text>
-                                <Text>Nail tehnician</Text>
-                            </View>
+                            {activeWorkerDetails && !isGetUserDataLoading &&
+                                <View className="h-full">
+                                    <View className="flex flex-row justify-center items-center mt-10">
+                                        <Image
+                                            className="w-36 h-36 rounded-full border-2 border-textPrimary"
+                                            source={`http://192.168.1.13:5000/photos/profile-photo${activeWorkerDetails?._id}.png`}
+                                            placeholder={{ blurhash }}
+                                            contentFit="cover"
+                                            transition={1000}
+                                        />
+                                    </View>
+                                    <View className="flex flex-col justify-center items-center">
+                                        <Text className="text-xl mt-5 text-textPrimary" bold>{activeWorkerDetails?.first_name} {activeWorkerDetails?.last_name}</Text>
+                                        <Text className="text-lg text-textMid text-center">{activeWorkerDetails?.description || 'Nema opis'}</Text>
+                                    </View>
 
-                            <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
-                        </TouchableOpacity>
+                                    <View className="flex flex-col justify-center items-center mt-8">
+                                        <Text className="text-md text-textMid text-center">
+                                            Pošalji korisniku zahtev za pridruživanje salonu
+                                        </Text>
+                                        <Text className="text-md text-textMid text-center">
+                                            Kada korisnik prihvati zahtev, postaćete član tima
+                                        </Text>
+                                    </View>
+
+                                    <View className="mt-28">
+                                        <CustomButton 
+                                            text={'Pošalji zahtev'}
+                                        />
+                                    </View>
+                                </View>
+                            }
                         </View>
-                    </ScrollView>
+                    }
+
+                    {!selectedWorker && 
+                    <View className="h-full">
+                        <View className="mt-4">
+                            <CustomInput 
+                                label={'Pretraga'}
+                                placeholder='Pretraži po imenu i prezimenu'
+                                inputIcon={()=>(<FontAwesome name="search" size={24} color="black" />)}
+                                iconSide='right'
+                                value={searchText}
+                                onChangeText={text => setSearchText(text)}
+                            />
+                        </View>
                     
+                        {isLoading && workersFound.length === 0 &&
+                            <View className="w-full flex flex-col justify-center items-center mt-28">
+                                <LootieLoader dark={true} d={70} />
+                            </View>
+                        }
+
+                        {!isLoading && workersFound.length === 0 && emptyResponse && debouncedSearchText && 
+                            <View className="w-full flex flex-col justify-center items-center mt-20">
+                                <Text semi>Nismo pronašli nijednog <Text bold>tiki</Text> člana sa ovim imenom</Text>
+                            </View>
+                        }
+
+                    
+                        <View className="h-full">
+                            <FlatList
+                                data={isLoading || !searchText ? [] : workersFound}
+                                keyExtractor={(item) => item?._id.toString()}
+                                showsVerticalScrollIndicator={false}
+                                contentContainerStyle={{ paddingBottom: 0 }}
+                                renderItem={({ item, index }) => {
+                                    return (
+                                        <WorkerItem 
+                                            item={item} 
+                                            index={index} 
+                                            setSelectedWorker={setSelectedWorker} 
+                                        />
+                                    )
+                                }}
+                            /> 
+                        </View>
+                    
+                    
+                    </View>}
                 </View>
               </View>
           </View>

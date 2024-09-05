@@ -149,7 +149,7 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                             {salonData?.workers.length > 0 &&
                                 <View className="flex flex-row justify-between items-center mt-8">
                                     <View>
-                                        <Text className={`text-md`} semi>Ovde možeš dodeliti uslugu članovima</Text>
+                                        <Text className={`text-md`} semi>Možeš odmah dodeliti uslugu članovima</Text>
                                         <Text className={`mb-1 text-md text-textMid`} semi>ili kasnije u podešavanjima usluge</Text>
                                     </View>
 
@@ -179,7 +179,7 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                             }
                                             <Image
                                                 className={`rounded-full border-4 ${workers.includes(worker?._id) ? 'border-appColor' : 'border-transparent'}`}
-                                                source={`http://192.168.0.72:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
+                                                source={`http://192.168.1.13:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
                                                 placeholder={{ blurhash }}
                                                 contentFit="cover"
                                                 transition={1000}

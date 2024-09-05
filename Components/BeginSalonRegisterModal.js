@@ -43,7 +43,7 @@ const BeginSalonRegisterModal = ({isModalVisible, setIsModalVisible}) => {
 
                     <View>
                         <View className="flex flex-col justify-center items-center mt-4">
-                            <Text className="text-lg" bold>Započni proces dodavanja svog salona!</Text>
+                            <Text className="text-lg text-center" bold>Započni proces dodavanja svog salona!</Text>
 
                             <Text className="text-center text-textMid mt-2">
                                 U sledećim koracima ćemo ti pomoći da lako dodaš svoj salon i započneš svoj put.
