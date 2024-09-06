@@ -9,7 +9,7 @@ import CustomInput from './CustomComponents/CustomInput'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
 import { useNavigation } from '@react-navigation/native'
-import { useGetUserDataMutation, useSearchForWorkerMutation } from '../redux/apiCore'
+import { useCheckIfToJoinSalonRequestExistsMutation, useCreateToJoinSalonRequestMutation, useGetUserDataMutation, useSearchForWorkerMutation } from '../redux/apiCore'
 import LootieLoader from './LootieAnimations/Loader'
 import Animated, { BounceInDown, BounceInUp, FadeInDown } from 'react-native-reanimated'
 import { useDispatch, useSelector } from 'react-redux'
@@ -60,18 +60,39 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
     const [workersFound, setWorkersFound] = useState([])
     const [emptyResponse, setEmptyResponse] = useState(false)
     const [getUserData, {isLoading: isGetUserDataLoading}] = useGetUserDataMutation()
-    const {activeWorkerDetails} = useSelector(state => state.general)
+    const {activeWorkerDetails, currentSalon: salonData, userData} = useSelector(state => state.general)
     const dispatch = useDispatch()
-    useEffect(()=>{console.log(workersFound)}, [workersFound])
+    const [createToJoinSalonRequest, {isLoading: isCreateToJoinSalonRequestLoading}] = useCreateToJoinSalonRequestMutation()
+    const [isRequestSuccess, setIsRequestSuccess] = useState(false)
+    const [errorMessage, setErrorMessage] = useState('')
+    const [requestAlreadySent, setRequestAlreadySent] = useState(false)
+    const [checkIfToJoinSalonRequestExists, {isLoading: isCheckRequestLoading}] = useCheckIfToJoinSalonRequestExistsMutation()
+
     useEffect(()=>{
         if(!selectedWorker){
+            setRequestAlreadySent(false)
+            setIsRequestSuccess(false)
+            setErrorMessage('')
             dispatch(setActiveWorkerDetails(null))
             return
         }
 
         try{
-            getUserData({userId: selectedWorker?._id})
+            (
+                async () => {
+                    const {error, data} = await checkIfToJoinSalonRequestExists({
+                        recipient: selectedWorker?._id,
+                        salonId: salonData?._id,
+                        sender: userData?._id
+                    })
 
+                    if(error){
+                        setRequestAlreadySent(true)
+                    }
+                }
+            )()
+
+            getUserData({userId: selectedWorker?._id})
         }catch(error){
             console.log(error)
         }
@@ -118,8 +139,42 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
     }, [debouncedSearchText])
 
 
+    const handleCreateToJoinRequest = async () => {
+        try{
+            const {error, data} = await createToJoinSalonRequest({
+                recipient: selectedWorker?._id,
+                salonId: salonData?._id,
+                sender: userData?._id
+            })
+
+            if(error){
+                setErrorMessage('Došlo je do greške')
+                return
+            }
+
+            if(data && data.success){
+                setIsRequestSuccess(true)
+                setErrorMessage('')
+            }
+
+        }catch(error){
+            console.log(error)
+        }
+    }
+
     const closeModal = () => {
         setIsModalVisible(false)
+    }
+
+    const resetModal = () => {
+        setSearchText('')
+        setDebouncedSearchText('')
+        setEmptyResponse(false)
+        setWorkersFound([])
+        setSelectedWorker(null)
+        dispatch(setActiveWorkerDetails(null))
+        setIsRequestSuccess(false)
+        setErrorMessage('')
     }
 
     return (
@@ -128,13 +183,11 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
           animationInTiming={300}
           animationOutTiming={300}
           style={{margin: 0}}
+          onModalShow={()=>{
+            resetModal()
+          }}
           onModalHide={()=>{
-            setSearchText('')
-            setDebouncedSearchText('')
-            setEmptyResponse(false)
-            setWorkersFound([])
-            setSelectedWorker(null)
-            dispatch(setActiveWorkerDetails(null))
+            resetModal()
           }}
       >
           <View className="flex-1 flex flex-col justify-end items-center w-full">
@@ -159,13 +212,13 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
                     <View className="bg-textSecondary w-full h-0.5 mt-4"></View>
                     {selectedWorker && 
                         <View className="mt-4">
-                            {(!activeWorkerDetails || isGetUserDataLoading) && 
+                            {(!activeWorkerDetails || isGetUserDataLoading || isCheckRequestLoading) && 
                                 <View className="h-5/6 flex flex-col justify-center items-center">
                                     <LootieLoader dark={true} d={70} />
                                 </View>
                             }
 
-                            {activeWorkerDetails && !isGetUserDataLoading &&
+                            {activeWorkerDetails && !isGetUserDataLoading && !isCheckRequestLoading &&
                                 <View className="h-full">
                                     <View className="flex flex-row justify-center items-center mt-10">
                                         <Image
@@ -181,19 +234,53 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
                                         <Text className="text-lg text-textMid text-center">{activeWorkerDetails?.description || 'Nema opis'}</Text>
                                     </View>
 
-                                    <View className="flex flex-col justify-center items-center mt-8">
-                                        <Text className="text-md text-textMid text-center">
-                                            Pošalji korisniku zahtev za pridruživanje salonu
-                                        </Text>
-                                        <Text className="text-md text-textMid text-center">
-                                            Kada korisnik prihvati zahtev, postaćete član tima
-                                        </Text>
+                                    {!requestAlreadySent && 
+                                        <View className="flex flex-col justify-center items-center mt-8">
+                                            <Text className="text-md text-textMid text-center">
+                                                Pošalji korisniku zahtev za pridruživanje salonu
+                                            </Text>
+                                            <Text className="text-md text-textMid text-center">
+                                                Kada korisnik prihvati zahtev, postaćete član tima
+                                            </Text>
+                                        </View>
+                                    }
+
+                                    {requestAlreadySent && 
+                                        <View className="flex flex-col justify-center items-center mt-8">
+                                            <Text className="text-md text-textMid text-center">
+                                                Zahtev za pridruživanje je već poslat
+                                            </Text>
+                                            <Text className="text-md text-textMid text-center">
+                                                Obavestićemo te čim dođe do promena
+                                            </Text>
+                                        </View>
+                                    }
+
+                                    <View className="flex flex-row justify-center items-center mt-16 h-8">
+                                        <Text className="text-red-500" semi>{errorMessage}</Text>
+                                        {isRequestSuccess && <Text className="text-textPrimary" semi>Zahtev uspešno poslat!</Text>}
                                     </View>
 
-                                    <View className="mt-28">
-                                        <CustomButton 
-                                            text={'Pošalji zahtev'}
-                                        />
+                                    <View className="mt-12">
+                                        {requestAlreadySent && 
+                                            <CustomButton 
+                                                text={'Poništi zahtev'}
+                                                onPress={()=>{}}
+                                                isLoading={isCreateToJoinSalonRequestLoading}
+                                                isSuccess={isRequestSuccess}
+                                                isError={!!errorMessage}
+                                            />
+                                        }
+                                        
+                                        {!requestAlreadySent && 
+                                            <CustomButton 
+                                                text={'Pošalji zahtev'}
+                                                onPress={handleCreateToJoinRequest}
+                                                isLoading={isCreateToJoinSalonRequestLoading}
+                                                isSuccess={isRequestSuccess}
+                                                isError={!!errorMessage}
+                                            />
+                                        }
                                     </View>
                                 </View>
                             }

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import {store} from './redux/store'
 import LoadingComponent from './Components/LoadingComponent';
+import { SocketContextProvider } from './Context/SocketContext';
 
 const loadFonts = async () => {
   await Font.loadAsync({
@@ -28,7 +29,9 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <Navigation />
+      <SocketContextProvider>
+        <Navigation />
+      </SocketContextProvider>
     </Provider>
   );
 }

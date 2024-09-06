@@ -23,6 +23,7 @@ export {default as SalonSingleWorkerScreen} from './SalonSingleWorkerScreen'
 export {default as WorkerScreen} from './WorkerScreen'
 
 
+export {default as NotificationsScreen} from './NotificationsScreen'
 
 
 

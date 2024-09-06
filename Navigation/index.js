@@ -6,24 +6,38 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { useDispatch, useSelector } from "react-redux"
 import { useCallback, useEffect } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { setUser } from "../redux/generalSlice"
+import { setNotifications, setUser } from "../redux/generalSlice"
+import { useSocket } from "../Context/SocketContext"
+import { useGetNotificationsMutation } from "../redux/apiCore"
 // import { usePushNotifications } from "../usePushNotifications"
+
 
 const Stack = createNativeStackNavigator()
 
 const StackNavigator = () => {
-  const {userData} = useSelector(state => state.general)
+  const {userData, notifications} = useSelector(state => state.general)
   const dispatch = useDispatch()
   const navigation = useNavigation()
   // const {expoPushToken, notification} = usePushNotifications()
+  const {socket} = useSocket()
+  const [getNotifications] = useGetNotificationsMutation()
 
+  useEffect(()=>{
+    if(!socket) return
+
+    socket.on('newNotification', (newNotification) => {
+      getNotifications()
+    })
+
+    return () => socket.off('newNotification')
+}, [socket])
   
 
+  //ON FOCUS IF USER IN ASYNC STORAGE - SET IT IN REDUX STATE
   useFocusEffect(useCallback(()=>{
     (async () => {
       try{
         const user = await AsyncStorage.getItem('@userData')
-        // console.log(user)
         dispatch(setUser(user ? JSON.parse(user) : null))
           
       }catch(error){
@@ -32,17 +46,14 @@ const StackNavigator = () => {
     })()
   }, []))
 
-
+  //EVERYTIME USER IN REDUX STATE CHANGES - SET IT TO ASYNC STORAGE
   useEffect(()=>{
     (async () => {
       if(userData === 'loading') return
-      // console.log('setting user data')
-      // console.log('setting: ', userData)
       await AsyncStorage.setItem('@userData', JSON.stringify(userData))
       if(!userData){
         navigation.navigate('AuthTabScreens')
       }
-      // console.log('end user data')
     })()
   }, [userData])
 

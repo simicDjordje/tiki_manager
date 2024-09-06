@@ -13,7 +13,7 @@ import Text from '../Components/CustomComponents/CustomText'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import LootieLoader from '../Components/LootieAnimations/Loader'
 import Animated, { FadeInDown, FadeInUp, FadeOutDown } from 'react-native-reanimated'
-import { useGetUserSalonsMutation } from '../redux/apiCore'
+import { useGetNotificationsMutation, useGetUserSalonsMutation } from '../redux/apiCore'
 import SalonsPartHomeScreen from '../Components/SalonsPartHomeScreen'
 import { useDispatch, useSelector } from 'react-redux'
 import { setJustCreatedSalon, setJustCreatedWorkerAccount, setJustSignedUp, setUser } from '../redux/generalSlice'
@@ -27,6 +27,7 @@ const HomeScreen = ({route, navigation}) => {
         justSignedUp,
         userSalons,
         comesFrom,
+        notifications,
     } = useSelector(state => state.general)
     const dispatch = useDispatch()
 
@@ -41,10 +42,12 @@ const HomeScreen = ({route, navigation}) => {
 
     //api
     const [getUserSalons, {isLoading: isGetUserSalonsLoading}] = useGetUserSalonsMutation()
+    const [getNotifications, {isLoading: isNotificationsLoading}] = useGetNotificationsMutation()
 
     //ON FOCUS
     useFocusEffect(useCallback(()=>{
         getUserSalons()
+        getNotifications()
     }, []))
 
 
@@ -86,22 +89,26 @@ const HomeScreen = ({route, navigation}) => {
     [navigation, comesFrom]
   );
 
+  const handleToNotificationsScreen = () => {
+    navigation.navigate('StackTabScreens', {screen: 'NotificationsScreen'})
+  }
+
   return (
     <SafeAreaView className="bg-bgPrimary h-full relative">
-        <StatusBar style={(justCreatedSalon || justCreatedWorkerAccount) ? "light" : "dark"} />
-        {(justCreatedSalon || justCreatedWorkerAccount) && <View className="top-0 bottom-0 left-0 right-0 bg-black absolute opacity-90"></View>}
+        <StatusBar />
         <ScrollView ref={scrollViewRef}>
             <View className="min-h-screen flex flex-col justify-between items-center">
                 <View className="w-full flex flex-row justify-between items-center px-4 mt-4">
                     <View>
-                        <Text className={`${(justCreatedSalon || justCreatedWorkerAccount) ? 'text-textSecondary' : 'text-textPrimary'} text-3xl`} bold>tiki <Text className="text-textSecondary text-2xl" semi>manager</Text></Text>
+                        <Text className={`text-textPrimary text-3xl`} bold>tiki <Text className="text-textSecondary text-2xl" semi>manager</Text></Text>
                     </View>
 
                     <View className="flex flex-row justify-between items-center">
-                        <TouchableOpacity className=" bg-textPrimary p-2 rounded-full flex flex-row justify-center items-center relative">
-                            <View className="bg-appColor px-2 py-1 rounded-full absolute -top-2 -right-2 z-10">
-                                <Text className="text-white">2</Text>
-                            </View>
+                        <TouchableOpacity onPress={handleToNotificationsScreen} className=" bg-textPrimary p-2 rounded-full flex flex-row justify-center items-center relative">
+                            {notifications?.unseen?.length > 0 && 
+                            <View className="bg-appColor w-7 h-7 flex flex-row justify-center items-center rounded-full absolute -top-2 -right-2 z-10">
+                                <Text className="text-white">{notifications?.unseen?.length}</Text>
+                            </View>}
                             <Ionicons name="notifications-outline" size={24} color="white" />
                         </TouchableOpacity>
                     </View>
@@ -115,7 +122,6 @@ const HomeScreen = ({route, navigation}) => {
 
                 {userData &&
                 <Animated.View entering={FadeInDown} exiting={FadeOutDown} className="bg-bgSecondary flex-1 w-full min-h-screen mt-8 px-4 relative" style={{borderTopLeftRadius: 50, borderTopRightRadius: 50}}>
-                    {(justCreatedSalon || justCreatedWorkerAccount) && <View className="top-0 bottom-0 left-0 right-0 bg-textPrimary absolute opacity-50 z-10"></View>}
                     <View className="flex flex-row justify-between items-center mt-10">
                         <View className="flex flex-col justify-between items-start">
                             <Text className="text-textPrimary text-2xl" bold>{userData?.first_name} {userData?.last_name}</Text>

@@ -18,7 +18,12 @@ const initialState = {
   comesFrom: null,
   activeCategory: null,
   activeService: null,
-  activeWorkerDetails: null
+  activeWorkerDetails: null,
+  notifications: {
+    seen: [],
+    unseen: [],
+    all: [],
+  },
 }
 
 
@@ -68,7 +73,12 @@ const generalSlice = createSlice({
 
     setActiveWorkerDetails: (state, action) => {
       state.activeWorkerDetails = action.payload
-    }
+    },
+
+    setNotifications: (state, action) => {
+      state.notifications = action.payload
+    },
+
   },
   extraReducers: (builder) => {
 
@@ -76,10 +86,23 @@ const generalSlice = createSlice({
       apiCore.endpoints.getUserSalons.matchFulfilled,
       (state, action) => {
         const dataReversed = action?.payload?.result ? [...action?.payload?.result].reverse() : []
-
+        
         state.userSalons.salonsActive = dataReversed.filter(i => i.isActive)
         state.userSalons.salonsInactive = dataReversed.filter(i => !i.isActive)
 
+      }
+    )
+
+    builder.addMatcher(
+      apiCore.endpoints.getNotifications.matchFulfilled,
+      (state, action) => {
+        const responseData = action.payload?.result ? [...action?.payload?.result] : []
+
+        state.notifications.seen = responseData.filter(i => i.seen)
+        state.notifications.unseen = responseData.filter(i => !i.seen)
+        state.notifications.all = responseData
+        
+        console.log('STATE NOTIFICATIONS: ', state.notifications)
       }
     )
 
@@ -143,6 +166,7 @@ export const {
         setActiveCategory,
         setActiveService,
         setActiveWorkerDetails,
+        setNotifications,
     } = generalSlice.actions
 
 export default generalSlice.reducer

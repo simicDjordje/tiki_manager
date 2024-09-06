@@ -18,6 +18,8 @@ export const apiCore = createApi({
 		}
 	}),
 	endpoints: (builder) => ({
+		//users
+
 		checkIfUserExists: builder.mutation({
 			query: (data) => {
 				return {
@@ -54,6 +56,27 @@ export const apiCore = createApi({
 				}
 			}
 		}),
+		getUserData: builder.mutation({
+			query: (data) => {
+				return {
+					url: `/users/get-user-data`,
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
+		searchForWorker: builder.mutation({
+			query: (data) => {
+				return {
+					url: `/users/search`,
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
+		//end users
+
+		//salons
 		getUserSalons: builder.mutation({
 			query: (data) => {
 				return {
@@ -90,6 +113,9 @@ export const apiCore = createApi({
 				}
 			}
 		}),
+		//end salons
+
+		//services
 		createCategory: builder.mutation({
 			query: (data) => {
 				return {
@@ -117,24 +143,41 @@ export const apiCore = createApi({
 				}
 			}
 		}),
-		getUserData: builder.mutation({
+		//end services
+
+
+		//requests
+		createToJoinSalonRequest: builder.mutation({
 			query: (data) => {
 				return {
-					url: `/users/get-user-data`,
+					url: `/requests/create/join-to-salon`,
 					method: 'POST',
 					body: data
 				}
 			}
 		}),
-		searchForWorker: builder.mutation({
+		checkIfToJoinSalonRequestExists: builder.mutation({
 			query: (data) => {
 				return {
-					url: `/users/search`,
+					url: `/requests/check-if-exists/join-to-salon`,
 					method: 'POST',
 					body: data
 				}
 			}
 		}),
+		//end requests
+
+		//notifications
+		getNotifications: builder.mutation({
+			query: (data) => {
+				return {
+					url: `/notifications/get-notifications`,
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
+		//end notifications
 	})
 })
 
@@ -152,4 +195,7 @@ export const {
 	useUpdateServiceMutation,
 	useGetUserDataMutation,
 	useSearchForWorkerMutation,
+	useCreateToJoinSalonRequestMutation,
+	useCheckIfToJoinSalonRequestExistsMutation,
+	useGetNotificationsMutation,
 } = apiCore;
