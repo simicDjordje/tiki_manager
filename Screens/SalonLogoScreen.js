@@ -108,7 +108,7 @@ const SalonLogoScreen = ({navigation}) => {
 
                     <Image
                         className="w-44 h-44 rounded-full border-2 border-textPrimary"
-                        source={image ? image.uri : `http://192.168.1.13:5000/photos/salon-logo_${salonData?.logoId}.png`}
+                        source={image ? image.uri : `http://192.168.1.26:5000/photos/salon-logo_${salonData?.logoId}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}
@@ -120,7 +120,7 @@ const SalonLogoScreen = ({navigation}) => {
               <View className="w-full flex flex-row justify-between items-center px-8 mt-10 bg-bgPrimary py-2 rounded-xl">
                   <Image
                         className="w-8 h-8 rounded-full border-2 border-appColorDark"
-                        source={image ? image.uri : `http://192.168.1.13:5000/photos/salon-logo_${salonData?.logoId}.png`}
+                        source={image ? image.uri : `http://192.168.1.26:5000/photos/salon-logo_${salonData?.logoId}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}
@@ -128,7 +128,7 @@ const SalonLogoScreen = ({navigation}) => {
 
                   <Image
                         className="w-12 h-12 rounded-full border-2 border-textPrimary"
-                        source={image ? image.uri : `http://192.168.1.13:5000/photos/salon-logo_${salonData?.logoId}.png`}
+                        source={image ? image.uri : `http://192.168.1.26:5000/photos/salon-logo_${salonData?.logoId}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}
@@ -136,7 +136,7 @@ const SalonLogoScreen = ({navigation}) => {
 
                   <Image
                         className="w-16 h-16 rounded-full border-2 border-appColor"
-                        source={image ? image.uri : `http://192.168.1.13:5000/photos/salon-logo_${salonData?.logoId}.png`}
+                        source={image ? image.uri : `http://192.168.1.26:5000/photos/salon-logo_${salonData?.logoId}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}
@@ -144,7 +144,7 @@ const SalonLogoScreen = ({navigation}) => {
 
                   <Image
                         className="w-20 h-20 rounded-full border-2 border-textPrimary"
-                        source={image ? image.uri : `http://192.168.1.13:5000/photos/salon-logo_${salonData?.logoId}.png`}
+                        source={image ? image.uri : `http://192.168.1.26:5000/photos/salon-logo_${salonData?.logoId}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}

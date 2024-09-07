@@ -9,17 +9,25 @@ import Text from '../Components/CustomComponents/CustomText'
 
 import { useSelector } from 'react-redux'
 import Animated, { FadeInDown } from 'react-native-reanimated'
+import { useCheckIfToJoinSalonRequestExistsMutation } from '../redux/apiCore'
+import LootieLoader from '../Components/LootieAnimations/Loader'
 
 
 
 // const blurhash =
 //   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
-const NotifcationCard = ({item, index}) => {
+const NotifcationCard = ({item, index, setNotificationDetails}) => {
+    
+
+    const handleOnPress = () => {
+        setNotificationDetails(item)
+    }
+
     return (
         <Animated.View entering={FadeInDown}>
             <TouchableOpacity 
-                onPress={()=>{}}
+                onPress={handleOnPress}
                 className={`py-4 w-full ${item?.seen ? 'bg-bgSecondary border-textSecondary' : 'bg-bgPrimary'} rounded-2xl flex flex-row justify-between items-center px-4`}
                 style={item?.seen ? {borderWidth: 0.5} : {}}
                 >
@@ -41,16 +49,63 @@ const NotifcationCard = ({item, index}) => {
 }
 
 const NotificationsScreen = ({navigation}) => {
-  const {userData, notifications} = useSelector(state => state.general)
+  const {userData, notifications, currentSalon: salonData} = useSelector(state => state.general)
   const [sortedNotifications, setSortedNotifications] = useState({
     today: [],
     thisWeek: [],
     thisMonth: [],
     rest: []
   })
-  
+
+  const [notificationDetails, setNotificationDetails] = useState(null)
+  const [checkIfToJoinSalonRequestExists, {isLoading: isCheckRequestLoading}] = useCheckIfToJoinSalonRequestExistsMutation()
+  const [requestDetails, setRequestDetails] = useState(null)
+  const [requestErrorMessage, setRequestErrorMessage] = useState('')
+
+  useEffect(()=>{
+    if(!notificationDetails){
+        setRequestDetails(null)
+        setRequestErrorMessage('')
+        return
+    }
+    console.log(notificationDetails)
+    try{
+        if(notificationDetails?.type === 'toJoinSalon'){
+            (
+                async () => {
+                    const {error, data} = await checkIfToJoinSalonRequestExists({
+                        recipient: notificationDetails?.recipient,
+                        salonId: salonData?._id,
+                        sender: notificationDetails?.sender
+                    })
+    
+                    if(error){
+                        console.log(error)
+                        setRequestErrorMessage('Došlo je do greške')
+                    }
+    
+                    if(data && data.success){
+                        setRequestDetails(data?.result)
+                    }
+                }
+            )()
+        }
+    }catch(error){
+        console.log(error)
+    }
+  }, [notificationDetails])
+
+
   useEffect(() => {
-    if(notifications.all.length === 0) return
+    if(notifications.all.length === 0){
+        setSortedNotifications({
+            today: [],
+            thisWeek: [],
+            thisMonth: [],
+            rest: []
+        })
+        return
+    }
 
     const separateNotifications = (notifications) => {
       const today = new Date();
@@ -94,7 +149,11 @@ const NotificationsScreen = ({navigation}) => {
   }, [notifications]);
 
   const handleBack = () => {
-    navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
+    if(!notificationDetails){
+        navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
+    }else{
+        setNotificationDetails(null)
+    }
   }
 
 
@@ -109,7 +168,29 @@ const NotificationsScreen = ({navigation}) => {
         </View>
 
         <View className="h-full flex flex-col justify-between px-4">
-          <View className="flex-1 flex flex-col justify-start items-center">
+          {notificationDetails && 
+            <View className="flex-1 flex flex-col justify-start items-center">
+                {isCheckRequestLoading && 
+                    <View className="h-5/6 flex flex-col justify-center items-center">
+                        <LootieLoader dark={true} d={70} />
+                    </View>
+                }
+
+                {requestErrorMessage && 
+                    <View className="h-5/6 flex flex-col justify-center items-center">
+                        <Text className="text-lg" bold>{requestErrorMessage}</Text>
+                    </View>
+                }
+
+                {requestDetails && 
+                    <View className="w-full">
+                        <Text>{notificationDetails.message}</Text>
+                    </View>
+                }
+            </View>
+          }
+
+          {!notificationDetails && <View className="flex-1 flex flex-col justify-start items-center">
            
             {notifications.all.length === 0 && 
                 <View className="flex flex-col justify-start items-center mt-10">
@@ -132,7 +213,8 @@ const NotificationsScreen = ({navigation}) => {
                             return (
                                 <NotifcationCard 
                                     item={item} 
-                                    index={index}  
+                                    index={index} 
+                                    setNotificationDetails={setNotificationDetails} 
                                 />
                             )
                         }}
@@ -209,7 +291,7 @@ const NotificationsScreen = ({navigation}) => {
                 </View>
             }
 
-          </View>
+          </View>}
         </View>
     </SafeAreaView>
   )

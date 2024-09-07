@@ -25,11 +25,11 @@ const StackNavigator = () => {
   useEffect(()=>{
     if(!socket) return
 
-    socket.on('newNotification', (newNotification) => {
+    socket.on('notificationsChange', () => {
       getNotifications()
     })
 
-    return () => socket.off('newNotification')
+    return () => socket.off('notificationsChange')
 }, [socket])
   
 

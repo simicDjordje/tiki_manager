@@ -9,7 +9,7 @@ import CustomInput from './CustomComponents/CustomInput'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
 import { useNavigation } from '@react-navigation/native'
-import { useCheckIfToJoinSalonRequestExistsMutation, useCreateToJoinSalonRequestMutation, useGetUserDataMutation, useSearchForWorkerMutation } from '../redux/apiCore'
+import { useCheckIfToJoinSalonRequestExistsMutation, useCreateToJoinSalonRequestMutation, useDeleteToJoinSalonRequestMutation, useGetUserDataMutation, useSearchForWorkerMutation } from '../redux/apiCore'
 import LootieLoader from './LootieAnimations/Loader'
 import Animated, { BounceInDown, BounceInUp, FadeInDown } from 'react-native-reanimated'
 import { useDispatch, useSelector } from 'react-redux'
@@ -35,7 +35,7 @@ const blurhash =
         >
             <Image
                 className="w-16 h-16 rounded-full border-2 border-textPrimary"
-                source={`http://192.168.1.13:5000/photos/profile-photo${item?._id ? item?._id : item}.png`}
+                source={`http://192.168.1.26:5000/photos/profile-photo${item?._id ? item?._id : item}.png`}
                 placeholder={{ blurhash }}
                 contentFit="cover"
                 transition={1000}
@@ -65,15 +65,20 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
     const [createToJoinSalonRequest, {isLoading: isCreateToJoinSalonRequestLoading}] = useCreateToJoinSalonRequestMutation()
     const [isRequestSuccess, setIsRequestSuccess] = useState(false)
     const [errorMessage, setErrorMessage] = useState('')
-    const [requestAlreadySent, setRequestAlreadySent] = useState(false)
+    const [requestAlreadySent, setRequestAlreadySent] = useState(null)
     const [checkIfToJoinSalonRequestExists, {isLoading: isCheckRequestLoading}] = useCheckIfToJoinSalonRequestExistsMutation()
+    const [deleteToJoinSalonRequest, {isLoading: isDeleteRequestLoading}] = useDeleteToJoinSalonRequestMutation()
+    const [deletedRequestSuccess, setDeletedRequestSuccess] = useState(false)
+    const [deleteErrorMessage, setDeleteErrorMessage] = useState('')
 
     useEffect(()=>{
         if(!selectedWorker){
-            setRequestAlreadySent(false)
+            setRequestAlreadySent(null)
             setIsRequestSuccess(false)
             setErrorMessage('')
             dispatch(setActiveWorkerDetails(null))
+            setDeletedRequestSuccess(false)
+            setDeleteErrorMessage('')
             return
         }
 
@@ -87,7 +92,11 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
                     })
 
                     if(error){
-                        setRequestAlreadySent(true)
+                        setRequestAlreadySent(null)
+                    }
+
+                    if(data && data.success){
+                        setRequestAlreadySent(data.result)
                     }
                 }
             )()
@@ -140,6 +149,9 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
 
 
     const handleCreateToJoinRequest = async () => {
+        setDeletedRequestSuccess(false)
+        setDeleteErrorMessage('')
+
         try{
             const {error, data} = await createToJoinSalonRequest({
                 recipient: selectedWorker?._id,
@@ -162,6 +174,35 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
         }
     }
 
+    const handleDeleteRequest = async () => {
+        if(!requestAlreadySent) return
+
+        setIsRequestSuccess(false)
+        setErrorMessage('')
+
+        try{
+            (async () => {
+                const {error, data} = await deleteToJoinSalonRequest({requestId: requestAlreadySent?._id})
+
+                if(error){
+                    setDeleteErrorMessage('Došlo je do greške')
+                    return
+                }
+
+                if(data && data.success){
+                    setDeletedRequestSuccess(true)
+                    setDeleteErrorMessage('')
+
+                    setTimeout(()=>{
+                        setRequestAlreadySent(null)
+                    }, 2700)
+                }
+            })()
+        }catch(error){
+            console.log(error)
+        }
+    }
+
     const closeModal = () => {
         setIsModalVisible(false)
     }
@@ -175,6 +216,8 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
         dispatch(setActiveWorkerDetails(null))
         setIsRequestSuccess(false)
         setErrorMessage('')
+        setDeletedRequestSuccess(false)
+        setDeleteErrorMessage('')
     }
 
     return (
@@ -223,7 +266,7 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
                                     <View className="flex flex-row justify-center items-center mt-10">
                                         <Image
                                             className="w-36 h-36 rounded-full border-2 border-textPrimary"
-                                            source={`http://192.168.1.13:5000/photos/profile-photo${activeWorkerDetails?._id}.png`}
+                                            source={`http://192.168.1.26:5000/photos/profile-photo${activeWorkerDetails?._id}.png`}
                                             placeholder={{ blurhash }}
                                             contentFit="cover"
                                             transition={1000}
@@ -258,17 +301,20 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
 
                                     <View className="flex flex-row justify-center items-center mt-16 h-8">
                                         <Text className="text-red-500" semi>{errorMessage}</Text>
+                                        <Text className="text-red-500" semi>{deleteErrorMessage}</Text>
                                         {isRequestSuccess && <Text className="text-textPrimary" semi>Zahtev uspešno poslat!</Text>}
+                                        {deletedRequestSuccess && <Text className="text-textPrimary" semi>Zahtev obrisan!</Text>}
                                     </View>
 
                                     <View className="mt-12">
+
                                         {requestAlreadySent && 
                                             <CustomButton 
                                                 text={'Poništi zahtev'}
-                                                onPress={()=>{}}
-                                                isLoading={isCreateToJoinSalonRequestLoading}
-                                                isSuccess={isRequestSuccess}
-                                                isError={!!errorMessage}
+                                                onPress={handleDeleteRequest}
+                                                isLoading={isDeleteRequestLoading}
+                                                isSuccess={deletedRequestSuccess}
+                                                isError={!!deleteErrorMessage}
                                             />
                                         }
                                         

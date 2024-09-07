@@ -28,7 +28,7 @@ const WorkerCard = forwardRef(({userData, isJustCreated}, ref) => {
       }
       {/* <Image
           className="w-16 h-16 rounded-full border-2 border-appColor"
-          source={`http://192.168.1.13:5000/photos/profile-photo${userData?._id}.png`}
+          source={`http://192.168.1.26:5000/photos/profile-photo${userData?._id}.png`}
           placeholder={{ blurhash }}
           contentFit="cover"
           transition={1000}
