@@ -4,9 +4,30 @@ import Text from './CustomText'
 import LootieSuccess from '../LootieAnimations/Success'
 import LootieLoader from '../LootieAnimations/Loader'
 import LootieError from '../LootieAnimations/Error'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 
-const CustomButton = ({onPress, text, isLoading, isSuccess, isError}) => {
+const CustomButton = ({onPress, text, isLoading, isSuccess, isError, variant, acceptIcon, rejectIcon}) => {
     const [innerError, setInnerError] = useState(isError || false)
+    let btnClassName = ''
+    let btnStyle = {}
+    let iconColor = 'black'
+
+    if(!variant){
+        btnClassName = 'bg-appColorDark rounded-xl h-14 flex flex-row justify-center items-center w-full'
+        iconColor = 'white'
+    }
+
+    if(variant === 'dark'){
+        btnClassName = 'bg-textPrimary rounded-xl h-14 flex flex-row justify-center items-center w-full'
+        iconColor = 'white'
+    }
+
+    if(variant === 'transparent'){
+        btnClassName = 'rounded-xl h-14 flex flex-row justify-center items-center w-full border-textSecondary'
+        btnStyle.borderWidth = 0.5
+        iconColor = 'black'
+    }
 
     useEffect(() => {
         if (isError) {
@@ -24,7 +45,9 @@ const CustomButton = ({onPress, text, isLoading, isSuccess, isError}) => {
 
     if(innerError) return (
         <TouchableOpacity 
-            className="bg-textPrimary rounded-xl h-14 flex flex-row justify-center items-center w-full">
+            className={btnClassName}
+            style={btnStyle}
+            >
             <LootieError d={40} />
         </TouchableOpacity>
     )
@@ -32,14 +55,18 @@ const CustomButton = ({onPress, text, isLoading, isSuccess, isError}) => {
 
     if(isLoading) return (
         <TouchableOpacity 
-            className="bg-appColorDark rounded-xl h-14 flex flex-row justify-center items-center w-full">
+            className={btnClassName}
+            style={btnStyle}
+            >
             <LootieLoader d={40} />
         </TouchableOpacity>
     )
 
     if(isSuccess) return (
         <TouchableOpacity 
-            className="bg-textPrimary rounded-xl h-14 flex flex-row justify-center items-center w-full">
+            className={btnClassName}
+            style={btnStyle}
+            >
            <LootieSuccess d={150} />
         </TouchableOpacity>
     )
@@ -47,8 +74,12 @@ const CustomButton = ({onPress, text, isLoading, isSuccess, isError}) => {
   return (
     <TouchableOpacity 
         onPress={onPress}
-        className="bg-textPrimary rounded-xl h-14 flex flex-row justify-center items-center w-full">
-        <Text className="text-white text-lg" bold>{text}</Text>
+        className={btnClassName}
+        style={btnStyle}
+        >
+        {(!acceptIcon && !rejectIcon) && <Text className="text-white text-lg" bold>{text}</Text>}
+        {rejectIcon && <Ionicons name="close" size={28} color={iconColor} />}
+        {acceptIcon && <FontAwesome6 name="check" size={24} color={iconColor} />}
     </TouchableOpacity>
   )
 }

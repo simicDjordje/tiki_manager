@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const apiCore = createApi({
 	reducerPath: 'apiCore',
 	baseQuery: fetchBaseQuery({
-		baseUrl: 'http://192.168.1.26:5000/api/v1',
+		baseUrl: 'http://192.168.0.72:5000/api/v1',
 		prepareHeaders: async (headers) => {
 			let user = await AsyncStorage.getItem('@userData')
 			user = JSON.parse(user)
@@ -174,6 +174,24 @@ export const apiCore = createApi({
 				}
 			}
 		}),
+		getRequest: builder.mutation({
+			query: (data) => {
+				return {
+					url: `/requests/get-request`,
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
+		updateRequest: builder.mutation({
+			query: (data) => {
+				return {
+					url: `/requests//update/join-to-salon`,
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
 		//end requests
 
 		//notifications
@@ -181,6 +199,15 @@ export const apiCore = createApi({
 			query: (data) => {
 				return {
 					url: `/notifications/get-notifications`,
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
+		markSeenNotification: builder.mutation({
+			query: (data) => {
+				return {
+					url: `/notifications/mark-seen`,
 					method: 'POST',
 					body: data
 				}
@@ -207,5 +234,8 @@ export const {
 	useCreateToJoinSalonRequestMutation,
 	useCheckIfToJoinSalonRequestExistsMutation,
 	useGetNotificationsMutation,
-	useDeleteToJoinSalonRequestMutation
+	useDeleteToJoinSalonRequestMutation,
+	useGetRequestMutation,
+	useUpdateRequestMutation,
+	useMarkSeenNotificationMutation
 } = apiCore;
