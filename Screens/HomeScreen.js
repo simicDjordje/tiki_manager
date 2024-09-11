@@ -17,6 +17,7 @@ import { useGetMyUserDataMutation, useGetNotificationsMutation, useGetUserSalons
 import SalonsPartHomeScreen from '../Components/SalonsPartHomeScreen'
 import { useDispatch, useSelector } from 'react-redux'
 import { setJustCreatedSalon, setJustCreatedWorkerAccount, setJustSignedUp, setUser } from '../redux/generalSlice'
+import MessageModal from '../Components/MessageModal'
 
 const HomeScreen = ({route, navigation}) => {
     //redux 
@@ -34,6 +35,7 @@ const HomeScreen = ({route, navigation}) => {
     //states
     const [isCreateWorkerAccountModalVisible, setIsCreateWorkerAccountModalVisible] = useState(false)
     const [isBeginSalonRegisterModalVisible, setIsBeginSalonRegisterModalVisible] = useState(false)
+    const [isMessageModalVisible, setIsMessageModalVisible] = useState(false)
 
     //refs
     const scrollViewRef = useRef(null)
@@ -47,6 +49,11 @@ const HomeScreen = ({route, navigation}) => {
 
     //ON FOCUS
     useFocusEffect(useCallback(()=>{
+        // if(justSignedUp){
+        //     navigation.navigate('StackTabScreens', {screen: 'WelcomeScreen'})
+        //     return
+        // }
+
         getUserSalons()
         getNotifications()
         getMyUserData()
@@ -146,6 +153,7 @@ const HomeScreen = ({route, navigation}) => {
                                 userData={userData} 
                                 isJustCreated={justCreatedWorkerAccount} 
                                 ref={workerCardRef}
+                                setIsMessageModalVisible={setIsMessageModalVisible}
                             />
                         }
                         
@@ -199,11 +207,11 @@ const HomeScreen = ({route, navigation}) => {
             </View>
         </ScrollView>
         
-        <WelcomeModal 
+        {/* <WelcomeModal 
             isModalVisible={justSignedUp || false}
             setIsModalVisible={() => {dispatch(setJustSignedUp(false))}}
             userData={userData}
-        />
+        /> */}
 
         <CreateWorkerAccountModal 
             isModalVisible={isCreateWorkerAccountModalVisible}
@@ -213,6 +221,15 @@ const HomeScreen = ({route, navigation}) => {
         <BeginSalonRegisterModal 
             isModalVisible={isBeginSalonRegisterModalVisible}
             setIsModalVisible={setIsBeginSalonRegisterModalVisible}
+        />
+
+        <MessageModal 
+            isModalVisible={isMessageModalVisible}
+            setIsModalVisible={setIsMessageModalVisible}
+            handleConfirm={() => setIsMessageModalVisible(false)}
+            title={'Nisi član salona'}
+            text={'Moraš biti član salona i imati dodeljene usluge'}
+            buttonText={'OK'}
         />
     </SafeAreaView>
   )

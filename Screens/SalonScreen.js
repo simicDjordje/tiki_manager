@@ -30,7 +30,7 @@ const SalonScreen = ({navigation}) => {
 
     useEffect(()=>{
         if(!salonData) return
-        console.log('AHHAHAHAHAH: ', salonData)
+        
         const servicesArray = salonData?.categories?.map(i => i.category.services).flat()
         setServices(servicesArray)
     }, [salonData])
@@ -140,7 +140,7 @@ const SalonScreen = ({navigation}) => {
                             {salonData?.salonImageIds?.map((imageId, index) => {
                                 return (
                                     <Image
-                                        key={index}
+                                        key={imageId}
                                         className="w-9 h-9 rounded-lg mx-1 my-0.5"
                                         // style={{borderWidth: 0.5}}
                                         source={`http://192.168.1.28:5000/photos/salon-photo_${imageId}.png`}

@@ -12,10 +12,14 @@ const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
-const WorkerCard = forwardRef(({userData, isJustCreated}, ref) => {
+const WorkerCard = forwardRef(({userData, isJustCreated, setIsMessageModalVisible}, ref) => {
   const navigation = useNavigation()
 
   const handleToWorkerScreen = () => {
+    if(!userData?.worksInSalon){
+      setIsMessageModalVisible(true)
+      return
+    }
     navigation.navigate('StackTabScreens', {screen: 'WorkerScreen'})
   }
 
@@ -39,7 +43,8 @@ const WorkerCard = forwardRef(({userData, isJustCreated}, ref) => {
       <View className="flex-1 h-full p-4">
         <Text className="text-lg" bold>Termini</Text>
         <Text className="text-md" semi>Upravljaj svojim terminima</Text>
-        <Text className="text-md text-textMid">Moraš biti član nekog salona</Text>
+        {!userData?.worksInSalon && <Text className="text-md text-textMid">Moraš biti član nekog salona</Text>}
+        {userData?.worksInSalon && <Text className="text-md text-textMid">Označi svoje slobodne termine</Text>}
       </View>
 
       <View className="">

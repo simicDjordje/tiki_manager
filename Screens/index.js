@@ -25,6 +25,7 @@ export {default as WorkerScreen} from './WorkerScreen'
 
 export {default as NotificationsScreen} from './NotificationsScreen'
 
+export {default as WelcomeScreen} from './WelcomeScreen'
 
 
 

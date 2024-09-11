@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import CustomInput from './CustomComponents/CustomInput'
 import Feather from '@expo/vector-icons/Feather'
 import Text from './CustomComponents/CustomText'
-import { useSignInUserMutation } from '../redux/apiCore'
+import { useGetNotificationsMutation, useGetUserSalonsMutation, useSignInUserMutation } from '../redux/apiCore'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import CustomButton from './CustomComponents/CustomButton'
 import { useNavigation } from '@react-navigation/native'
@@ -20,6 +20,8 @@ const LoginComponent = ({setAuthType}) => {
     const [signInUser, {isLoading}] = useSignInUserMutation()
     const dispatch = useDispatch()
 
+    const [getUserSalons, {isLoading: isGetUserSalonsLoading}] = useGetUserSalonsMutation()
+    const [getNotifications, {isLoading: isNotificationsLoading}] = useGetNotificationsMutation()
 
     const handleLogin = async () => {
         if(!email || !password){
@@ -48,6 +50,10 @@ const LoginComponent = ({setAuthType}) => {
                 setErrorMessage('')
                 setPasswordVisible(false)
                 dispatch(setComesFrom('auth'))
+
+                getUserSalons()
+                getNotifications()
+
                 navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
             }
         }catch(error){

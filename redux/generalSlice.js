@@ -153,6 +153,7 @@ const generalSlice = createSlice({
       builder.addMatcher(
         apiCore.endpoints.getMyUserData.matchFulfilled,
         (state, action) => {
+          // console.log(action.payload.result)
           state.userData = action?.payload?.result ? action?.payload?.result : null
         }
       )

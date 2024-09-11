@@ -65,7 +65,9 @@ const RegisterScreen = ({navigation}) => {
                 dispatch(setJustSignedUp(true))
                 dispatch(setUser(signUpData.result))
                 dispatch(setComesFrom('auth'))
-                navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
+                // navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
+                navigation.navigate('StackTabScreens', {screen: 'WelcomeScreen'})
+
             }
         }catch(error){
             console.log(error)
