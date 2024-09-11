@@ -149,6 +149,13 @@ const generalSlice = createSlice({
           state.activeWorkerDetails = action?.payload?.result ? action?.payload?.result : null
         }
       )
+
+      builder.addMatcher(
+        apiCore.endpoints.getMyUserData.matchFulfilled,
+        (state, action) => {
+          state.userData = action?.payload?.result ? action?.payload?.result : null
+        }
+      )
   },
 })
 

@@ -35,6 +35,7 @@ const ServiceScreen = () => {
     price: activeService?.price || ''
   })
   const [workers, setWorkers] = useState(activeService?.users || [])
+  console.log('kurac: ', activeService?.users)
   const [originalWorkers, setOriginalWorkers] = useState(activeService?.users || [])
   const [validation, setValidation] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
@@ -97,10 +98,10 @@ const ServiceScreen = () => {
 
   useEffect(() => navigation.addListener('beforeRemove', (e) => {
     console.log(shouldLeaveOnScreen)
-    // if (shouldLeaveOnScreen || isSuccess) {
-    //   // If we don't have unsaved changes, then we don't need to do anything
-    //   return;
-    // }
+    if (shouldLeaveOnScreen || isSuccess) {
+      // If we don't have unsaved changes, then we don't need to do anything
+      return;
+    }
 
     // Prevent default behavior of leaving the screen
     e.preventDefault();
@@ -112,6 +113,11 @@ const ServiceScreen = () => {
 );
 
   const handleBack = () => {
+    if(!shouldLeaveOnScreen){
+      // Prompt the user before leaving the screen
+      setIsUnsavedChangesModalVisible(true)
+      return
+    }
     navigation.navigate('StackTabScreens', {screen: 'SalonServicesScreen'})
   }
 
@@ -122,7 +128,11 @@ const ServiceScreen = () => {
     }
 
     try{
-        const {error, data} = await updateService({serviceId: activeService?._id, ...inputsData, users: workers})
+        const {error, data} = await updateService({
+          serviceId: activeService?._id, 
+          ...inputsData, 
+          users: workers
+        })
 
         if(error){
             setErrorMessage('Došlo je do greške')
@@ -144,7 +154,7 @@ const ServiceScreen = () => {
   return (
     <SafeAreaView className="bg-bgSecondary h-full">
         <StatusBar style={'dark'} />
-        <View className="flex flex-row justify-between items-center pt-20 pb-4 -mt-16 px-4 bg-bgPrimary">
+        <View className="flex flex-row justify-between items-center pt-20 pb-4 -mt-16 px-4 bg-bgSecondary">
             <TouchableOpacity onPress={handleBack}>
                 <MaterialIcons name="arrow-back-ios-new" size={24} color="#232323" />
             </TouchableOpacity>
@@ -203,12 +213,13 @@ const ServiceScreen = () => {
                             {workers.length === 0 && <Text className="text-red-700" semi>Usluga nije dodeljena nijednom članu</Text>}
                             {workers.length > 0 && 
                                 <View className="flex flex-row justify-start items-center">
-                                    {workers?.slice(0, 10).map((worker, index) => {
+                                    {workers?.slice(0, 10).map((worker) => {
+                                      
                                         return (
                                             <Image
-                                                key={index}
-                                                className="w-8 h-8 rounded-full border-2 border-appColorDark"
-                                                source={`http://192.168.0.72:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
+                                                key={worker?._id ? worker?._id : worker}
+                                                className="w-8 h-8 rounded-full border-2 border-appColorDark -ml-1"
+                                                source={`http://192.168.1.28:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
                                                 placeholder={{ blurhash }}
                                                 contentFit="cover"
                                                 transition={1000}
@@ -258,8 +269,8 @@ const ServiceScreen = () => {
             isModalVisible={isUnsavedChangesModalVisible}
             setIsModalVisible={setIsUnsavedChangesModalVisible}
             handleConfirm={() => {
-                setShouldLeaveOnScreen(true)
-              }}
+              navigation.navigate('StackTabScreens', {screen: 'SalonServicesScreen'})
+            }}
           />   
           </View>
         </View>

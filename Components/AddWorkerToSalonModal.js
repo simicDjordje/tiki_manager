@@ -35,7 +35,7 @@ const blurhash =
         >
             <Image
                 className="w-16 h-16 rounded-full border-2 border-textPrimary"
-                source={`http://192.168.0.72:5000/photos/profile-photo${item?._id ? item?._id : item}.png`}
+                source={`http://192.168.1.28:5000/photos/profile-photo${item?._id ? item?._id : item}.png`}
                 placeholder={{ blurhash }}
                 contentFit="cover"
                 transition={1000}
@@ -66,6 +66,7 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
     const [isRequestSuccess, setIsRequestSuccess] = useState(false)
     const [errorMessage, setErrorMessage] = useState('')
     const [requestAlreadySent, setRequestAlreadySent] = useState(null)
+    const [requestDetails, setRequestDetails] = useState(null)
     const [checkIfToJoinSalonRequestExists, {isLoading: isCheckRequestLoading}] = useCheckIfToJoinSalonRequestExistsMutation()
     const [deleteToJoinSalonRequest, {isLoading: isDeleteRequestLoading}] = useDeleteToJoinSalonRequestMutation()
     const [deletedRequestSuccess, setDeletedRequestSuccess] = useState(false)
@@ -74,6 +75,7 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
     useEffect(()=>{
         if(!selectedWorker){
             setRequestAlreadySent(null)
+            setRequestDetails(null)
             setIsRequestSuccess(false)
             setErrorMessage('')
             dispatch(setActiveWorkerDetails(null))
@@ -92,11 +94,17 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
                     })
 
                     if(error){
+                        setRequestDetails(null)
                         setRequestAlreadySent(null)
                     }
 
                     if(data && data.success){
-                        setRequestAlreadySent(data.result)
+                        setRequestDetails(data?.result)
+
+                        if(data?.result.status === 'pending'){
+                            setRequestAlreadySent(true)
+                        }
+
                     }
                 }
             )()
@@ -182,7 +190,7 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
 
         try{
             (async () => {
-                const {error, data} = await deleteToJoinSalonRequest({requestId: requestAlreadySent?._id})
+                const {error, data} = await deleteToJoinSalonRequest({requestId: requestDetails?._id})
 
                 if(error){
                     setDeleteErrorMessage('Došlo je do greške')
@@ -218,6 +226,8 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
         setErrorMessage('')
         setDeletedRequestSuccess(false)
         setDeleteErrorMessage('')
+        setRequestAlreadySent(null)
+        setRequestDetails(null)
     }
 
     return (
@@ -266,7 +276,7 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
                                     <View className="flex flex-row justify-center items-center mt-10">
                                         <Image
                                             className="w-36 h-36 rounded-full border-2 border-textPrimary"
-                                            source={`http://192.168.0.72:5000/photos/profile-photo${activeWorkerDetails?._id}.png`}
+                                            source={`http://192.168.1.28:5000/photos/profile-photo${activeWorkerDetails?._id}.png`}
                                             placeholder={{ blurhash }}
                                             contentFit="cover"
                                             transition={1000}
@@ -288,7 +298,7 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
                                         </View>
                                     }
 
-                                    {requestAlreadySent && 
+                                    {requestAlreadySent &&
                                         <View className="flex flex-col justify-center items-center mt-8">
                                             <Text className="text-md text-textMid text-center">
                                                 Zahtev za pridruživanje je već poslat

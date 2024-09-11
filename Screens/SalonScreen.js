@@ -30,7 +30,7 @@ const SalonScreen = ({navigation}) => {
 
     useEffect(()=>{
         if(!salonData) return
-
+        console.log('AHHAHAHAHAH: ', salonData)
         const servicesArray = salonData?.categories?.map(i => i.category.services).flat()
         setServices(servicesArray)
     }, [salonData])
@@ -69,7 +69,7 @@ const SalonScreen = ({navigation}) => {
   return (
     <SafeAreaView className="bg-bgSecondary h-full">
         <StatusBar style={'dark'} />
-        <View className="flex flex-row justify-between items-center pt-20 pb-4 -mt-16 px-4 bg-bgPrimary h-30">
+        <View className="flex flex-row justify-between items-center pt-20 pb-4 -mt-16 px-4 bg-bgSecondary h-30">
             <TouchableOpacity onPress={handleBack}>
                 <MaterialIcons name="arrow-back-ios-new" size={24} color="#232323" />
             </TouchableOpacity>
@@ -87,16 +87,18 @@ const SalonScreen = ({navigation}) => {
                 <View className="flex flex-row justify-between items-center mt-6 w-full">
                     <View className="flex flex-col justify-between items-start">
                         <Text className="text-2xl" bold>Podešavanja salona</Text>
-                        <View className="bg-red-700 py-1 px-2 rounded-2xl">
+                        <View className="bg-red-700 py-1 px-2 rounded-2xl mt-2">
                             <Text className="text-white text-xs" bold>Neaktivan</Text>
                         </View>
                     </View>
-                    <Ionicons name="settings-sharp" size={34} color="black" />
+                    {/* <Ionicons name="settings-sharp" size={34} color="black" /> */}
                 </View>
                 <View className="bg-textSecondary mt-8 w-full mb-4" style={{height: 0.5}}></View>
 
                 <View>
-                    <Text className="text-textMid mb-3" semi>Moraš dodati usluge i članove salona</Text>
+                    {salonData?.workers.length == 0 && services?.length === 0 && <Text className="text-textMid mb-3" semi>Moraš dodati usluge i članove salona</Text>}
+                    {salonData?.workers.length > 0 && services?.length === 0 && <Text className="text-textMid mb-3" semi>Moraš dodati usluge</Text>}
+                    {salonData?.workers.length == 0 && services?.length > 0 && <Text className="text-textMid mb-3" semi>Moraš dodati članove salona</Text>}
                     <TouchableOpacity className="bg-textPrimary rounded-xl mb-6 h-14 flex flex-row justify-between items-center w-full px-2">
                         <View className="flex-1 flex flex-row justify-center items-center">
                             <Text className="text-white text-lg ml-4" bold>Aktiviraj salon</Text>
@@ -114,8 +116,8 @@ const SalonScreen = ({navigation}) => {
                         <View className="bg-textSecondary my-2 w-full" style={{height: 0.5}}></View>
                         <View className="flex flex-row justify-center items-center w-full flex-1">
                             <Image
-                                className="w-20 h-20 rounded-full border-2 border-textPrimary mb-2"
-                                source={`http://192.168.0.72:5000/photos/salon-logo_${salonData?.logoId}.png`}
+                                className="w-20 h-20 rounded-full mb-2"
+                                source={`http://192.168.1.28:5000/photos/salon-logo_${salonData?.logoId}.png`}
                                 placeholder={{ blurhash }}
                                 contentFit="cover"
                                 transition={1000}
@@ -139,9 +141,9 @@ const SalonScreen = ({navigation}) => {
                                 return (
                                     <Image
                                         key={index}
-                                        className="w-9 h-9 border-textPrimary rounded-lg mx-1 my-0.5"
-                                        style={{borderWidth: 0.5}}
-                                        source={`http://192.168.0.72:5000/photos/salon-photo_${imageId}.png`}
+                                        className="w-9 h-9 rounded-lg mx-1 my-0.5"
+                                        // style={{borderWidth: 0.5}}
+                                        source={`http://192.168.1.28:5000/photos/salon-photo_${imageId}.png`}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
@@ -204,7 +206,7 @@ const SalonScreen = ({navigation}) => {
                     <View className="p-1 bg-textPrimary rounded-full">
                         <Entypo name="plus" size={20} color="white" />
                     </View>}
-                    {services?.length > 0 &&   <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />}
+                    {services?.length > 0 && <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />}
                 </TouchableOpacity>
 
                 <TouchableOpacity 
@@ -223,11 +225,12 @@ const SalonScreen = ({navigation}) => {
                         {salonData?.workers?.length > 0 && 
                             <View className="flex flex-row justify-start items-center p-1 bg-bgPrimary rounded-2xl">
                                 {salonData?.workers.length > 0 && salonData?.workers.slice(0, 9).map((worker, index) => {
+                                    
                                     return (
                                         <Image
-                                            key={index}
-                                            className="w-8 h-8 rounded-full border-2 border-appColorDark"
-                                            source={`http://192.168.0.72:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
+                                            key={worker?._id}
+                                            className="w-8 h-8 rounded-full border-2 border-appColorDark -ml-2"
+                                            source={`http://192.168.1.28:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
                                             placeholder={{ blurhash }}
                                             contentFit="cover"
                                             transition={1000}

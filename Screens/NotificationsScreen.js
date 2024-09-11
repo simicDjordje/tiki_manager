@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, ScrollView, FlatList } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
@@ -9,10 +9,11 @@ import Text from '../Components/CustomComponents/CustomText'
 
 import { useSelector } from 'react-redux'
 import Animated, { FadeInDown } from 'react-native-reanimated'
-import { useCheckIfToJoinSalonRequestExistsMutation, useGetNotificationsMutation, useGetRequestMutation, useMarkSeenNotificationMutation, useUpdateRequestMutation } from '../redux/apiCore'
+import { useCheckIfToJoinSalonRequestExistsMutation, useGetNotificationsMutation, useGetRequestMutation, useMarkSeenNotificationAllMutation, useMarkSeenNotificationMutation, useUpdateRequestMutation } from '../redux/apiCore'
 import LootieLoader from '../Components/LootieAnimations/Loader'
 import CustomButton from '../Components/CustomComponents/CustomButton'
 import ConfirmActionModal from '../Components/ConfirmActionModal'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
 
 
 
@@ -20,48 +21,74 @@ const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 const NotifcationCard = ({item, setNotificationDetails}) => {
-    const [getNotifications, {isLoading: isNotificationsLoading}] = useGetNotificationsMutation()
-    const [markSeenNotification, {isLoading}] = useMarkSeenNotificationMutation()
+    let smallTitle = ''
+    let bigTitle = item?.message || ''
+    // let showDot = false
+    // let dotColorClass = 'bg-black'
+    let textColorClass = 'text-textMid'
 
-    const handleMarkNotificationSeen = async () => {
-        try{
-            const {error, data} = await markSeenNotification({
-                notificationId: item?._id
-            })
-        }catch(error){
-            console.log(error)
+    if(item?.requestId){
+        let requestFromNotification = item?.requestId
+
+        if(requestFromNotification.requestType === 'toJoinSalon'){
+            if(requestFromNotification.status === 'pending'){
+                smallTitle = 'Zahtev za pridruživanje'
+            }
+
+            if(requestFromNotification.status === 'accepted'){
+                smallTitle = 'Zahtev za prihvaćen'
+                // showDot = true
+                // dotColorClass = 'bg-appColorDark'
+                //textColorClass = 'text-appColorDark'
+            }
         }
     }
 
+    if(!item?.requestId){
+        if(item?.type === 'toJoinSalon'){
+            smallTitle = 'Zahtev odbijen'
+            // showDot = true
+            // dotColorClass = 'bg-red-700'
+            //textColorClass = 'text-red-700'
+        }
+    }
+
+
     const handleOnPress = () => {
-        handleMarkNotificationSeen()
+        if(!item?.requestId) return
+
         setNotificationDetails(item)
-        getNotifications()
     }
 
     return (
         <Animated.View entering={FadeInDown}>
             <TouchableOpacity 
                 onPress={handleOnPress}
-                className={`py-4 w-full ${item?.seen ? 'bg-bgSecondary border-textSecondary' : 'bg-bgSecondary border-textSecondary'} rounded-2xl flex flex-row justify-between items-center px-4`}
+                className={`py-4 w-full ${item?.seen ? 'bg-bgSecondary border-textSecondary' : 'bg-bgSecondary border-textSecondary'} rounded-2xl flex flex-row justify-between items-center px-4 mb-5`}
                 style={item?.seen ? {borderWidth: 0.5} : {borderWidth: 0.5}}
                 >
-                {/* <View>
-                    <View className="bg-appColor h-3 w-3 rounded-full"></View>
-                </View> */}
+
+                {/* {showDot && 
+                    <View>
+                        <View className={`${dotColorClass} h-2 w-2 rounded-full`}></View>
+                    </View>
+                } */}
 
                 <View className="flex-1 ml-4">
-                    <Text className="text-md text-textMid" semi>Zahtev za pridruživanje</Text>
-                    <Text className={`text-md ${item?.seen ? 'text-textMid' : 'text-textPrimary'}`} bold>{item?.message || ''}</Text>
+                    <Text className={`text-md ${textColorClass}`} semi>{smallTitle}</Text>
+                    <Text className={`text-md ${item?.seen ? 'text-textMid' : 'text-textPrimary'}`} bold>{bigTitle}</Text>
                 </View>
 
-                <View className="ml-5">
-                    <MaterialIcons name="arrow-forward-ios" size={30} color={item?.seen ? '#6D6D60' : '#000'} />
-                </View>
+                {item?.requestId &&
+                    <View className="ml-5">
+                        <MaterialIcons name="arrow-forward-ios" size={30} color={item?.seen ? '#6D6D60' : '#000'} />
+                    </View>
+                }
             </TouchableOpacity>
         </Animated.View>
     )
 }
+
 
 const NotificationsScreen = ({navigation}) => {
   const {userData, notifications, currentSalon: salonData} = useSelector(state => state.general)
@@ -73,20 +100,18 @@ const NotificationsScreen = ({navigation}) => {
   })
 
   const [notificationDetails, setNotificationDetails] = useState(null)
-  const [getRequest, {isLoading: isGetRequestLoading}] = useGetRequestMutation()
-  const [requestDetails, setRequestDetails] = useState(null)
-  const [requestErrorMessage, setRequestErrorMessage] = useState('')
   const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false)
   const [confirmationType, setConfirmationType] = useState(null)
   const [updateRequest, {isLoading: isUpdateRequestLoading}] = useUpdateRequestMutation()
   const [getNotifications, {isLoading: isNotificationsLoading}] = useGetNotificationsMutation()
   const [isSuccess, setIsSuccess] = useState(false)
   const [isError, setIsError] = useState(false)
+  const [markSeenNotificationAll] = useMarkSeenNotificationAllMutation()
 
   const handleConfirm = async () => {
     try{
         const {error, data} = await updateRequest({
-            requestId: requestDetails?._id,
+            requestId: notificationDetails?.requestId?._id,
             confirmationType: confirmationType,
         })
 
@@ -102,7 +127,16 @@ const NotificationsScreen = ({navigation}) => {
                 setTimeout(()=>{
                     setIsConfirmModalVisible(false)
                     setNotificationDetails(null)
-                    setRequestDetails(null)
+                    getNotifications()
+                }, 2700)
+            }
+
+            if(data.message === 'Request updated successfully'){
+                setIsSuccess(true)
+                setIsError(false)
+                setTimeout(()=>{
+                    setIsConfirmModalVisible(false)
+                    //setNotificationDetails(null)
                     getNotifications()
                 }, 2700)
             }
@@ -112,36 +146,15 @@ const NotificationsScreen = ({navigation}) => {
     }
   }
 
-  useEffect(()=>{
-    if(!notificationDetails){
-        setRequestDetails(null)
-        setRequestErrorMessage('')
-        return
-    }
-    console.log(notificationDetails)
-    try{
-        if(notificationDetails?.type === 'toJoinSalon'){
-            (
-                async () => {
-                    const {error, data} = await getRequest({requestId: notificationDetails?.requestId})
-    
-                    if(error){
-                        console.log(error)
-                        setRequestErrorMessage('Došlo je do greške')
-                    }
-    
-                    if(data && data.success){
-                        console.log(data)
-                        setRequestDetails(data?.result)
-                    }
-                }
-            )()
-        }
-    }catch(error){
-        console.log(error)
-    }
-  }, [notificationDetails])
+  useFocusEffect(useCallback(()=>{
+    markSeenNotificationAll()
+  }, []))
 
+  useEffect(()=>{
+    // if(!notificationDetails){
+    //     getNotifications()
+    // }
+  }, [notificationDetails])
 
   useEffect(() => {
     if(notifications.all.length === 0){
@@ -217,98 +230,44 @@ const NotificationsScreen = ({navigation}) => {
         <View className="h-full flex flex-col justify-between px-4">
           {notificationDetails && 
             <View className="flex-1 flex flex-col justify-start items-center">
-                {isGetRequestLoading && 
-                    <View className="h-5/6 flex flex-col justify-center items-center">
-                        <LootieLoader dark={true} d={70} />
-                    </View>
-                }
+                {
+                notificationDetails?.requestId && 
+                notificationDetails?.requestId?.requestType === 'toJoinSalon' && 
+                
+                <View className="w-full">
+                    {notificationDetails?.requestId.status === 'pending' &&
+                        <NotificationDetailsToJoinSalonPending
+                            notificationDetails={notificationDetails}
+                            confirmationType={confirmationType}
+                            setConfirmationType={setConfirmationType}
+                            setIsConfirmModalVisible={setIsConfirmModalVisible}
+                            isSuccess={isSuccess}
+                        />
+                    }
 
-                {requestErrorMessage && 
-                    <View className="h-5/6 flex flex-col justify-center items-center">
-                        <Text className="text-lg" bold>{requestErrorMessage}</Text>
-                    </View>
-                }
+                    {notificationDetails?.requestId.status === 'rejected' &&
+                        <NotificationDetailsToJoinSalonRejected
+                            notificationDetails={notificationDetails}
+                        />
+                    }
 
-                {requestDetails && 
-                    <Animated.View entering={FadeInDown} className="w-full mt-10 p-4 rounded-3xl border-textSecondary" style={{borderWidth: 0.5}}>
-                        <View className="w-full flex flex-row justify-between items-center">
-                            <Image
-                                className={`w-20 h-20 rounded-full mr-3 border-textPrimary border-2`}
-                                // style={{borderWidth: 0.5}}
-                                source={`http://192.168.0.72:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
-                                placeholder={{ blurhash }}
-                                contentFit="cover"
-                                transition={1000}
-                            />
-                            <View className="flex flex-col justify-start items-start w-full">
-                                <Text className="text-lg mb-2" bold>{requestDetails?.salonId?.name}</Text>
-                                <View className="flex flex-row justify-start items-center bg-textPrimary p-1 rounded-3xl">
-                                    {requestDetails?.salonId?.workers.length > 0 && requestDetails?.salonId?.workers.slice(0, 5).map((worker, index) => {
-                                            return (
-                                                <Image
-                                                    key={index}
-                                                    className={`w-8 h-8 rounded-full ${index > 0 && '-ml-2'}`}
-                                                    source={`http://192.168.0.72:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
-                                                    placeholder={{ blurhash }}
-                                                    contentFit="cover"
-                                                    transition={1000}
-                                                />
-                                            )
-                                    })}
-                                            
-                                    {requestDetails?.salonId?.workers.length > 5 && (
-                                        <View className="w-8 h-8 rounded-full border-2 border-appColorDark bg-textPrimary -ml-2 flex flex-row justify-center items-center">
-                                            <Text className="text-white" semi>+{requestDetails?.salonId.workers.length - 5}</Text>
-                                        </View>
-                                    )}
+                    {notificationDetails?.requestId.status === 'accepted' &&
+                        <NotificationDetailsToJoinSalonAccepted
+                            notificationDetails={notificationDetails}
+                        />
+                    }
+                </View>
 
-                                    {requestDetails?.salonId?.workers.length < 5 && <Text className="text-white ml-2 pr-2" semi>Postani član</Text>}
-                                </View>
-                            </View>
-                        </View>
-
-                        <View className="">
-                            <Text className="mt-8 text-textPrimary text-center" bold>{notificationDetails?.message}?</Text>
-                            <Text className="text-textMid text-center">Prihvati poziv, pridruži se salonu i upravljaj svojim terminima</Text>
-                        </View>
-
-                        <View className="flex flex-row justify-between items-center mt-10">
-                            <View className="w-[48%]">
-                                <CustomButton 
-                                    text={'Odbij'}
-                                    variant={'transparent'}
-                                    isIcon
-                                    rejectIcon
-                                    onPress={() => {
-                                        setConfirmationType('reject')
-                                        setIsConfirmModalVisible(true)
-                                    }}
-                                />
-                            </View>
-                            <View className="w-[48%]">
-                                <CustomButton 
-                                    text={'Prihvati'}
-                                    isIcon
-                                    variant={'dark'}
-                                    acceptIcon
-                                    onPress={() => {
-                                        setConfirmationType('accept')
-                                        setIsConfirmModalVisible(true)
-                                    }}
-                                />
-                            </View>
-                        </View>
-                    </Animated.View>
                 }
             </View>
           }
 
           {!notificationDetails && <View className="flex-1 flex flex-col justify-start items-center">
-            {isNotificationsLoading && 
+            {/* {isNotificationsLoading && 
                 <View className="h-5/6 flex flex-col justify-center items-center">
                     <LootieLoader dark={true} d={70} />
                 </View>
-            }
+            } */}
 
             {notifications.all.length === 0 && 
                 <View className="flex flex-col justify-start items-center mt-10">
@@ -342,8 +301,8 @@ const NotificationsScreen = ({navigation}) => {
             {sortedNotifications?.thisWeek.length > 0 && 
                 <View className="w-full">
                     <View className="mt-4">
-                        <Text className="text-textPrimary text-md" bold>Ove nedelje</Text>
-                        <View className="bg-textSecondary w-full my-4" style={{height: 0.5}}></View>
+                        <Text className="text-textPrimary text-md mb-4" bold>Ove nedelje</Text>
+                        {/* <View className="bg-textSecondary w-full my-4" style={{height: 0.5}}></View> */}
                     </View>
                     <FlatList
                         data={sortedNotifications.thisWeek}
@@ -365,8 +324,8 @@ const NotificationsScreen = ({navigation}) => {
             {sortedNotifications?.thisMonth.length > 0 && 
                 <View className="w-full">
                     <View className="mt-4">
-                        <Text className="text-textPrimary text-md" bold>Ovog meseca</Text>
-                        <View className="bg-textSecondary w-full my-4" style={{height: 0.5}}></View>
+                        <Text className="text-textPrimary text-md mb-4" bold>Ovog meseca</Text>
+                        {/* <View className="bg-textSecondary w-full my-4" style={{height: 0.5}}></View> */}
                     </View>
                     <FlatList
                         data={sortedNotifications.thisMonth}
@@ -388,8 +347,8 @@ const NotificationsScreen = ({navigation}) => {
             {sortedNotifications?.rest.length > 0 && 
                 <View className="w-full">
                     <View className="mt-4">
-                        <Text className="text-textPrimary text-md" bold>Sve prethodno</Text>
-                        <View className="bg-textSecondary w-full my-4" style={{height: 0.5}}></View>
+                        <Text className="text-textPrimary text-md mb-4" bold>Sve prethodno</Text>
+                        {/* <View className="bg-textSecondary w-full my-4" style={{height: 0.5}}></View> */}
                     </View>
                     <FlatList
                         data={sortedNotifications.rest}
@@ -426,3 +385,215 @@ const NotificationsScreen = ({navigation}) => {
 }
 
 export default NotificationsScreen
+
+
+
+//TO JOIN SALON PENDING
+const NotificationDetailsToJoinSalonPending = ({
+    notificationDetails, 
+    confirmationType, 
+    setConfirmationType, 
+    setIsConfirmModalVisible,
+    isSuccess
+}) => {
+    const {requestId} = notificationDetails
+    const [requestDetails, setRequestDetails] = useState(requestId)
+    const [getRequest] = useGetRequestMutation()
+    const navigation = useNavigation()
+    const [requestAccepted, setRequestAccepted] = useState(false)
+
+    useEffect(()=>{
+        if(confirmationType != 'accept' && !isSuccess) return
+
+        (async () => {
+            try{
+                const {error, data} = await getRequest({requestId: requestDetails?._id})
+
+                if(data && data.success){
+                    setRequestDetails(data?.result)
+                    setRequestAccepted(true)
+                }
+            }catch(error){
+                console.log(error)
+            }
+        })()
+
+        
+    }, [confirmationType, isSuccess])
+
+    return (
+        <Animated.View entering={FadeInDown} className="w-full mt-10 p-4 rounded-3xl border-textSecondary" style={{borderWidth: 0.5}}>
+            <View className="w-full flex flex-row justify-between items-center">
+                <Image
+                    className={`w-20 h-20 rounded-full mr-3`}
+                    // style={{borderWidth: 0.5}}
+                    source={`http://192.168.1.28:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
+                    placeholder={{ blurhash }}
+                    contentFit="cover"
+                    transition={1000}
+                />
+                <View className="flex flex-col justify-start items-start w-full">
+                    <Text className="text-lg mb-2" bold>{requestDetails?.salonId?.name}</Text>
+                    <View className="flex flex-row justify-start items-center bg-textPrimary p-1 rounded-3xl">
+                        {requestDetails?.salonId?.workers.length > 0 && requestDetails?.salonId?.workers.slice(0, 5).map((worker, index) => {
+                                return (
+                                    <Image
+                                        key={index}
+                                        className={`w-8 h-8 rounded-full ${index > 0 && '-ml-2'} border-textPrimary`}
+                                        source={`http://192.168.1.28:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
+                                        placeholder={{ blurhash }}
+                                        contentFit="cover"
+                                        transition={1000}
+                                        style={{borderWidth: 2}}
+                                    />
+                                )
+                        })}
+                                
+                        {requestDetails?.salonId?.workers.length > 5 && (
+                            <View className="w-8 h-8 rounded-full border-2 border-appColorDark bg-textPrimary -ml-2 flex flex-row justify-center items-center">
+                                <Text className="text-white" semi>+{requestDetails?.salonId.workers.length - 5}</Text>
+                            </View>
+                        )}
+
+                        {requestDetails?.salonId?.workers.length < 5 && <Text className="text-white ml-2 pr-2" semi>{!requestAccepted && 'Postani član'}</Text>}
+                    </View>
+                </View>
+            </View>
+
+            {!requestAccepted && 
+                <View className="">
+                    <Text className="mt-8 text-textPrimary text-center" bold>{notificationDetails?.message}</Text>
+                    <Text className="text-textMid text-center">Prihvati poziv, pridruži se salonu i upravljaj svojim terminima</Text>
+                </View>
+            }
+
+            {requestAccepted && 
+                <View className="">
+                    <Text className="mt-8 text-textPrimary text-center" bold>Novi član se pridružio!</Text>
+                    <Text className="text-textMid text-center">Na početnoj stranici postavi svoje slobodne termine i prati svoje rezervacije</Text>
+                </View>
+            }
+            
+            {requestAccepted && 
+                <View className="flex flex-row justify-center items-center mt-10">
+                    <CustomButton 
+                        text={'Nazad na početnu'}
+                        variant={'dark'}
+                        onPress={() => {
+                            navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
+                        }}
+                    />
+                </View>
+            }
+
+            {!requestAccepted &&
+                <View className="flex flex-row justify-between items-center mt-10">
+                    <View className="w-[48%]">
+                        <CustomButton 
+                            text={'Odbij'}
+                            variant={'transparent'}
+                            isIcon
+                            rejectIcon
+                            onPress={() => {
+                                setConfirmationType('reject')
+                                setIsConfirmModalVisible(true)
+                            }}
+                        />
+                    </View>
+                    <View className="w-[48%]">
+                        <CustomButton 
+                            text={'Prihvati'}
+                            isIcon
+                            variant={'dark'}
+                            acceptIcon
+                            onPress={() => {
+                                setConfirmationType('accept')
+                                setIsConfirmModalVisible(true)
+                            }}
+                        />
+                    </View>
+                </View>
+            }
+        </Animated.View>
+    )
+}
+
+
+//TO JOIN SALON REJECTED
+const NotificationDetailsToJoinSalonRejected = ({notificationDetails}) => {
+    const {requestId: requestDetails} = notificationDetails
+
+    return (
+        <Animated.View entering={FadeInDown} className="w-full mt-10 p-4 rounded-3xl border-textSecondary" style={{borderWidth: 0.5}}>
+            <View className="flex flex-row justify-center items-center">
+                <Text className="text-lg mb-2" bold>{requestDetails?.salonId?.name}</Text>
+            </View>
+
+            <View className="w-full flex flex-row justify-center items-center">
+                <Image
+                    className={`w-20 h-20 rounded-full -mr-2`}
+                    // style={{borderWidth: 0.5}}
+                    source={`http://192.168.1.28:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
+                    placeholder={{ blurhash }}
+                    contentFit="cover"
+                    transition={1000}
+                />
+                <Image
+                    className={`w-20 h-20 rounded-full`}
+                    // style={{borderWidth: 0.5}}
+                    source={`http://192.168.1.28:5000/photos/profile-photo${requestDetails?.recipient}.png`}
+                    placeholder={{ blurhash }}
+                    contentFit="cover"
+                    transition={1000}
+                />
+            </View>
+
+            <View className="">
+                <Text className="mt-8 text-textPrimary text-center" bold>{notificationDetails?.message}</Text>
+            </View>
+        </Animated.View>
+    )
+}
+
+//TO JOIN SALON ACCEPTED
+const NotificationDetailsToJoinSalonAccepted = ({notificationDetails}) => {
+    const {requestId: requestDetails} = notificationDetails
+    const navigation = useNavigation()
+
+    return (
+        <Animated.View entering={FadeInDown} className="w-full mt-10 p-4 rounded-3xl border-textSecondary" style={{borderWidth: 0.5}}>
+            <View className="flex flex-col justify-center items-center">
+                <Text className="text-2xl text-center" bold>{requestDetails?.salonId?.name}</Text>
+                <Text bold>ima novog člana!</Text>
+            </View>
+            <View className="mt-8">
+                <Text className="text-textMid text-center" bold>{notificationDetails?.message}</Text>
+            </View>
+
+            <View className="w-full flex flex-row justify-center items-center my-5">
+                <Image
+                    className={`w-24 h-24 rounded-full`}
+                    // style={{borderWidth: 0.5}}
+                    source={`http://192.168.1.28:5000/photos/profile-photo${requestDetails?.recipient}.png`}
+                    placeholder={{ blurhash }}
+                    contentFit="cover"
+                    transition={1000}
+                />
+            </View>
+
+            <View className="">
+                <Text className="text-textMid text-center">Novom članu je potrebno dodeliti usluge kako bi mogao da započne sa rezervacijama</Text>
+            </View>
+
+            <View className="flex flex-row justify-center items-center mt-10">
+                <CustomButton 
+                    text={'Nazad na početnu'}
+                    variant={'dark'}
+                    onPress={() => {
+                        navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
+                    }}
+                />
+            </View>
+        </Animated.View>
+    )
+}

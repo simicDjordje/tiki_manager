@@ -13,7 +13,7 @@ import Text from '../Components/CustomComponents/CustomText'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import LootieLoader from '../Components/LootieAnimations/Loader'
 import Animated, { FadeInDown, FadeInUp, FadeOutDown } from 'react-native-reanimated'
-import { useGetNotificationsMutation, useGetUserSalonsMutation } from '../redux/apiCore'
+import { useGetMyUserDataMutation, useGetNotificationsMutation, useGetUserSalonsMutation } from '../redux/apiCore'
 import SalonsPartHomeScreen from '../Components/SalonsPartHomeScreen'
 import { useDispatch, useSelector } from 'react-redux'
 import { setJustCreatedSalon, setJustCreatedWorkerAccount, setJustSignedUp, setUser } from '../redux/generalSlice'
@@ -43,11 +43,13 @@ const HomeScreen = ({route, navigation}) => {
     //api
     const [getUserSalons, {isLoading: isGetUserSalonsLoading}] = useGetUserSalonsMutation()
     const [getNotifications, {isLoading: isNotificationsLoading}] = useGetNotificationsMutation()
+    const [getMyUserData] = useGetMyUserDataMutation()
 
     //ON FOCUS
     useFocusEffect(useCallback(()=>{
         getUserSalons()
         getNotifications()
+        getMyUserData()
     }, []))
 
 
@@ -125,9 +127,11 @@ const HomeScreen = ({route, navigation}) => {
                     <View className="flex flex-row justify-between items-center mt-10">
                         <View className="flex flex-col justify-between items-start">
                             <Text className="text-textPrimary text-2xl" bold>{userData?.first_name} {userData?.last_name}</Text>
-                            <View className="bg-appColor rounded-2xl mt-2 px-2 py-1">
-                                <Text className="text-white" bold>Beauty salon PK</Text>
-                            </View>
+                            {userData?.worksInSalon && 
+                                <View className="bg-appColor rounded-2xl mt-2 px-2 py-1">
+                                    <Text className="text-white" bold>{userData?.worksInSalon?.name}</Text>
+                                </View>
+                            }
                         </View>
                         <TouchableOpacity 
                         onPress={()=>{setIsBeginSalonRegisterModalVisible(true)}}

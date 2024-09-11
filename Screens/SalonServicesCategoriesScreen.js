@@ -75,7 +75,7 @@ const SalonServicesCategoriesScreen = ({navigation}) => {
   return (
     <SafeAreaView className="bg-bgSecondary h-full">
         <StatusBar style={'dark'} />
-        <View className="flex flex-row justify-between items-center pt-20 pb-4 -mt-16 px-4 bg-bgPrimary">
+        <View className="flex flex-row justify-between items-center pt-20 pb-4 -mt-16 px-4 bg-bgSecondary">
             <TouchableOpacity onPress={handleBack}>
                 <MaterialIcons name="arrow-back-ios-new" size={24} color="#232323" />
             </TouchableOpacity>

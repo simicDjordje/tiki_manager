@@ -54,7 +54,7 @@ const SalonServicesScreen = ({navigation}) => {
   return (
     <SafeAreaView className="bg-bgSecondary h-full">
         <StatusBar style={'dark'} />
-        <View className="flex flex-row justify-between items-center pt-20 pb-4 -mt-16 px-4 bg-bgPrimary">
+        <View className="flex flex-row justify-between items-center pt-20 pb-4 -mt-16 px-4 bg-bgSecondary">
             <TouchableOpacity onPress={handleBack}>
                 <MaterialIcons name="arrow-back-ios-new" size={24} color="#232323" />
             </TouchableOpacity>
@@ -118,8 +118,9 @@ const SalonServicesScreen = ({navigation}) => {
                         <View className="flex flex-col justify-between">
                         
                         {servicesFiltered.map((service, index) => {
+                            
                             return (
-                                <TouchableOpacity key={index} onPress={() => handleToService(service)} className={`bg-bgPrimary w-full mt-4 ${service?.users?.length > 0 ? 'h-56' : 'h-48'} rounded-xl p-4`}>
+                                <TouchableOpacity key={service?._id} onPress={() => handleToService(service)} className={`bg-bgPrimary w-full mt-4 ${service?.users?.length > 0 ? 'h-56' : 'h-48'} rounded-xl p-4`}>
                                     <View className="flex flex-row justify-between items-center">
                                         <Text className="text-textPrimary text-xl" bold>{service?.name}</Text>
                                         <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
@@ -155,9 +156,9 @@ const SalonServicesScreen = ({navigation}) => {
                                             {service?.users.length > 0 && service?.users.slice(0, 8).map((user, indec) => {
                                                 return (
                                                     <Image
-                                                        key={index}
-                                                        className="w-10 h-10 rounded-full border-2 border-appColorDark"
-                                                        source={`http://192.168.0.72:5000/photos/profile-photo${user?._id ? user?._id : user}.png`}
+                                                        key={user?._id}
+                                                        className="w-10 h-10 rounded-full border-2 border-appColorDark -ml-2"
+                                                        source={`http://192.168.1.28:5000/photos/profile-photo${user?._id ? user?._id : user}.png`}
                                                         placeholder={{ blurhash }}
                                                         contentFit="cover"
                                                         transition={1000}

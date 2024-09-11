@@ -8,6 +8,7 @@ import Text from './CustomComponents/CustomText'
 import AntDesign from '@expo/vector-icons/AntDesign'
 import { useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
+import Animated, { FadeInDown } from 'react-native-reanimated'
 // import LootieTwoPeople from './LootieAnimations/TwoPeople'
 
 const blurhash =
@@ -101,26 +102,27 @@ const ServiceWorkersModal = ({isModalVisible, setIsModalVisible, workers, setWor
                                 {salonData?.workers?.map((worker, index) => {
                                     //activeService?.users.length
                                     return (
-                                        <TouchableOpacity 
-                                            onPress={() => handleWorker(worker)}
-                                            key={index}
-                                            className="w-full h-20 flex flex-row justify-between items-center bg-bgPrimary rounded-xl px-2"
-                                            >
-                                            <Image
-                                                className="w-16 h-16 rounded-full border-2 border-appColorDark"
-                                                source={`http://192.168.0.72:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
-                                                placeholder={{ blurhash }}
-                                                contentFit="cover"
-                                                transition={1000}
-                                            />
+                                        <Animated.View key={worker?._id} entering={FadeInDown}>
+                                            <TouchableOpacity 
+                                                onPress={() => handleWorker(worker)}
+                                                className="w-full h-20 mb-5 flex flex-row justify-between items-center bg-bgPrimary rounded-xl px-2"
+                                                >
+                                                <Image
+                                                    className="w-16 h-16 rounded-full"
+                                                    source={`http://192.168.1.28:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
+                                                    placeholder={{ blurhash }}
+                                                    contentFit="cover"
+                                                    transition={1000}
+                                                />
 
-                                            <View className="flex-1 px-4">
-                                                <Text semi>{worker?.first_name} {worker?.last_name}</Text>
-                                                <Text>{worker?.description || ''}</Text>
-                                            </View>
+                                                <View className="flex-1 px-4">
+                                                    <Text semi>{worker?.first_name} {worker?.last_name}</Text>
+                                                    <Text>{worker?.description || ''}</Text>
+                                                </View>
 
-                                            <AntDesign name={workers.includes(worker?._id) ? 'checksquare' : 'checksquareo'} size={24} color={workers.includes(worker?._id) ? '#5F9EA0' : '#232323'} />
-                                        </TouchableOpacity>
+                                                <AntDesign name={workers.includes(worker?._id) ? 'checksquare' : 'checksquareo'} size={24} color={workers.includes(worker?._id) ? '#5F9EA0' : '#232323'} />
+                                            </TouchableOpacity>
+                                        </Animated.View>
                                     )
                                 })}
                             </View>

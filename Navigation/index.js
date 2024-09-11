@@ -8,7 +8,7 @@ import { useCallback, useEffect } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { setNotifications, setUser } from "../redux/generalSlice"
 import { useSocket } from "../Context/SocketContext"
-import { useGetNotificationsMutation } from "../redux/apiCore"
+import { useGetMyUserDataMutation, useGetNotificationsMutation } from "../redux/apiCore"
 // import { usePushNotifications } from "../usePushNotifications"
 
 
@@ -21,12 +21,14 @@ const StackNavigator = () => {
   // const {expoPushToken, notification} = usePushNotifications()
   const {socket} = useSocket()
   const [getNotifications] = useGetNotificationsMutation()
+  const [getMyUserData] = useGetMyUserDataMutation()
 
   useEffect(()=>{
     if(!socket) return
 
     socket.on('notificationsChange', () => {
       getNotifications()
+      getMyUserData()
     })
 
     return () => socket.off('notificationsChange')

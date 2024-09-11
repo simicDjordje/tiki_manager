@@ -1,9 +1,9 @@
 import { View, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
-import { useNavigation } from '@react-navigation/native'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { Image } from 'expo-image'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import Entypo from '@expo/vector-icons/Entypo'
@@ -18,6 +18,7 @@ import { useSelector } from 'react-redux'
 import CreateWorkerAccountModal from '../Components/CreateWorkerAccountModal'
 import { useGetUserDataMutation, useUpdateSalonMutation } from '../redux/apiCore'
 import AddYourselfInSalonModal from '../Components/AddYourselfInSalonModal'
+import Animated, { FadeInDown } from 'react-native-reanimated'
 
 
 const blurhash =
@@ -32,28 +33,35 @@ const SalonWorkersScreen = ({navigation}) => {
   const [isSalonWorkerDetailsModalVisible, setIsSalonWorkerDetailsModalVisible] = useState(false)
   const [isCreateWorkerAccountModalVisible, setIsCreateWorkerAccountModalVisible] = useState(false)
   const [isAddYourselfModalVisible, setIsAddYourselfModalVisible] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
-  const [updateSalon, {isLoading}] = useUpdateSalonMutation()
+  const [updateSalon, {isLoading: isUpdateSalonLoading}] = useUpdateSalonMutation()
   const [errorMessage, setErrorMessage] = useState('')
 
   const [getUserData] = useGetUserDataMutation()
 
-  useEffect(() => {
-    if (salonData?.workers) {
-        const sortedWorkersArray = [...salonData.workers];
-        const currentUserIndex = sortedWorkersArray.findIndex(worker => worker._id === userData?._id);
-
-        if (currentUserIndex > -1) {
-            const [currentUser] = sortedWorkersArray.splice(currentUserIndex, 1);
-            sortedWorkersArray.unshift(currentUser);
+  useFocusEffect(useCallback(() => {
+    try{
+        if (salonData?.workers) {
+            const sortedWorkersArray = [...salonData.workers];
+            const currentUserIndex = sortedWorkersArray.findIndex(worker => worker._id === userData?._id);
+    
+            if (currentUserIndex > -1) {
+                const [currentUser] = sortedWorkersArray.splice(currentUserIndex, 1);
+                sortedWorkersArray.unshift(currentUser);
+            }
+    
+            // Only update the state if the sorted workers array has changed
+            if (JSON.stringify(sortedWorkersArray) !== JSON.stringify(sortedWorkers)) {
+                setSortedWorkers(sortedWorkersArray);
+            }
         }
-
-        // Only update the state if the sorted workers array has changed
-        if (JSON.stringify(sortedWorkersArray) !== JSON.stringify(sortedWorkers)) {
-            setSortedWorkers(sortedWorkersArray);
-        }
+    }catch(error){
+        console.log(error)
+    }finally{
+        setIsLoading(false)
     }
-}, [salonData?.workers, userData])
+}, [salonData?.workers, userData]))
 
   const handleBack = () => {
     navigation.navigate('StackTabScreens', {screen: 'SalonScreen'})
@@ -83,7 +91,7 @@ const SalonWorkersScreen = ({navigation}) => {
   return (
     <SafeAreaView className="bg-bgSecondary h-full">
         <StatusBar style={'dark'} />
-        <View className="flex flex-row justify-between items-center pt-20 pb-4 -mt-16 px-4 bg-bgPrimary">
+        <View className="flex flex-row justify-between items-center pt-20 pb-4 -mt-16 px-4 bg-bgSecondary">
             <TouchableOpacity onPress={handleBack}>
                 <MaterialIcons name="arrow-back-ios-new" size={24} color="#232323" />
             </TouchableOpacity>
@@ -100,7 +108,7 @@ const SalonWorkersScreen = ({navigation}) => {
                 </TouchableOpacity>
             </View>
             <View className="bg-textSecondary mt-8 w-full mb-5" style={{height: 0.5}}></View>
-            
+            {!isLoading && <View className="w-full">
             {sortedWorkers.length === 0 && <View>
                 <Text className="text-center text-textPrimary" bold>Dodaj članove salona</Text>
                 <Text className="text-center text-textMid">Dodeli članovima salona usluge kako bi mogli da primaju rezervacije</Text>
@@ -132,7 +140,7 @@ const SalonWorkersScreen = ({navigation}) => {
                             {userData.haveWorkerAccount &&
                                 <Image
                                     className="w-20 h-20 rounded-full border-2 border-appColorDark"
-                                    source={`http://192.168.0.72:5000/photos/profile-photo${userData?._id}.png`}
+                                    source={`http://192.168.1.28:5000/photos/profile-photo${userData?._id}.png`}
                                     placeholder={{ blurhash }}
                                     contentFit="cover"
                                     transition={1000}
@@ -163,11 +171,12 @@ const SalonWorkersScreen = ({navigation}) => {
                             const isYou = worker?._id === userData?._id
 
                             return (
-                                <TouchableOpacity key={index} onPress={() => seeWorkerDetails(worker?._id)} className="bg-bgPrimary w-full mt-4 rounded-xl p-4 flex flex-col justify-between">
+                                <Animated.View entering={FadeInDown} key={index}>
+                                <TouchableOpacity onPress={() => seeWorkerDetails(worker?._id)} className="bg-bgPrimary w-full mt-4 rounded-xl p-4 flex flex-col justify-between">
                                     <View className="flex flex-row justify-between items-center pb-2">
                                         <Image
-                                            className="w-16 h-16 rounded-full border-2 border-appColorDark"
-                                            source={`http://192.168.0.72:5000/photos/profile-photo${worker?._id}.png`}
+                                            className="w-16 h-16 rounded-full"
+                                            source={`http://192.168.1.28:5000/photos/profile-photo${worker?._id}.png`}
                                             placeholder={{ blurhash }}
                                             contentFit="cover"
                                             transition={1000}
@@ -208,6 +217,7 @@ const SalonWorkersScreen = ({navigation}) => {
                                         </View>
                                     </View> */}
                                 </TouchableOpacity>
+                                </Animated.View>
                             )
                         })}
                         
@@ -215,6 +225,7 @@ const SalonWorkersScreen = ({navigation}) => {
                     </View>
                 </ScrollView>
               }
+              </View>}
           </View>
         </View>
 
