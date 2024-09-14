@@ -165,7 +165,7 @@ const SalonWorkersScreen = ({navigation}) => {
               
             
               {sortedWorkers.length > 0 && 
-                <ScrollView className="w-full -mt-16">
+                <ScrollView className="w-full -mt-16 mb-36">
                     <View className="min-h-screen">
                         {sortedWorkers.map((worker, index) => {
                             const isYou = worker?._id === userData?._id

@@ -30,7 +30,7 @@ const LoginComponent = ({setAuthType}) => {
         }
 
         try{
-            const {error, data} = await signInUser({email, password})
+            const {error, data} = await signInUser({email: email.toLocaleLowerCase(), password})
             
             if(error){
                 console.log(error)

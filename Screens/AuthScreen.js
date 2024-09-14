@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import LoadingComponent from '../Components/LoadingComponent'
 import { useSelector } from 'react-redux'
+import { StatusBar } from 'expo-status-bar'
 
 
 
@@ -34,22 +35,25 @@ const AuthScreen = ({navigation}) => {
   if(isLoadingScreen) return <LoadingComponent />
 
   return (
-    <SafeAreaView className="bg-appColor h-full">
-    <View className="h-full flex flex-col justify-between items-center">
-            <View className="w-full mt-4 flex flex-col justify-between h-24">
-                <View className="px-4">
-                    <Text className="text-white text-3xl" bold>tiki <Text className="text-2xl text-appColorDark" semi>manager</Text></Text>
-                </View>
-            </View>
+    <View className="bg-appColor h-full">
+      <StatusBar style={'light'} />
+      <SafeAreaView className="h-full">
+      <View className="h-full flex flex-col justify-between items-center">
+              <View className="w-full mt-4 flex flex-col justify-between h-24">
+                  <View className="px-4">
+                      <Text className="text-white text-3xl" bold>tiki <Text className="text-2xl text-appColorDark" semi>manager</Text></Text>
+                  </View>
+              </View>
 
+              
+              {/* Auth Component */}
+              <AuthComponent />
             
-            {/* Auth Component */}
-            <AuthComponent />
-          
-    </View>
+      </View>
 
-        
-    </SafeAreaView>
+          
+      </SafeAreaView>
+    </View>
   )
 }
 
