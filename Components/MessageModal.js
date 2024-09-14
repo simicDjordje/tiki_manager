@@ -24,18 +24,19 @@ const MessageModal = ({
         <View className="flex-1 flex flex-col justify-center items-center">
             <View className="h-2/6 w-full">
               <View className="h-full w-full bg-bgPrimary flex flex-col justify-between items-center px-4 relative rounded-3xl">
-                <View className="px-4 mt-4">
+                <View className="px-4 py-2 flex flex-col justify-between h-full">
                   <View className="flex flex-row justify-end items-center">
-                    <TouchableOpacity onPress={()=>setIsModalVisible(false)} className="absolute -top-8 -right-12 p-3 bg-textPrimary rounded-full">
+                    {/* <TouchableOpacity onPress={()=>setIsModalVisible(false)} className="absolute -top-8 -right-12 p-3 bg-textPrimary rounded-full">
                       <Ionicons name="close" size={24} color="white" />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                   </View>
-                  <Text className="mt-4 text-center text-xl text-textPrimary" bold>{title}</Text>
-                  <Text className="mt-2 text-lg text-textMid text-center" bold>{text}</Text>
+
+                  <Text className="text-center text-xl text-textPrimary" bold>{title}</Text>
+                  <Text className="text-md text-textMid text-center" bold>{text}</Text>
 
                   <TouchableOpacity 
                       onPress={handleConfirm}
-                      className="bg-textPrimary rounded-xl p-4 flex flex-row justify-center items-center mt-10">
+                      className="bg-textPrimary rounded-xl p-4 flex flex-row justify-center items-center mb-2">
                       <Text className="text-white text-lg" bold>{buttonText}</Text>
                   </TouchableOpacity>
                 </View>

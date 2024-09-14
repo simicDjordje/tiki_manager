@@ -12,32 +12,36 @@ const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
-const WorkerCard = forwardRef(({userData, isJustCreated, setIsMessageModalVisible}, ref) => {
+const WorkerCard = forwardRef(({userData, setIsMessageModalVisible, setTitle, setMessage}, ref) => {
   const navigation = useNavigation()
 
   const handleToWorkerScreen = () => {
-    if(!userData?.worksInSalon){
-      setIsMessageModalVisible(true)
-      return
-    }
+
+    // if(!userData?.worksInSalon){
+    //   setTitle('Nisi član salona')
+    //   setMessage('Moraš biti član salona i imati dodeljene usluge')
+    //   setIsMessageModalVisible(true)
+    //   return
+    // }
+
+    // if(!userData?.worksInSalon?.isActive){
+    //   setTitle(`${userData?.worksInSalon?.name || 'Salon'} je neaktivan`)
+    //   setMessage('Nakon aktivacije salona, moći ćeš da upravljaš terminima')
+    //   setIsMessageModalVisible(true)
+    //   return
+    // }
+
+    // if(userData?.services.length === 0){
+    //   setTitle(`Nije ti dodeljena nijedna usluga`)
+    //   setMessage('Nakon dodeljene usluge moći ćeš da upravljaš terminima')
+    //   setIsMessageModalVisible(true)
+    //   return
+    // }
     navigation.navigate('StackTabScreens', {screen: 'WorkerScreen'})
   }
 
   return (
-    <TouchableOpacity ref={ref} onPress={handleToWorkerScreen} className={`bg-bgPrimary h-28 w-full rounded-3xl mb-4 flex flex-row justify-between items-center px-4 relative z-10 ${isJustCreated && 'z-20'}`}>
-      {isJustCreated && 
-          <Animated.View entering={BounceInDown} exiting={BounceOut} className="bg-appColor absolute -top-12 px-4 py-2 rounded-xl w-full">
-              <Text className="text-white" bold>Upravljaj lako svojim terminima</Text>
-          </Animated.View>
-      }
-      {/* <Image
-          className="w-16 h-16 rounded-full border-2 border-appColor"
-          source={`http://192.168.1.28:5000/photos/profile-photo${userData?._id}.png`}
-          placeholder={{ blurhash }}
-          contentFit="cover"
-          transition={1000}
-      /> */}
-
+    <TouchableOpacity ref={ref} onPress={handleToWorkerScreen} className={`bg-bgPrimary h-28 w-full rounded-3xl mb-4 flex flex-row justify-between items-center px-4 relative`}>
       <FontAwesome6 name="calendar-days" size={24} color="#000" />
 
       <View className="flex-1 h-full p-4">

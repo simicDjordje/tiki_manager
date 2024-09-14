@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const apiCore = createApi({
 	reducerPath: 'apiCore',
 	baseQuery: fetchBaseQuery({
-		baseUrl: 'http://192.168.1.28:5000/api/v1',
+		baseUrl: 'http://192.168.1.29:5000/api/v1',
 		prepareHeaders: async (headers) => {
 			let user = await AsyncStorage.getItem('@userData')
 			user = JSON.parse(user)
@@ -78,6 +78,15 @@ export const apiCore = createApi({
 			query: (data) => {
 				return {
 					url: `/users/search`,
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
+		updateUser: builder.mutation({
+			query: (data) => {
+				return {
+					url: `/users/update`,
 					method: 'POST',
 					body: data
 				}
@@ -258,4 +267,5 @@ export const {
 	useMarkSeenNotificationMutation,
 	useMarkSeenNotificationAllMutation,
 	useGetMyUserDataMutation,
+	useUpdateUserMutation,
 } = apiCore;

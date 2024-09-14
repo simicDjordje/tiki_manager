@@ -28,6 +28,9 @@ export {default as NotificationsScreen} from './NotificationsScreen'
 export {default as WelcomeScreen} from './WelcomeScreen'
 
 
+export {default as ReservationsScreen} from './ReservationsScreen'
+
+
 
 
 

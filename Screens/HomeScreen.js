@@ -18,6 +18,7 @@ import SalonsPartHomeScreen from '../Components/SalonsPartHomeScreen'
 import { useDispatch, useSelector } from 'react-redux'
 import { setJustCreatedSalon, setJustCreatedWorkerAccount, setJustSignedUp, setUser } from '../redux/generalSlice'
 import MessageModal from '../Components/MessageModal'
+import ReservationsCard from '../Components/ReservationsCard'
 
 const HomeScreen = ({route, navigation}) => {
     //redux 
@@ -37,6 +38,9 @@ const HomeScreen = ({route, navigation}) => {
     const [isBeginSalonRegisterModalVisible, setIsBeginSalonRegisterModalVisible] = useState(false)
     const [isMessageModalVisible, setIsMessageModalVisible] = useState(false)
 
+    const [title, setTitle] = useState('')
+    const [message, setMessage] = useState('')
+
     //refs
     const scrollViewRef = useRef(null)
     const salonCardRef = useRef(null)
@@ -49,11 +53,6 @@ const HomeScreen = ({route, navigation}) => {
 
     //ON FOCUS
     useFocusEffect(useCallback(()=>{
-        // if(justSignedUp){
-        //     navigation.navigate('StackTabScreens', {screen: 'WelcomeScreen'})
-        //     return
-        // }
-
         getUserSalons()
         getNotifications()
         getMyUserData()
@@ -151,11 +150,19 @@ const HomeScreen = ({route, navigation}) => {
                         {userData?.haveWorkerAccount && 
                             <WorkerCard 
                                 userData={userData} 
-                                isJustCreated={justCreatedWorkerAccount} 
                                 ref={workerCardRef}
                                 setIsMessageModalVisible={setIsMessageModalVisible}
+                                setTitle={setTitle}
+                                setMessage={setMessage}
                             />
                         }
+
+                        {/* {userData?.haveWorkerAccount && 
+                            <ReservationsCard 
+                                userData={userData} 
+                                setIsMessageModalVisible={setIsMessageModalVisible}
+                            />
+                        } */}
                         
                     </View>
 
@@ -227,8 +234,8 @@ const HomeScreen = ({route, navigation}) => {
             isModalVisible={isMessageModalVisible}
             setIsModalVisible={setIsMessageModalVisible}
             handleConfirm={() => setIsMessageModalVisible(false)}
-            title={'Nisi član salona'}
-            text={'Moraš biti član salona i imati dodeljene usluge'}
+            title={title}
+            text={message}
             buttonText={'OK'}
         />
     </SafeAreaView>

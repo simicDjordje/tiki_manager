@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
@@ -7,78 +7,203 @@ import Text from '../Components/CustomComponents/CustomText'
 import CalendarPicker from 'react-native-calendar-picker'
 import { timeSlotsConstants } from '../constants'
 import CustomButton from '../Components/CustomComponents/CustomButton'
+import { useFocusEffect } from '@react-navigation/native'
+import AntDesign from '@expo/vector-icons/AntDesign'
+import { useGetMyUserDataMutation, useUpdateUserMutation } from '../redux/apiCore'
+import Animated, { BounceInRight, FadeInDown, FadeInLeft, FadeInUp } from 'react-native-reanimated'
+import { useSelector } from 'react-redux'
 
+// new Date(2024, 7, 23),
 
 const monthsArray = ["Januar", "Februar", "Mart", "April", "Maj", "Jun", "Jul", "Avgust", "Septembar", "Oktobar", "Novembar", "Decembar"]
 const weekdaysArray = ["Pon", "Uto", "Sre", "Čet", "Pet", "Sub", "Ned"]
 
 const WorkerScreen = ({navigation}) => {
-    const today = new Date()
-    const salonName = 'Beauty salon PK'
+    const {userData} = useSelector(state => state.general)
+    const [today, setToday] = useState()
     const [selectedStartDate, setSelectedStartDate] = useState(null)
-    const markedDates = [
-        new Date(2024, 7, 23),
-        new Date(2024, 7, 24),
-        new Date(2024, 7, 25),
-        new Date(2024, 7, 26),
-        new Date(2024, 7, 30),
-        new Date(2024, 7, 31),
-        new Date(2024, 8, 1),
-        new Date(2024, 8, 4),
-        new Date(2024, 8, 5),
-        new Date(2024, 8, 6),
-        new Date(2024, 8, 7),
-        new Date(2024, 8, 8),
-        new Date(2024, 8, 9),
-        new Date(2024, 8, 10),
-        new Date(2024, 8, 11),
-        new Date(2024, 8, 19),
-        new Date(2024, 8, 27),
-        new Date(2024, 8, 28),
-        new Date(2024, 8, 16),
-    ]
+    const [markedDates, setMarkedDates] = useState([])
     const [timeSlots, setTimeSlots] = useState([...timeSlotsConstants])
     const [selectedTimeSlots, setSelectedTimeSlots] = useState({})
+    const [isTodaySelected, setIsTodaySelected] = useState()
+    const [errorMessage, setErrorMessage] = useState('')
+    const [isSuccess, setIsSuccess] = useState(false)
+    const [refreshTimeSlots, setRefreshTimeSlots] = useState(false)
 
-    const customDatesStyles = []
+    //api
+    const [updateUser, {isLoading: isUpdateUserLoading}] = useUpdateUserMutation()
+    const [getMyUserData] = useGetMyUserDataMutation()
 
-    markedDates.sort((a, b) => a - b)
+    const handleUpdateTimeSlots = async () => {
+        for(const dateStringKey in selectedTimeSlots){
+            if(selectedTimeSlots[dateStringKey] && selectedTimeSlots[dateStringKey].length === 0){
+                delete selectedTimeSlots[dateStringKey]
+            }
+        }
 
-    for (let i = 0; i < markedDates.length; i++) {
-        const current = markedDates[i];
-        const next = markedDates[i + 1];
+        try{
+            const {error, data} = await updateUser({timeSlots: selectedTimeSlots})
+
+            if(error){
+                setErrorMessage('Došlo je do greške')
+                setIsSuccess(false)
+                return
+            }
+
+            if(data && data.success){
+                setIsSuccess(true)
+                setErrorMessage('')
+                getMyUserData()
+            }
+
+        }catch(error){
+            console.log(error)
+        }
+    }
+
+    useFocusEffect(useCallback(()=>{
+        const todayDate = new Date();
+        todayDate.setHours(0, 0, 0, 0)
+
+        setToday(todayDate)
+
+
+        if(userData && userData.timeSlots){
+            setSelectedTimeSlots({...userData.timeSlots})
+
+            const updatedMarkedDates = []
+
+            // Current time in seconds since midnight
+            const currentTimeInSeconds = new Date().getHours() * 3600 + new Date().getMinutes() * 60
+
+
+            for (const dateStringKey in userData.timeSlots) {
+                const [day, month, year] = dateStringKey.split('-')
+                const slotDate = new Date(year, month, day)
+
+                if (slotDate.getTime() === todayDate.getTime()) {
+                    // Check if any timeSlot is greater than the current time for today
+                    const hasFutureTimeSlot = userData.timeSlots[dateStringKey].some(
+                        (slot) => slot.value > currentTimeInSeconds
+                    )
+
+                    if (hasFutureTimeSlot) {
+                        updatedMarkedDates.push(slotDate)
+                    }
+                } else {
+                    // For dates other than today, add them to marked dates
+                    updatedMarkedDates.push(slotDate)
+                }
+            }
+
+            setMarkedDates(updatedMarkedDates)
+        }
+    }, []))
+
     
-        const isStart = i === 0 || (markedDates[i - 1] && markedDates[i - 1].getTime() !== current.getTime() - 86400000);
-        const isEnd = !next || next.getTime() !== current.getTime() + 86400000;
-    
-        customDatesStyles.push({
-          date: current,
-          style: { 
-            backgroundColor: '#00505b',
-            borderTopLeftRadius: isStart ? 20 : 0,
-            borderBottomLeftRadius: isStart ? 20 : 0,
-            borderTopRightRadius: isEnd ? 20 : 0,
-            borderBottomRightRadius: isEnd ? 20 : 0,
-            paddingLeft: 50
-            
-          },
-          textStyle: { color: '#fff', marginLeft: -50 },
-        });
-      }
+    const customDatesStyles = useMemo(()=>{
+        const copyMarkedDates = [...markedDates]
+
+        copyMarkedDates.sort((a, b) => a - b)
+
+        const updatedCustomDatesStyles = []
+
+        for (let i = 0; i < copyMarkedDates.length; i++) {
+            const current = copyMarkedDates[i]
+
+            updatedCustomDatesStyles.push({
+              date: current,
+              style: { 
+                backgroundColor: '#00505b',
+              },
+              textStyle: { color: '#fff'},
+            })
+        }
+
+        return updatedCustomDatesStyles
+    }, [markedDates])
 
     const handleBack = () => {
         navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
     }
 
     const onDateChange = (date) => {
-        console.log(date.toString())
-        console.log(date.toString().split(' '))
+        setRefreshTimeSlots(true)
+
+        setTimeout(()=>{
+            setRefreshTimeSlots(false)
+        }, 50)
+
+        const todayDate = new Date();
+        todayDate.setHours(0, 0, 0, 0)
+
+        setToday(todayDate)
+        
+        const isToday = date && 
+        date.getDate() == todayDate.getDate() &&
+        date.getMonth() == todayDate.getMonth() &&
+        date.getFullYear() == todayDate.getFullYear();
+        
+        setIsTodaySelected(isToday)
         setSelectedStartDate(date)
+        
     }
 
-    // const handleSelectTimeSlot = {
-    //     const selectedStartDateArray = selectedStartDate.toString().split(' ')
-    // }
+    const handleSelectTimeSlot = (timeSlot) => {
+        const dateStringKey = `${selectedStartDate.getDate()}-${selectedStartDate.getMonth()}-${selectedStartDate.getFullYear()}`
+        const foundArray = selectedTimeSlots[dateStringKey] ? [...selectedTimeSlots[dateStringKey]] : null
+
+        const markedDateIndex = markedDates.findIndex(date => {
+            return date.getDate() === selectedStartDate.getDate() && 
+            date.getMonth() === selectedStartDate.getMonth() && 
+            date.getFullYear() === selectedStartDate.getFullYear()
+        })
+
+        if(foundArray){
+            const timeSlotIndex = foundArray.findIndex(slot => slot.value === timeSlot.value)
+
+            if (timeSlotIndex > -1) {
+                // If the timeSlot is found, remove it from the array
+                foundArray.splice(timeSlotIndex, 1)
+
+                if(foundArray.length === 0){
+                    
+                    if(markedDateIndex > -1){
+                        const updatedMarkedDates = [...markedDates]
+                        updatedMarkedDates.splice(markedDateIndex, 1)
+
+                        setMarkedDates(updatedMarkedDates)
+                    }
+
+                }
+            } else {
+                // If the timeSlot is not found, add it to the array
+                foundArray.push(timeSlot)
+
+                if(!markedDateIndex > -1){
+                    setMarkedDates([...markedDates, new Date(selectedStartDate.getFullYear(), selectedStartDate.getMonth(), selectedStartDate.getDate())])
+                }
+
+            }
+
+            setSelectedTimeSlots({
+                ...selectedTimeSlots,
+                [dateStringKey]: foundArray
+            })
+
+            return
+        }
+
+        setSelectedTimeSlots({
+            ...selectedTimeSlots,
+            [dateStringKey]: [timeSlot]
+        })
+
+        setMarkedDates([...markedDates, new Date(selectedStartDate.getFullYear(), selectedStartDate.getMonth(), selectedStartDate.getDate())])
+
+    }
+
+    useEffect(()=>{console.log(markedDates)}, [markedDates])
 
   return (
     <SafeAreaView className="bg-bgSecondary h-full">
@@ -92,11 +217,23 @@ const WorkerScreen = ({navigation}) => {
             </View>
 
             <View className="px-4 flex-1">
+                <View className="flex flex-col justify-between items-start px-2 mt-4">
+                    <View className="flex flex-row justify-start items-center">
+                        <View className="h-3 w-3 bg-appColorDark rounded-full"></View>
+                        <Text className="text-textMid ml-2" semi>Datumi na kojima su postavljeni termini</Text>
+                    </View>
+
+                    <View className="flex flex-row justify-start items-center">
+                        <View className="h-3 w-3 bg-appColor rounded-full"></View>
+                        <Text className="text-textMid ml-2" semi>Trenutno izabran datum</Text>
+                    </View>
+                </View>
+
                 <View className="mt-8">
                     <Text className="text-textMid" semi>Izaberi datum i označi željene termine</Text>
                 </View>
 
-                <View className="bg-bgPrimary mt-3 py-5 rounded-xl">
+                <Animated.View className="bg-bgPrimary mt-3 py-5 rounded-xl">
                     <CalendarPicker 
                         previousComponent={
                             <View className="ml-2">
@@ -117,12 +254,17 @@ const WorkerScreen = ({navigation}) => {
                         selectedDayTextColor='#fff'
                         todayBackgroundColor="transparent"
                         todayTextStyle={{ color: '#000' }}
-                        disabledDates={(date) => date < today}
+                        disabledDates={(date) => {
+                            const normalizedDate = new Date(date);
+                            normalizedDate.setHours(0, 0, 0, 0); // Normalize the date to 00:00:00
+                        
+                            return normalizedDate < today; // Disable dates before today
+                          }}
                         disabledDatesTextStyle={{ color: '#babbb6' }}
                         customDatesStyles={customDatesStyles}
                         allowBackwardRangeSelect={true}
                     />
-                </View>
+                </Animated.View>
 
                 {selectedStartDate !== null &&
                 
@@ -131,6 +273,7 @@ const WorkerScreen = ({navigation}) => {
                         <Text className={`mb-1 text-md mt-4`}>Termini za: <Text semi>{selectedStartDate.getDate()}. {monthsArray[selectedStartDate.getMonth()]}</Text></Text>
                         <Text className={`mb-1 text-xs mt-4`}>Skroluj desno za još</Text>
                     </View> 
+                    {!refreshTimeSlots && <Animated.View entering={BounceInRight}>
                     <ScrollView 
                         className="mb-2 -mr-10"
                         horizontal={true}
@@ -142,28 +285,52 @@ const WorkerScreen = ({navigation}) => {
                         {timeSlots.map((timeSlot, index) => {
                             const indexPlusOne = index + 1
                             const lastItem = timeSlots.length == indexPlusOne
-                            const isSelected = indexPlusOne % 2 === 0
+                            let isSelected = false
+
+                            const dateStringKey = `${selectedStartDate.getDate()}-${selectedStartDate.getMonth()}-${selectedStartDate.getFullYear()}`
+                            const foundArray = selectedTimeSlots[dateStringKey]
+
+                            if(foundArray){
+                                const timeSlotIndex = foundArray.findIndex(slot => slot.value === timeSlot.value)
+
+                                if (timeSlotIndex > -1) isSelected = true
+                            }
 
                             const now = new Date()
                             const currentSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()
 
-                            if(timeSlot.value < currentSeconds) return null
+                            if(timeSlot.value < currentSeconds + 2000 && isTodaySelected) return null
 
                             return (
-                                <TouchableOpacity key={index} className={`w-24
-                                    h-14 ${isSelected ? 'bg-appColor' : 'bg-bgPrimary'} ml-2 rounded-xl flex flex-row justify-center items-center ${lastItem && 'mr-20'}`}>
+                                <TouchableOpacity 
+                                    onPress={() => {handleSelectTimeSlot(timeSlot)}}
+                                    key={index} 
+                                    className={`w-24 h-14 ${isSelected ? 'bg-appColor' : 'bg-bgPrimary'} ml-2 rounded-xl flex flex-row justify-center items-center ${lastItem && 'mr-20'} relative`}>
+                                    {/* {isSelected && 
+                                        <View className="absolute z-10 rounded-full bg-white top-0 right-0">
+                                            <AntDesign name="checkcircle" size={18} color="#00505b" />
+                                        </View>
+                                    } */}
                                     <Text semi className={`${isSelected ? 'text-white' : 'text-textPrimary'}`}>{timeSlot.label}</Text>
                                 </TouchableOpacity>
                             )
                         })}
                     </ScrollView>
+                    </Animated.View>}
                 </View>}
+            </View>
+            
+            <View className="flex flex-row justify-center items-center h-5 mb-6">
+                <Text className="text-red-700 text-center">{errorMessage}</Text>
             </View>
 
             <View className="px-4 mb-8">
                 <CustomButton 
                     text={'Sačuvaj'}
-                    onPress={()=>{}}
+                    onPress={handleUpdateTimeSlots}
+                    isError={!!errorMessage}
+                    isSuccess={isSuccess}
+                    isLoading={isUpdateUserLoading}
                 />
             </View>
         </View>

@@ -427,7 +427,7 @@ const NotificationDetailsToJoinSalonPending = ({
                 <Image
                     className={`w-20 h-20 rounded-full mr-3`}
                     // style={{borderWidth: 0.5}}
-                    source={`http://192.168.1.28:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
+                    source={`http://192.168.1.29:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
                     placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}
@@ -440,7 +440,7 @@ const NotificationDetailsToJoinSalonPending = ({
                                     <Image
                                         key={index}
                                         className={`w-8 h-8 rounded-full ${index > 0 && '-ml-2'} border-textPrimary`}
-                                        source={`http://192.168.1.28:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
+                                        source={`http://192.168.1.29:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
@@ -533,7 +533,7 @@ const NotificationDetailsToJoinSalonRejected = ({notificationDetails}) => {
                 <Image
                     className={`w-20 h-20 rounded-full -mr-2`}
                     // style={{borderWidth: 0.5}}
-                    source={`http://192.168.1.28:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
+                    source={`http://192.168.1.29:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
                     placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}
@@ -541,7 +541,7 @@ const NotificationDetailsToJoinSalonRejected = ({notificationDetails}) => {
                 <Image
                     className={`w-20 h-20 rounded-full`}
                     // style={{borderWidth: 0.5}}
-                    source={`http://192.168.1.28:5000/photos/profile-photo${requestDetails?.recipient}.png`}
+                    source={`http://192.168.1.29:5000/photos/profile-photo${requestDetails?.recipient}.png`}
                     placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}
@@ -574,7 +574,7 @@ const NotificationDetailsToJoinSalonAccepted = ({notificationDetails}) => {
                 <Image
                     className={`w-24 h-24 rounded-full`}
                     // style={{borderWidth: 0.5}}
-                    source={`http://192.168.1.28:5000/photos/profile-photo${requestDetails?.recipient}.png`}
+                    source={`http://192.168.1.29:5000/photos/profile-photo${requestDetails?.recipient}.png`}
                     placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}

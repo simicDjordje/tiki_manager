@@ -36,7 +36,7 @@ const AuthScreen = ({navigation}) => {
   return (
     <SafeAreaView className="bg-appColor h-full">
     <View className="h-full flex flex-col justify-between items-center">
-            <View className="w-full flex-1 mt-4 flex flex-col justify-between">
+            <View className="w-full mt-4 flex flex-col justify-between h-24">
                 <View className="px-4">
                     <Text className="text-white text-3xl" bold>tiki <Text className="text-2xl text-appColorDark" semi>manager</Text></Text>
                 </View>
@@ -44,7 +44,7 @@ const AuthScreen = ({navigation}) => {
 
             
             {/* Auth Component */}
-            {!isLoadingScreen && <AuthComponent />}
+            <AuthComponent />
           
     </View>
 
