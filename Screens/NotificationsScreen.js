@@ -6,7 +6,6 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import { Image } from 'expo-image'
 import Entypo from '@expo/vector-icons/Entypo'
 import Text from '../Components/CustomComponents/CustomText'
-
 import { useSelector } from 'react-redux'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useCheckIfToJoinSalonRequestExistsMutation, useGetNotificationsMutation, useGetRequestMutation, useGetReservationMutation, useMarkSeenNotificationAllMutation, useMarkSeenNotificationMutation, useUpdateRequestMutation } from '../redux/apiCore'
@@ -14,6 +13,10 @@ import LootieLoader from '../Components/LootieAnimations/Loader'
 import CustomButton from '../Components/CustomComponents/CustomButton'
 import ConfirmActionModal from '../Components/ConfirmActionModal'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
+import CustomAvatar from '../Components/CustomAvatar'
+import { formatDistanceToNow } from 'date-fns'
+import { srLatn } from 'date-fns/locale'
+
 
 const daysObj = {
     1: 'Ponedeljak',
@@ -28,12 +31,19 @@ const daysObj = {
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
-const NotifcationCard = ({item, setNotificationDetails}) => {
+const timeAgoInSerbian = (dateString) => {
+    const date = new Date(dateString);
+
+    return formatDistanceToNow(date, { addSuffix: true, locale: srLatn });
+}
+
+const NotifcationCard = ({item, setNotificationDetails, timeAgo}) => {
     let smallTitle = ''
     let bigTitle = item?.message || ''
     // let showDot = false
     // let dotColorClass = 'bg-black'
     let textColorClass = 'text-textMid'
+    let avatarText = ''
 
     if(item?.requestId){
         let requestFromNotification = item?.requestId
@@ -58,6 +68,10 @@ const NotifcationCard = ({item, setNotificationDetails}) => {
         if(reservationFromNotification.reservationType === 'toReservationService'){
             if(reservationFromNotification.status === 'pending'){
                 smallTitle = 'Rezervacija termina'
+                const sender = reservationFromNotification?.sender
+                if(sender && !sender.hasProfilePhoto){
+                    avatarText = `${sender?.first_name[0]} ${sender?.last_name[0]}`
+                }
             }
 
             if(reservationFromNotification.status === 'accepted'){
@@ -86,17 +100,32 @@ const NotifcationCard = ({item, setNotificationDetails}) => {
 
     return (
         <Animated.View entering={FadeInDown}>
+            <View className="flex flex-row justify-end items-center mb-1">
+                <Text className="text-xs text-textSecondary">{timeAgo}</Text>
+            </View>
             <TouchableOpacity 
                 onPress={handleOnPress}
                 className={`py-4 w-full ${item?.seen ? 'bg-bgSecondary border-textSecondary' : 'bg-bgSecondary border-textSecondary'} rounded-2xl flex flex-row justify-between items-center px-4 mb-5`}
                 style={item?.seen ? {borderWidth: 0.5} : {borderWidth: 0.5}}
                 >
-
-                {/* {showDot && 
-                    <View>
-                        <View className={`${dotColorClass} h-2 w-2 rounded-full`}></View>
+                
+                {item?.reservationId && item?.reservationId?.sender && !item?.reservationId?.sender?.hasProfilePhoto &&
+                    <View className="w-10 h-10">
+                        <CustomAvatar 
+                            text={avatarText}
+                        />
                     </View>
-                } */}
+                }
+
+                {item?.reservationId && item?.reservationId?.sender && item?.reservationId?.sender?.hasProfilePhoto &&
+                    <Image
+                        className={`w-10 h-10 rounded-full`}
+                        source={`http://192.168.1.5:5000/photos/profile-photo${item?.reservationId?.sender?._id}.png`}
+                        placeholder={{ blurhash }}
+                        contentFit="cover"
+                        transition={1000}
+                    />
+                }
 
                 <View className="flex-1 ml-4">
                     <Text className={`text-md ${textColorClass}`} semi>{smallTitle}</Text>
@@ -182,51 +211,62 @@ const NotificationsScreen = ({navigation}) => {
 
   useEffect(() => {
     if(notifications.all.length === 0){
-        setSortedNotifications({
-            today: [],
-            thisWeek: [],
-            thisMonth: [],
-            rest: []
-        })
+        // setSortedNotifications({
+        //     today: [],
+        //     thisWeek: [],
+        //     thisMonth: [],
+        //     rest: []
+        // })
+        setSortedNotifications([])
         return
     }
 
     const separateNotifications = (notifications) => {
-      const today = new Date();
-      const startOfToday = new Date(today.setHours(0, 0, 0, 0));
-      const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay())); // Start of the week
-      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1); // Start of the month
-
-      const todayNotifications = [];
-      const weekNotifications = [];
-      const monthNotifications = [];
-      const restNotifications = [];
-
-      notifications.forEach(notification => {
-        const notificationDate = new Date(notification.createdAt);
-
-        if (notificationDate >= startOfToday) {
-          // Notifications for today
-          todayNotifications.push(notification);
-        } else if (notificationDate >= startOfWeek && notificationDate < startOfToday) {
-          // Notifications for this week excluding today
-          weekNotifications.push(notification);
-        } else if (notificationDate >= startOfMonth && notificationDate < startOfWeek) {
-          // Notifications for this month excluding this week
-          monthNotifications.push(notification);
-        } else {
-          // Notifications older than this month
-          restNotifications.push(notification);
-        }
-      });
-
-      return {
-        today: todayNotifications,
-        thisWeek: weekNotifications,
-        thisMonth: monthNotifications,
-        rest: restNotifications
+        const today = new Date();
+        const startOfToday = new Date(today.setHours(0, 0, 0, 0));
+        const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay())); // Start of the week
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1); // Start of the month
+      
+        const combinedNotifications = [];
+        let hasToday = false, hasThisWeek = false, hasThisMonth = false, hasRest = false;
+      
+        notifications.forEach(notification => {
+          const notificationDate = new Date(notification.createdAt);
+      
+          if (notificationDate >= startOfToday) {
+            if (!hasToday) {
+              // Add a section label for today
+              combinedNotifications.push({ type: 'header', label: 'Danas' });
+              hasToday = true;
+            }
+            combinedNotifications.push({ type: 'notification', item: notification });
+          } else if (notificationDate >= startOfWeek && notificationDate < startOfToday) {
+            if (!hasThisWeek) {
+              // Add a section label for this week
+              combinedNotifications.push({ type: 'header', label: 'Ove nedelje' });
+              hasThisWeek = true;
+            }
+            combinedNotifications.push({ type: 'notification', item: notification });
+          } else if (notificationDate >= startOfMonth && notificationDate < startOfWeek) {
+            if (!hasThisMonth) {
+              // Add a section label for this month
+              combinedNotifications.push({ type: 'header', label: 'Ovog meseca' });
+              hasThisMonth = true;
+            }
+            combinedNotifications.push({ type: 'notification', item: notification });
+          } else {
+            if (!hasRest) {
+              // Add a section label for older notifications
+              combinedNotifications.push({ type: 'header', label: 'Sve prethodno' });
+              hasRest = true;
+            }
+            combinedNotifications.push({ type: 'notification', item: notification });
+          }
+        });
+      
+        return combinedNotifications;
       };
-    };
+      
 
     const sorted = separateNotifications(notifications.all);
     setSortedNotifications(sorted);
@@ -317,96 +357,38 @@ const NotificationsScreen = ({navigation}) => {
                 </View>
             }
 
-            {sortedNotifications?.today.length > 0 && 
-                <View className="w-full">
-                    <View className="mt-4">
-                        <Text className="text-textPrimary text-md mb-4" bold>Danas</Text>
-                        {/* <View className="bg-textSecondary w-full my-4" style={{height: 0.5}}></View> */}
-                    </View>
-                    <FlatList
-                        data={sortedNotifications.today}
-                        keyExtractor={(item) => item?._id.toString()}
-                        showsVerticalScrollIndicator={false}
-                        contentContainerStyle={{ paddingBottom: 0 }}
-                        renderItem={({ item, index }) => {
-                            return (
-                                <NotifcationCard 
-                                    item={item} 
-                                    setNotificationDetails={setNotificationDetails} 
-                                />
-                            )
-                        }}
-                    /> 
-                </View>
-            }
+           
 
-            {sortedNotifications?.thisWeek.length > 0 && 
-                <View className="w-full">
-                    <View className="mt-4">
-                        <Text className="text-textPrimary text-md mb-4" bold>Ove nedelje</Text>
-                        {/* <View className="bg-textSecondary w-full my-4" style={{height: 0.5}}></View> */}
-                    </View>
-                    <FlatList
-                        data={sortedNotifications.thisWeek}
-                        keyExtractor={(item) => item?._id.toString()}
-                        showsVerticalScrollIndicator={false}
-                        contentContainerStyle={{ paddingBottom: 0 }}
-                        renderItem={({ item, index }) => {
-                            return (
-                                <NotifcationCard 
-                                    item={item} 
-                                    setNotificationDetails={setNotificationDetails} 
-                                />
-                            )
-                        }}
-                    /> 
-                </View>
-            }
+            
 
-            {sortedNotifications?.thisMonth.length > 0 && 
-                <View className="w-full">
-                    <View className="mt-4">
-                        <Text className="text-textPrimary text-md mb-4" bold>Ovog meseca</Text>
-                        {/* <View className="bg-textSecondary w-full my-4" style={{height: 0.5}}></View> */}
-                    </View>
-                    <FlatList
-                        data={sortedNotifications.thisMonth}
-                        keyExtractor={(item) => item?._id.toString()}
-                        showsVerticalScrollIndicator={false}
-                        contentContainerStyle={{ paddingBottom: 0 }}
-                        renderItem={({ item, index }) => {
-                            return (
-                                <NotifcationCard 
-                                    item={item}
-                                    setNotificationDetails={setNotificationDetails}  
-                                />
-                            )
-                        }}
-                    /> 
-                </View>
-            }
+            
 
-            {sortedNotifications?.rest.length > 0 && 
-                <View className="w-full">
-                    <View className="mt-4">
-                        <Text className="text-textPrimary text-md mb-4" bold>Sve prethodno</Text>
-                        {/* <View className="bg-textSecondary w-full my-4" style={{height: 0.5}}></View> */}
-                    </View>
-                    <FlatList
-                        data={sortedNotifications.rest}
-                        keyExtractor={(item) => item?._id.toString()}
-                        showsVerticalScrollIndicator={false}
-                        contentContainerStyle={{ paddingBottom: 0 }}
-                        renderItem={({ item, index }) => {
-                            return (
-                                <NotifcationCard 
-                                    item={item} 
-                                    setNotificationDetails={setNotificationDetails} 
-                                />
-                            )
-                        }}
-                    /> 
-                </View>
+            {sortedNotifications.length > 0 && 
+                <FlatList
+                    data={sortedNotifications}
+                    keyExtractor={(item, index) => item.type === 'header' ? `header-${index}` : item.item?._id.toString()}
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{ paddingBottom: 100 }}
+                    renderItem={({ item }) => {
+                    if (item.type === 'header') {
+                        return (
+                        <View className="w-full mt-4">
+                            <Text className="text-textPrimary text-md mb-4" bold>{item.label}</Text>
+                        </View>
+                        );
+                    } else if (item.type === 'notification') {
+                        const timeAgo = timeAgoInSerbian(item.item.createdAt)
+
+                        return (
+                        <NotifcationCard 
+                            item={item.item} 
+                            setNotificationDetails={setNotificationDetails} 
+                            timeAgo={timeAgo}
+                        />
+                        );
+                    }
+                    }}
+                />
             }
 
           </View>}
@@ -660,6 +642,13 @@ const NotificationDetailsToReservationService = ({
     const [dateText, setDateText] = useState('')
     const [smallDateText, setSmallDateText] = useState('')
 
+    let avatarText = ''
+    const timeAgo = timeAgoInSerbian(reservationDetails?.createdAt) || ''
+
+    if(reservationDetails?.sender){
+        avatarText = `${reservationDetails?.sender?.first_name[0]} ${reservationDetails?.sender?.last_name[0]}`
+    }
+
     useEffect(()=>{
         const dateSplited = reservationDetails?.date.split('-')
         setDateText(`${dateSplited[0]}.${dateSplited[1]}.${dateSplited[2]}.`)
@@ -683,7 +672,7 @@ const NotificationDetailsToReservationService = ({
         }else{
             const dayNum = date.getDay()
             const dayName = daysObj[dayNum]
-
+            //console.log(dayNum)
             setSmallDateText(dayName)
         }
 
@@ -710,10 +699,13 @@ const NotificationDetailsToReservationService = ({
 
     return (
         <Animated.View entering={FadeInDown} className="w-full mt-10 p-4 rounded-3xl border-textSecondary" style={{borderWidth: 0.5}}>
+            <View className="flex flex-row justify-end items-center mb-1">
+                <Text className="text-xs text-textSecondary">{timeAgo}</Text>
+            </View>
             <View className="w-full flex flex-row justify-between">
                 {reservationDetails?.sender && reservationDetails?.sender?.hasProfilePhoto && 
                     <Image
-                        className={`w-20 h-20 rounded-full mr-3`}
+                        className={`w-16 h-16 rounded-full mr-3`}
                         // style={{borderWidth: 0.5}}
                         source={`http://192.168.1.5:5000/photos/profile-photo${reservationDetails?.sender?._id}.png`}
                         placeholder={{ blurhash }}
@@ -721,11 +713,23 @@ const NotificationDetailsToReservationService = ({
                         transition={1000}
                     />
                 }
+
+                {reservationDetails?.sender && !reservationDetails?.sender?.hasProfilePhoto && 
+                    <View className="w-16 h-16 mr-3">
+                        <CustomAvatar big text={avatarText} />
+                    </View>
+                }
                 <View className="flex flex-col justify-start items-start w-full">
                     <Text className="text-textPrimary text-lg" bold>{reservationDetails?.sender && `${reservationDetails?.sender?.first_name} ${reservationDetails?.sender?.last_name}`}</Text>
                     <Text className="text-textPrimary">Želi da rezerviše termin?</Text>
                 </View>
             </View>
+
+            {reservationDetails?.senderText && 
+                <View className="bg-bgPrimary p-3 mt-5 rounded-2xl">
+                    <Text className="text-textPrimary" semi>{reservationDetails?.senderText}</Text>
+                </View>
+            }
 
             <View className="w-full border-2 border-dashed my-5"></View>
 
