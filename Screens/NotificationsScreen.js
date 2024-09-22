@@ -9,13 +9,21 @@ import Text from '../Components/CustomComponents/CustomText'
 
 import { useSelector } from 'react-redux'
 import Animated, { FadeInDown } from 'react-native-reanimated'
-import { useCheckIfToJoinSalonRequestExistsMutation, useGetNotificationsMutation, useGetRequestMutation, useMarkSeenNotificationAllMutation, useMarkSeenNotificationMutation, useUpdateRequestMutation } from '../redux/apiCore'
+import { useCheckIfToJoinSalonRequestExistsMutation, useGetNotificationsMutation, useGetRequestMutation, useGetReservationMutation, useMarkSeenNotificationAllMutation, useMarkSeenNotificationMutation, useUpdateRequestMutation } from '../redux/apiCore'
 import LootieLoader from '../Components/LootieAnimations/Loader'
 import CustomButton from '../Components/CustomComponents/CustomButton'
 import ConfirmActionModal from '../Components/ConfirmActionModal'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 
-
+const daysObj = {
+    1: 'Ponedeljak',
+    2: 'Utorak',
+    3: 'Sreda',
+    4: 'Četvrtak',
+    5: 'Petak',
+    6: 'Subota',
+    0: 'Nedelja'
+}
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
@@ -44,18 +52,34 @@ const NotifcationCard = ({item, setNotificationDetails}) => {
         }
     }
 
-    if(!item?.requestId){
-        if(item?.type === 'toJoinSalon'){
-            smallTitle = 'Zahtev odbijen'
-            // showDot = true
-            // dotColorClass = 'bg-red-700'
-            //textColorClass = 'text-red-700'
+    if(item?.reservationId){
+        let reservationFromNotification = item?.reservationId
+
+        if(reservationFromNotification.reservationType === 'toReservationService'){
+            if(reservationFromNotification.status === 'pending'){
+                smallTitle = 'Rezervacija termina'
+            }
+
+            if(reservationFromNotification.status === 'accepted'){
+                smallTitle = 'Rezervacija prihvaćena'
+            }
         }
     }
 
 
+    //CHECK THIS LATERRRRRR IMPORTANT
+    // if(!item?.requestId){
+    //     if(item?.type === 'toJoinSalon'){
+    //         smallTitle = 'Zahtev odbijen'
+    //         // showDot = true
+    //         // dotColorClass = 'bg-red-700'
+    //         //textColorClass = 'text-red-700'
+    //     }
+    // }
+
+
     const handleOnPress = () => {
-        if(!item?.requestId) return
+        if(!item?.requestId && !item?.reservationId) return
 
         setNotificationDetails(item)
     }
@@ -79,7 +103,7 @@ const NotifcationCard = ({item, setNotificationDetails}) => {
                     <Text className={`text-md ${item?.seen ? 'text-textMid' : 'text-textPrimary'}`} bold>{bigTitle}</Text>
                 </View>
 
-                {item?.requestId &&
+                {(item?.requestId || item?.reservationId ) &&
                     <View className="ml-5">
                         <MaterialIcons name="arrow-forward-ios" size={30} color={item?.seen ? '#6D6D60' : '#000'} />
                     </View>
@@ -259,6 +283,24 @@ const NotificationsScreen = ({navigation}) => {
                 </View>
 
                 }
+
+
+                {/* reservations */}
+                {
+                    notificationDetails?.reservationId && 
+                    notificationDetails?.reservationId?.reservationType === 'toReservationService' && 
+                        <View className="w-full">
+                            {notificationDetails?.reservationId.status === 'pending' &&
+                                <NotificationDetailsToReservationService
+                                    notificationDetails={notificationDetails}
+                                    confirmationType={confirmationType}
+                                    setConfirmationType={setConfirmationType}
+                                    setIsConfirmModalVisible={setIsConfirmModalVisible}
+                                    isSuccess={isSuccess}
+                                />
+                            }
+                        </View>
+                }
             </View>
           }
 
@@ -427,7 +469,7 @@ const NotificationDetailsToJoinSalonPending = ({
                 <Image
                     className={`w-20 h-20 rounded-full mr-3`}
                     // style={{borderWidth: 0.5}}
-                    source={`http://192.168.1.29:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
+                    source={`http://192.168.1.5:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
                     placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}
@@ -440,7 +482,7 @@ const NotificationDetailsToJoinSalonPending = ({
                                     <Image
                                         key={index}
                                         className={`w-8 h-8 rounded-full ${index > 0 && '-ml-2'} border-textPrimary`}
-                                        source={`http://192.168.1.29:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
+                                        source={`http://192.168.1.5:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
@@ -533,7 +575,7 @@ const NotificationDetailsToJoinSalonRejected = ({notificationDetails}) => {
                 <Image
                     className={`w-20 h-20 rounded-full -mr-2`}
                     // style={{borderWidth: 0.5}}
-                    source={`http://192.168.1.29:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
+                    source={`http://192.168.1.5:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
                     placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}
@@ -541,7 +583,7 @@ const NotificationDetailsToJoinSalonRejected = ({notificationDetails}) => {
                 <Image
                     className={`w-20 h-20 rounded-full`}
                     // style={{borderWidth: 0.5}}
-                    source={`http://192.168.1.29:5000/photos/profile-photo${requestDetails?.recipient}.png`}
+                    source={`http://192.168.1.5:5000/photos/profile-photo${requestDetails?.recipient}.png`}
                     placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}
@@ -574,7 +616,7 @@ const NotificationDetailsToJoinSalonAccepted = ({notificationDetails}) => {
                 <Image
                     className={`w-24 h-24 rounded-full`}
                     // style={{borderWidth: 0.5}}
-                    source={`http://192.168.1.29:5000/photos/profile-photo${requestDetails?.recipient}.png`}
+                    source={`http://192.168.1.5:5000/photos/profile-photo${requestDetails?.recipient}.png`}
                     placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}
@@ -594,6 +636,168 @@ const NotificationDetailsToJoinSalonAccepted = ({notificationDetails}) => {
                     }}
                 />
             </View>
+        </Animated.View>
+    )
+}
+
+
+
+//RESERVATIONS
+
+//TO JOIN SALON PENDING
+const NotificationDetailsToReservationService = ({
+    notificationDetails, 
+    confirmationType, 
+    setConfirmationType, 
+    setIsConfirmModalVisible,
+    isSuccess
+}) => {
+    const {reservationId} = notificationDetails
+    const [reservationDetails, setReservationDetails] = useState(reservationId)
+    const [getReservation] = useGetReservationMutation()
+    const navigation = useNavigation()
+    const [reservationAccepted, setReservationAccepted] = useState(false)
+    const [dateText, setDateText] = useState('')
+    const [smallDateText, setSmallDateText] = useState('')
+
+    useEffect(()=>{
+        const dateSplited = reservationDetails?.date.split('-')
+        setDateText(`${dateSplited[0]}.${dateSplited[1]}.${dateSplited[2]}.`)
+
+        const date = new Date(reservationDetails?.formattedDate);
+        const today = new Date();
+
+        // Create a new date for tomorrow by adding 1 day to today
+        const tomorrow = new Date();
+        tomorrow.setDate(today.getDate() + 1);
+
+        // Check if the date is today
+        if (today.getFullYear() === date.getFullYear() &&
+            today.getMonth() === date.getMonth() &&
+            today.getDate() === date.getDate()) {
+            setSmallDateText('Danas');
+        }else if (tomorrow.getFullYear() === date.getFullYear() &&
+            tomorrow.getMonth() === date.getMonth() &&
+            tomorrow.getDate() === date.getDate()) {
+            setSmallDateText('Sutra');
+        }else{
+            const dayNum = date.getDay()
+            const dayName = daysObj[dayNum]
+
+            setSmallDateText(dayName)
+        }
+
+    }, [reservationDetails])
+
+    useEffect(()=>{
+        if(confirmationType != 'accept' && !isSuccess) return
+
+        (async () => {
+            try{
+                const {error, data} = await getReservation({reservationId: reservationDetails?._id})
+
+                if(data && data.success){
+                    setReservationDetails(data?.result)
+                    setReservationAccepted(true)
+                }
+            }catch(error){
+                console.log(error)
+            }
+        })()
+
+        
+    }, [confirmationType, isSuccess])
+
+    return (
+        <Animated.View entering={FadeInDown} className="w-full mt-10 p-4 rounded-3xl border-textSecondary" style={{borderWidth: 0.5}}>
+            <View className="w-full flex flex-row justify-between">
+                {reservationDetails?.sender && reservationDetails?.sender?.hasProfilePhoto && 
+                    <Image
+                        className={`w-20 h-20 rounded-full mr-3`}
+                        // style={{borderWidth: 0.5}}
+                        source={`http://192.168.1.5:5000/photos/profile-photo${reservationDetails?.sender?._id}.png`}
+                        placeholder={{ blurhash }}
+                        contentFit="cover"
+                        transition={1000}
+                    />
+                }
+                <View className="flex flex-col justify-start items-start w-full">
+                    <Text className="text-textPrimary text-lg" bold>{reservationDetails?.sender && `${reservationDetails?.sender?.first_name} ${reservationDetails?.sender?.last_name}`}</Text>
+                    <Text className="text-textPrimary">Želi da rezerviše termin?</Text>
+                </View>
+            </View>
+
+            <View className="w-full border-2 border-dashed my-5"></View>
+
+            <View className="flex flex-col justify-start items-start">
+                <Text className="text-textPrimary" bold>{reservationDetails?.service?.name}</Text>
+                <Text className="text-textPrimary">{reservationDetails?.service?.description}</Text>
+                <View className="bg-textPrimary pt-1 pb-2 px-2 rounded-xl mt-2 flex flex-row justify-center items-center">
+                    <Text className="text-bgSecondary mt-1" bold>{reservationDetails?.service?.price} RSD</Text>
+                </View>
+            </View>
+            
+            <View className="bg-textSecondary w-full my-4" style={{height: 0.5}}></View>
+
+            <View className="flex flex-col justify-start items-start">
+                <Text className="text-textPrimary" bold>Datum: <Text semi>{dateText}<Text className="text-textMid"> ({smallDateText})</Text></Text></Text>
+                <Text className="text-textPrimary" bold>Vreme: <Text semi>{reservationDetails?.time}h</Text></Text>
+            </View>
+
+            {/* {!requestAccepted && 
+                <View className="">
+                    <Text className="mt-8 text-textPrimary text-center" bold>{notificationDetails?.message}</Text>
+                    <Text className="text-textMid text-center">Prihvati poziv, pridruži se salonu i upravljaj svojim terminima</Text>
+                </View>
+            } */}
+
+            {/* {requestAccepted && 
+                <View className="">
+                    <Text className="mt-8 text-textPrimary text-center" bold>Novi član se pridružio!</Text>
+                    <Text className="text-textMid text-center">Na početnoj stranici postavi svoje slobodne termine i prati svoje rezervacije</Text>
+                </View>
+            } */}
+            
+            {/* {requestAccepted && 
+                <View className="flex flex-row justify-center items-center mt-10">
+                    <CustomButton 
+                        text={'Nazad na početnu'}
+                        variant={'dark'}
+                        onPress={() => {
+                            navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
+                        }}
+                    />
+                </View>
+            } */}
+
+            {!reservationAccepted &&
+                <View className="flex flex-row justify-between items-center mt-10">
+                    <View className="w-[48%]">
+                        <CustomButton 
+                            text={'Odbij'}
+                            variant={'transparent'}
+                            isIcon
+                            rejectIcon
+                            onPress={() => {
+                                setConfirmationType('reject')
+                                setIsConfirmModalVisible(true)
+                            }}
+                        />
+                    </View>
+                    <View className="w-[48%]">
+                        <CustomButton 
+                            text={'Prihvati'}
+                            isIcon
+                            variant={'dark'}
+                            acceptIcon
+                            onPress={() => {
+                                setConfirmationType('accept')
+                                setIsConfirmModalVisible(true)
+                            }}
+                        />
+                    </View>
+                </View>
+            }
         </Animated.View>
     )
 }

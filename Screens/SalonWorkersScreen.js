@@ -53,7 +53,7 @@ const SalonWorkersScreen = ({navigation}) => {
     
             // Only update the state if the sorted workers array has changed
             if (JSON.stringify(sortedWorkersArray) !== JSON.stringify(sortedWorkers)) {
-                setSortedWorkers(sortedWorkersArray);
+                setSortedWorkers(sortedWorkersArray || []);
             }
         }
     }catch(error){
@@ -108,30 +108,33 @@ const SalonWorkersScreen = ({navigation}) => {
                 </TouchableOpacity>
             </View>
             <View className="bg-textSecondary mt-8 w-full mb-5" style={{height: 0.5}}></View>
-            {!isLoading && <View className="w-full">
-            {sortedWorkers.length === 0 && <View>
+            {!isLoading && 
+            <View className="w-full">
+            {sortedWorkers.length === 0 && 
+            <View>
                 <Text className="text-center text-textPrimary" bold>Dodaj članove salona</Text>
                 <Text className="text-center text-textMid">Dodeli članovima salona usluge kako bi mogli da primaju rezervacije</Text>
                 <Text className="text-center text-textMid">Član salona će sam kreirati svoje slobodne termine</Text>
             </View>}
 
-            <View className="flex-1 w-full mb-3 mt-10">
-                {sortedWorkers.length === 0 && 
+            <View className="w-full mb-3 mt-10">
+                {sortedWorkers && sortedWorkers.length === 0 && 
                     <View className="flex flex-col justify-center items-center mt-10">
-                        <Text className="text-lg mb-3" bold>Dodaj novog člana</Text>
+                        <Text className="text-lg mb-3 text-textPrimary" bold>Dodaj novog člana</Text>
                         <TouchableOpacity onPress={beginAddWorker} className="p-4 bg-textPrimary rounded-full">
-                            <Entypo name="plus" size={64} color="white" />
+                        <Entypo name="plus" size={64} color="white" />
                         </TouchableOpacity>
                     </View>
                 }
                 
-                {sortedWorkers.length === 0  && 
+                
+                {sortedWorkers && sortedWorkers.length === 0  && 
                     <View className="px-12">
                         <View className="bg-textSecondary mt-5 w-full" style={{height: 0.5}}></View>
                     </View>
                 }
 
-                {sortedWorkers.length === 0 &&  
+                {sortedWorkers && sortedWorkers.length === 0 &&  
                     <View className="flex flex-col justify-center items-center mt-5">
                         <Text className="text-center text-textPrimary" bold>Radiš u svom salonu?</Text>
                         <Text className="text-center text-textMid" bold>Dodaj sebe kao člana</Text>
@@ -140,7 +143,7 @@ const SalonWorkersScreen = ({navigation}) => {
                             {userData.haveWorkerAccount &&
                                 <Image
                                     className="w-20 h-20 rounded-full border-2 border-appColorDark"
-                                    source={`http://192.168.1.29:5000/photos/profile-photo${userData?._id}.png`}
+                                    source={`http://192.168.1.5:5000/photos/profile-photo${userData?._id}.png`}
                                     placeholder={{ blurhash }}
                                     contentFit="cover"
                                     transition={1000}
@@ -176,7 +179,7 @@ const SalonWorkersScreen = ({navigation}) => {
                                     <View className="flex flex-row justify-between items-center pb-2">
                                         <Image
                                             className="w-16 h-16 rounded-full"
-                                            source={`http://192.168.1.29:5000/photos/profile-photo${worker?._id}.png`}
+                                            source={`http://192.168.1.5:5000/photos/profile-photo${worker?._id}.png`}
                                             placeholder={{ blurhash }}
                                             contentFit="cover"
                                             transition={1000}

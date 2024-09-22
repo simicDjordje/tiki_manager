@@ -102,7 +102,7 @@ const generalSlice = createSlice({
         state.notifications.unseen = responseData.filter(i => !i.seen)
         state.notifications.all = responseData
         
-        //console.log('STATE NOTIFICATIONS: ', state.notifications)
+        console.log('STATE NOTIFICATIONS: ', state.notifications.unseen)
       }
     )
 
