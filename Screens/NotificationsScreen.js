@@ -8,7 +8,7 @@ import Entypo from '@expo/vector-icons/Entypo'
 import Text from '../Components/CustomComponents/CustomText'
 import { useSelector } from 'react-redux'
 import Animated, { FadeInDown } from 'react-native-reanimated'
-import { useCheckIfToJoinSalonRequestExistsMutation, useGetNotificationsMutation, useGetRequestMutation, useGetReservationMutation, useMarkSeenNotificationAllMutation, useMarkSeenNotificationMutation, useUpdateRequestMutation } from '../redux/apiCore'
+import { useAcceptReservationMutation, useCheckIfToJoinSalonRequestExistsMutation, useGetNotificationsMutation, useGetRequestMutation, useGetReservationMutation, useMarkSeenNotificationAllMutation, useMarkSeenNotificationMutation, useRejectReservationMutation, useUpdateRequestMutation } from '../redux/apiCore'
 import LootieLoader from '../Components/LootieAnimations/Loader'
 import CustomButton from '../Components/CustomComponents/CustomButton'
 import ConfirmActionModal from '../Components/ConfirmActionModal'
@@ -44,7 +44,9 @@ const NotifcationCard = ({item, setNotificationDetails, timeAgo}) => {
     // let dotColorClass = 'bg-black'
     let textColorClass = 'text-textMid'
     let avatarText = ''
+    let imageBorderClass = ''
 
+    //request
     if(item?.requestId){
         let requestFromNotification = item?.requestId
 
@@ -54,13 +56,19 @@ const NotifcationCard = ({item, setNotificationDetails, timeAgo}) => {
             }
 
             if(requestFromNotification.status === 'accepted'){
-                smallTitle = 'Zahtev za prihvaćen'
-                // showDot = true
-                // dotColorClass = 'bg-appColorDark'
-                //textColorClass = 'text-appColorDark'
+                smallTitle = 'Zahtev je prihvaćen'
+                textColorClass = 'text-green-700'
             }
         }
     }
+
+    //It means that notification was related to request which is rejected and deleted so there is no further actions, just to inform
+    if(item?.type === 'toJoinSalon' && !item.requestId){
+        smallTitle = 'Zahtev je odbijen'
+        textColorClass = 'text-red-700'
+    }
+
+    //end request
 
     if(item?.reservationId){
         let reservationFromNotification = item?.reservationId
@@ -76,7 +84,11 @@ const NotifcationCard = ({item, setNotificationDetails, timeAgo}) => {
 
             if(reservationFromNotification.status === 'accepted'){
                 smallTitle = 'Rezervacija prihvaćena'
+                textColorClass = 'text-appColor'
+                imageBorderClass = 'border-2 border-appColor'
             }
+
+            
         }
     }
 
@@ -119,8 +131,8 @@ const NotifcationCard = ({item, setNotificationDetails, timeAgo}) => {
 
                 {item?.reservationId && item?.reservationId?.sender && item?.reservationId?.sender?.hasProfilePhoto &&
                     <Image
-                        className={`w-10 h-10 rounded-full`}
-                        source={`http://192.168.1.5:5000/photos/profile-photo${item?.reservationId?.sender?._id}.png`}
+                        className={`w-10 h-10 rounded-full ${imageBorderClass}`}
+                        source={`http://192.168.0.72:5000/photos/profile-photo${item?.reservationId?.sender?._id}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}
@@ -160,8 +172,44 @@ const NotificationsScreen = ({navigation}) => {
   const [isSuccess, setIsSuccess] = useState(false)
   const [isError, setIsError] = useState(false)
   const [markSeenNotificationAll] = useMarkSeenNotificationAllMutation()
+  const [rejectReservation, {isLoading: isRejectingReservation}] = useRejectReservationMutation()
+  const [acceptReservation, {isLoading: isAcceptingReservation}] = useAcceptReservationMutation()
+  const [confirmModalTitle, setConfirmModalTitle] = useState('')
+  const [confirmModalText, setConfirmModalText] = useState('')
 
-  const handleConfirm = async () => {
+  useEffect(()=>{
+    let confirmTitle = ''
+    let confirmText = ''
+
+    if(notificationDetails?.requestid){
+        if(confirmationType === 'accept'){
+            confirmTitle = 'Prihvatanje poziva'
+            confirmText = 'Da li sigurno želiš da prihvatiš poziv?'
+        }else{
+            confirmTitle = 'Odbijanje poziva'
+            confirmText = 'Da li sigurno želiš da odbiješ poziv?'
+        }
+    }
+
+
+    if(notificationDetails?.reservationId){
+        if(confirmationType === 'accept'){
+            confirmTitle = 'Prihvataš rezervaciju?'
+            confirmText = ''
+        }else{
+            confirmTitle = 'Odbijaš rezervaciju?'
+            confirmText = ''
+        }
+    }
+
+    setConfirmModalTitle(confirmTitle)
+    setConfirmModalText(confirmText)
+
+  }, [notificationDetails, confirmationType])
+
+  //Handle Request
+
+  const handleRequest = async () => {
     try{
         const {error, data} = await updateRequest({
             requestId: notificationDetails?.requestId?._id,
@@ -196,6 +244,80 @@ const NotificationsScreen = ({navigation}) => {
         }
     }catch(error){
         console.log(error)
+    }
+  }
+
+  //Reject reservation
+  const handleRejectReservation = async () => {
+    try{
+
+        const {error, data} = await rejectReservation({
+            reservationId: notificationDetails?.reservationId?._id,
+        })
+
+        if(error){
+            setIsError(true)
+            return
+        }
+        
+        if(data && data.success){
+            if(data.message === 'Reservation rejected successfully'){
+                setIsSuccess(true)
+                setIsError(false)
+                setTimeout(()=>{
+                    setIsConfirmModalVisible(false)
+                    setNotificationDetails(null)
+                    getNotifications()
+                }, 2700)
+            }
+        }
+    }catch(error){
+        console.log(error)
+    }
+  }
+
+  //Accept Reservation
+  const handleAcceptReservation = async () => {
+    try{
+
+        const {error, data} = await acceptReservation({
+            reservationId: notificationDetails?.reservationId?._id,
+        })
+
+        if(error){
+            setIsError(true)
+            return
+        }
+        
+        if(data && data.success){
+            if(data.message === 'Reservation accepted successfully'){
+                setIsSuccess(true)
+                setIsError(false)
+                setTimeout(()=>{
+                    setIsConfirmModalVisible(false)
+                    setNotificationDetails(null)
+                    getNotifications()
+                }, 2700)
+            }
+        }
+    }catch(error){
+        console.log(error)
+    }
+  }
+
+  const handleConfirm = async () => {
+    if(notificationDetails?.requestId){
+        await handleRequest()
+    }
+
+    if(notificationDetails?.reservationId){
+        if(confirmationType === 'reject'){
+            await handleRejectReservation()
+        }
+
+        if(confirmationType === 'accept'){
+            await handleAcceptReservation()
+        }
     }
   }
 
@@ -330,7 +452,7 @@ const NotificationsScreen = ({navigation}) => {
                     notificationDetails?.reservationId && 
                     notificationDetails?.reservationId?.reservationType === 'toReservationService' && 
                         <View className="w-full">
-                            {notificationDetails?.reservationId.status === 'pending' &&
+                            
                                 <NotificationDetailsToReservationService
                                     notificationDetails={notificationDetails}
                                     confirmationType={confirmationType}
@@ -338,7 +460,7 @@ const NotificationsScreen = ({navigation}) => {
                                     setIsConfirmModalVisible={setIsConfirmModalVisible}
                                     isSuccess={isSuccess}
                                 />
-                            }
+                            
                         </View>
                 }
             </View>
@@ -398,9 +520,9 @@ const NotificationsScreen = ({navigation}) => {
             isModalVisible={isConfirmModalVisible}
             setIsModalVisible={setIsConfirmModalVisible}
             handleConfirm={handleConfirm}
-            title={confirmationType === 'accept' ? 'Prihvatanje poziva' : 'Odbijanje poziva'}
-            question={confirmationType === 'accept' ? 'Da li sigurno želiš da prihvatiš poziv?' : 'Da li sigurno želiš da odbiješ poziv?'}
-            isLoading={isUpdateRequestLoading}
+            title={confirmModalTitle}
+            question={confirmModalText}
+            isLoading={isUpdateRequestLoading || isRejectingReservation || isAcceptingReservation}
             isSuccess={isSuccess}
             isError={isError}
         />
@@ -451,7 +573,7 @@ const NotificationDetailsToJoinSalonPending = ({
                 <Image
                     className={`w-20 h-20 rounded-full mr-3`}
                     // style={{borderWidth: 0.5}}
-                    source={`http://192.168.1.5:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
+                    source={`http://192.168.0.72:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
                     placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}
@@ -464,7 +586,7 @@ const NotificationDetailsToJoinSalonPending = ({
                                     <Image
                                         key={index}
                                         className={`w-8 h-8 rounded-full ${index > 0 && '-ml-2'} border-textPrimary`}
-                                        source={`http://192.168.1.5:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
+                                        source={`http://192.168.0.72:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
@@ -557,7 +679,7 @@ const NotificationDetailsToJoinSalonRejected = ({notificationDetails}) => {
                 <Image
                     className={`w-20 h-20 rounded-full -mr-2`}
                     // style={{borderWidth: 0.5}}
-                    source={`http://192.168.1.5:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
+                    source={`http://192.168.0.72:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
                     placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}
@@ -565,7 +687,7 @@ const NotificationDetailsToJoinSalonRejected = ({notificationDetails}) => {
                 <Image
                     className={`w-20 h-20 rounded-full`}
                     // style={{borderWidth: 0.5}}
-                    source={`http://192.168.1.5:5000/photos/profile-photo${requestDetails?.recipient}.png`}
+                    source={`http://192.168.0.72:5000/photos/profile-photo${requestDetails?.recipient}.png`}
                     placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}
@@ -598,7 +720,7 @@ const NotificationDetailsToJoinSalonAccepted = ({notificationDetails}) => {
                 <Image
                     className={`w-24 h-24 rounded-full`}
                     // style={{borderWidth: 0.5}}
-                    source={`http://192.168.1.5:5000/photos/profile-photo${requestDetails?.recipient}.png`}
+                    source={`http://192.168.0.72:5000/photos/profile-photo${requestDetails?.recipient}.png`}
                     placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}
@@ -638,7 +760,7 @@ const NotificationDetailsToReservationService = ({
     const [reservationDetails, setReservationDetails] = useState(reservationId)
     const [getReservation] = useGetReservationMutation()
     const navigation = useNavigation()
-    const [reservationAccepted, setReservationAccepted] = useState(false)
+    const [reservationAccepted, setReservationAccepted] = useState(reservationId?.status === 'accepted' ? true : false)
     const [dateText, setDateText] = useState('')
     const [smallDateText, setSmallDateText] = useState('')
 
@@ -679,20 +801,21 @@ const NotificationDetailsToReservationService = ({
     }, [reservationDetails])
 
     useEffect(()=>{
-        if(confirmationType != 'accept' && !isSuccess) return
 
-        (async () => {
-            try{
-                const {error, data} = await getReservation({reservationId: reservationDetails?._id})
-
-                if(data && data.success){
-                    setReservationDetails(data?.result)
-                    setReservationAccepted(true)
+        if(confirmationType === 'accept' && isSuccess){
+            (async () => {
+                try{
+                    const {error, data} = await getReservation({reservationId: reservationDetails?._id})
+    
+                    if(data && data.success){
+                        setReservationDetails(data?.result)
+                        setReservationAccepted(true)
+                    }
+                }catch(error){
+                    console.log(error)
                 }
-            }catch(error){
-                console.log(error)
-            }
-        })()
+            })()
+        }
 
         
     }, [confirmationType, isSuccess])
@@ -707,7 +830,7 @@ const NotificationDetailsToReservationService = ({
                     <Image
                         className={`w-16 h-16 rounded-full mr-3`}
                         // style={{borderWidth: 0.5}}
-                        source={`http://192.168.1.5:5000/photos/profile-photo${reservationDetails?.sender?._id}.png`}
+                        source={`http://192.168.0.72:5000/photos/profile-photo${reservationDetails?.sender?._id}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}
@@ -755,27 +878,29 @@ const NotificationDetailsToReservationService = ({
                 </View>
             } */}
 
-            {/* {requestAccepted && 
-                <View className="">
-                    <Text className="mt-8 text-textPrimary text-center" bold>Novi član se pridružio!</Text>
-                    <Text className="text-textMid text-center">Na početnoj stranici postavi svoje slobodne termine i prati svoje rezervacije</Text>
+            <View className="h-6 mt-5 flex flex-row justify-center items-center">
+            {reservationAccepted && 
+                <View className="w-full">
+                    <View className="bg-textSecondary w-full my-4" style={{height: 0.5}}></View>
+                    <Text className="text-textPrimary text-center" bold>Rezervacija je prihvaćena</Text>
                 </View>
-            } */}
+            }
+            </View>
             
-            {/* {requestAccepted && 
-                <View className="flex flex-row justify-center items-center mt-10">
+            {reservationAccepted && 
+                <View className="flex flex-row justify-center items-center mt-8">
                     <CustomButton 
-                        text={'Nazad na početnu'}
+                        text={'Pogledaj rezervacije'}
                         variant={'dark'}
                         onPress={() => {
-                            navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
+                            navigation.navigate('MainTabScreens', {screen: 'ReservationsScreen'})
                         }}
                     />
                 </View>
-            } */}
+            }
 
             {!reservationAccepted &&
-                <View className="flex flex-row justify-between items-center mt-10">
+                <View className="flex flex-row justify-between items-center mt-8">
                     <View className="w-[48%]">
                         <CustomButton 
                             text={'Odbij'}

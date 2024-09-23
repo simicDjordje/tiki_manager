@@ -12,6 +12,7 @@ import AntDesign from '@expo/vector-icons/AntDesign'
 import { useGetMyUserDataMutation, useUpdateUserMutation } from '../redux/apiCore'
 import Animated, { BounceInRight, FadeInDown, FadeInLeft, FadeInUp } from 'react-native-reanimated'
 import { useSelector } from 'react-redux'
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 // new Date(2024, 7, 23),
 
@@ -95,7 +96,7 @@ const WorkerScreen = ({navigation}) => {
                     updatedMarkedDates.push(slotDate)
                 }
             }
-
+            
             setMarkedDates(updatedMarkedDates)
         }
     }, []))
@@ -286,14 +287,21 @@ const WorkerScreen = ({navigation}) => {
                             const indexPlusOne = index + 1
                             const lastItem = timeSlots.length == indexPlusOne
                             let isSelected = false
-
+                            let hasReservation = false
                             const dateStringKey = `${selectedStartDate.getDate()}-${selectedStartDate.getMonth()}-${selectedStartDate.getFullYear()}`
                             const foundArray = selectedTimeSlots[dateStringKey]
 
                             if(foundArray){
                                 const timeSlotIndex = foundArray.findIndex(slot => slot.value === timeSlot.value)
 
-                                if (timeSlotIndex > -1) isSelected = true
+                                if (timeSlotIndex > -1){
+                                    isSelected = true
+
+                                    if(foundArray[timeSlotIndex]?.isReserved){
+                                        hasReservation = true
+                                    }
+                                }
+                                
                             }
 
                             const now = new Date()
@@ -301,16 +309,17 @@ const WorkerScreen = ({navigation}) => {
 
                             if(timeSlot.value < currentSeconds + 2000 && isTodaySelected) return null
 
+                            
                             return (
                                 <TouchableOpacity 
                                     onPress={() => {handleSelectTimeSlot(timeSlot)}}
                                     key={index} 
                                     className={`w-24 h-14 ${isSelected ? 'bg-appColor' : 'bg-bgPrimary'} ml-2 rounded-xl flex flex-row justify-center items-center ${lastItem && 'mr-20'} relative`}>
-                                    {/* {isSelected && 
-                                        <View className="absolute z-10 rounded-full bg-white top-0 right-0">
-                                            <AntDesign name="checkcircle" size={18} color="#00505b" />
+                                    {hasReservation && 
+                                        <View className="absolute z-10 rounded-full top-1 right-1">
+                                            <FontAwesome6 name="clock" size={16} color="white" />
                                         </View>
-                                    } */}
+                                    }
                                     <Text semi className={`${isSelected ? 'text-white' : 'text-textPrimary'}`}>{timeSlot.label}</Text>
                                 </TouchableOpacity>
                             )
