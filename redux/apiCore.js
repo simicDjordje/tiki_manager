@@ -279,6 +279,15 @@ export const apiCore = createApi({
 				}
 			}
 		}),
+		checkPendingReservationsByDateTime: builder.mutation({
+			query: (data) => {
+				return {
+					url: `/reservations/check-all-pending`,
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
 		//end reservations
 	})
 })
@@ -310,5 +319,6 @@ export const {
 	useGetReservationMutation,
 	useRejectReservationMutation,
 	useAcceptReservationMutation,
-	useCheckReservationMutation
+	useCheckReservationMutation,
+	useCheckPendingReservationsByDateTimeMutation
 } = apiCore;

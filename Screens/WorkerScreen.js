@@ -9,11 +9,13 @@ import { timeSlotsConstants } from '../constants'
 import CustomButton from '../Components/CustomComponents/CustomButton'
 import { useFocusEffect } from '@react-navigation/native'
 import AntDesign from '@expo/vector-icons/AntDesign'
-import { useCheckReservationMutation, useGetMyUserDataMutation, useRejectReservationMutation, useUpdateUserMutation } from '../redux/apiCore'
+import { useCheckPendingReservationsByDateTimeMutation, useCheckReservationMutation, useGetMyUserDataMutation, useRejectReservationMutation, useUpdateUserMutation } from '../redux/apiCore'
 import Animated, { BounceInRight, FadeInDown, FadeInLeft, FadeInUp } from 'react-native-reanimated'
 import { useSelector } from 'react-redux'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import ReservationExistsModal from '../Components/ReservationExistsModal'
+import LootieLoader from '../Components/LootieAnimations/Loader'
+import TimeSlotHasPendingReservationsModal from '../Components/TimeSlotHasPendingReservationsModal'
 
 // new Date(2024, 7, 23),
 
@@ -36,12 +38,16 @@ const WorkerScreen = ({navigation}) => {
     const [reservationRejected, setReservationRejected] = useState(false)
     const [rejectionError, setRejectionError] = useState(false)
     const [customRejectionLoading, setCustomRejectionLoading] = useState(false)
+    const [isTimeSlotHasPendingReservationsVisible, setIsTimeSlotHasPendingReservationsVisible] = useState(false)
+
+    const [existingPendingReservations, setExistingPendingReservations] = useState([])
 
     //api
     const [updateUser, {isLoading: isUpdateUserLoading}] = useUpdateUserMutation()
     const [getMyUserData] = useGetMyUserDataMutation()
     const [checkReservation, {isLoading: isCheckReservationLoading}] = useCheckReservationMutation()
     const [rejectReservation, {isLoading: isRejectingReservation}] = useRejectReservationMutation()
+    const [checkPendingReservationsByDateTime, {isLoading: isCheckPendingReservations}] = useCheckPendingReservationsByDateTimeMutation()
 
     const handleConfirm = async () => {
         setCustomRejectionLoading(true)
@@ -301,6 +307,30 @@ const WorkerScreen = ({navigation}) => {
                     return
                 }
 
+
+                if(foundArray[timeSlotIndex].numberOfPendingReservations > 0){
+                    setIsTimeSlotHasPendingReservationsVisible(true)
+
+                    setTimeout(async ()=>{
+                        const {error, data} = await checkPendingReservationsByDateTime({
+                            date: dateStringKey,
+                            time: foundArray[timeSlotIndex].label
+                        })
+    
+                        if(error){
+                            setIsTimeSlotHasPendingReservationsVisible(false)
+                        }
+    
+                        if(data && data.success){
+                            console.log('existing pending')
+                            console.log(data?.result)
+                            setExistingPendingReservations(data?.result)
+                        }
+                    }, 500)
+
+                    return
+                }
+
                 foundArray.splice(timeSlotIndex, 1)
 
                 if(foundArray.length === 0){
@@ -424,7 +454,9 @@ const WorkerScreen = ({navigation}) => {
                             const indexPlusOne = index + 1
                             const lastItem = timeSlots.length == indexPlusOne
                             let isSelected = false
-                            let hasReservation = false
+                            let hasAcceptedReservation = false
+                            let hasPendingReservations = false
+                            let numberOfPendingReservations = 0
                             const dateStringKey = `${selectedStartDate.getDate()}-${selectedStartDate.getMonth()}-${selectedStartDate.getFullYear()}`
                             const foundArray = selectedTimeSlots[dateStringKey]
 
@@ -435,7 +467,12 @@ const WorkerScreen = ({navigation}) => {
                                     isSelected = true
 
                                     if(foundArray[timeSlotIndex]?.isReserved){
-                                        hasReservation = true
+                                        hasAcceptedReservation = true
+                                    }
+                                    
+                                    if(foundArray[timeSlotIndex]?.numberOfPendingReservations > 0){
+                                        hasPendingReservations = true
+                                        numberOfPendingReservations = foundArray[timeSlotIndex]?.numberOfPendingReservations
                                     }
                                 }
                                 
@@ -452,12 +489,20 @@ const WorkerScreen = ({navigation}) => {
                                     onPress={() => {handleSelectTimeSlot(timeSlot)}}
                                     key={index} 
                                     className={`w-24 h-14 ${isSelected ? 'bg-appColor' : 'bg-bgPrimary'} ml-2 rounded-xl flex flex-row justify-center items-center ${lastItem && 'mr-20'} relative`}>
-                                    {hasReservation && 
+                                    {hasAcceptedReservation && 
                                         <View className="absolute z-10 rounded-full top-1 right-1">
                                             <FontAwesome6 name="clock" size={16} color="white" />
                                         </View>
                                     }
+
+                                    {!hasAcceptedReservation && hasPendingReservations &&
+                                        <View className={`absolute z-10 rounded-full -top-1 -right-1 ${numberOfPendingReservations > 999 ? 'p-1' : 'w-5 h-5'} flex flex-row justify-center items-center bg-appColorDark`}>
+                                            <Text className="text-xs text-white" bold>{numberOfPendingReservations}</Text>
+                                        </View>
+                                    }
+
                                     <Text semi className={`${isSelected ? 'text-white' : 'text-textPrimary'}`}>{timeSlot.label}</Text>
+                                    {/* {true && <LootieLoader d={30} />} */}
                                 </TouchableOpacity>
                             )
                         })}
@@ -495,6 +540,14 @@ const WorkerScreen = ({navigation}) => {
             setIsError={setRejectionError}
             rejectionLoading={customRejectionLoading || isRejectingReservation}
         />
+
+        <TimeSlotHasPendingReservationsModal 
+            isModalVisible={isTimeSlotHasPendingReservationsVisible}
+            setIsModalVisible={setIsTimeSlotHasPendingReservationsVisible}
+            existingReservations={existingPendingReservations}
+            isLoading={isCheckPendingReservations}
+        />
+
     </SafeAreaView>
   )
 }
