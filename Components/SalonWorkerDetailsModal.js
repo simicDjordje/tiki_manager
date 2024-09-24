@@ -68,7 +68,7 @@ const SalonWorkerDetailsModal = ({isModalVisible, setIsModalVisible}) => {
                                         <View className="flex flex-row justify-center items-center">
                                             <Image
                                                 className="w-36 h-36 rounded-full border-2 border-textPrimary"
-                                                source={`http://192.168.0.72:5000/photos/profile-photo${activeWorkerDetails?._id}.png`}
+                                                source={`http://192.168.1.5:5000/photos/profile-photo${activeWorkerDetails?._id}.png`}
                                                 placeholder={{ blurhash }}
                                                 contentFit="cover"
                                                 transition={1000}

@@ -35,7 +35,7 @@ const blurhash =
         >
             <Image
                 className="w-16 h-16 rounded-full border-2 border-textPrimary"
-                source={`http://192.168.0.72:5000/photos/profile-photo${item?._id ? item?._id : item}.png`}
+                source={`http://192.168.1.5:5000/photos/profile-photo${item?._id ? item?._id : item}.png`}
                 placeholder={{ blurhash }}
                 contentFit="cover"
                 transition={1000}
@@ -276,7 +276,7 @@ const AddWorkerToSalonModal = ({isModalVisible, setIsModalVisible}) => {
                                     <View className="flex flex-row justify-center items-center mt-10">
                                         <Image
                                             className="w-36 h-36 rounded-full border-2 border-textPrimary"
-                                            source={`http://192.168.0.72:5000/photos/profile-photo${activeWorkerDetails?._id}.png`}
+                                            source={`http://192.168.1.5:5000/photos/profile-photo${activeWorkerDetails?._id}.png`}
                                             placeholder={{ blurhash }}
                                             contentFit="cover"
                                             transition={1000}

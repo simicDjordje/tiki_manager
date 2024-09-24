@@ -20,9 +20,11 @@ const ConfirmActionModal = ({isModalVisible, setIsModalVisible, handleConfirm, t
               <View className="h-full w-full bg-bgPrimary flex flex-col justify-between items-center px-4 relative rounded-3xl">
                 <View className="px-4 mt-4">
                   <View className="flex flex-row justify-end items-center">
-                    <TouchableOpacity onPress={()=>setIsModalVisible(false)} className="absolute -top-8 -right-20 p-3 bg-textPrimary rounded-full">
-                      <Ionicons name="close" size={24} color="white" />
-                    </TouchableOpacity>
+                    {(!isLoading || !isSuccess) && 
+                      <TouchableOpacity onPress={()=>setIsModalVisible(false)} className="absolute -top-8 -right-20 p-3 bg-textPrimary rounded-full">
+                        <Ionicons name="close" size={24} color="white" />
+                      </TouchableOpacity>
+                    }
                   </View>
                   <Text className="mt-4 text-center text-xl text-textPrimary" bold>{title || ''}</Text>
                   {question && 

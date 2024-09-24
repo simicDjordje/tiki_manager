@@ -12,6 +12,8 @@ const CustomButton = ({onPress, text, isLoading, isSuccess, isError, variant, ac
     let btnClassName = ''
     let btnStyle = {}
     let iconColor = 'black'
+    let textClassName = 'text-white'
+    let isWhiteSuccess = false
 
     if(!variant){
         btnClassName = 'bg-appColorDark rounded-xl h-14 flex flex-row justify-center items-center w-full'
@@ -21,6 +23,12 @@ const CustomButton = ({onPress, text, isLoading, isSuccess, isError, variant, ac
     if(variant === 'dark'){
         btnClassName = 'bg-textPrimary rounded-xl h-14 flex flex-row justify-center items-center w-full'
         iconColor = 'white'
+        isWhiteSuccess = true
+    }
+
+    if(variant === 'light'){
+        btnClassName = 'bg-bgSecondary rounded-xl h-14 flex flex-row justify-center items-center w-full'
+        textClassName = 'text-black'
     }
 
     if(variant === 'transparent'){
@@ -67,7 +75,7 @@ const CustomButton = ({onPress, text, isLoading, isSuccess, isError, variant, ac
             className={btnClassName}
             style={btnStyle}
             >
-           <LootieSuccess d={150} />
+           <LootieSuccess d={isWhiteSuccess ? 70 : 150} white={isWhiteSuccess} />
         </TouchableOpacity>
     )
 
@@ -77,7 +85,7 @@ const CustomButton = ({onPress, text, isLoading, isSuccess, isError, variant, ac
         className={btnClassName}
         style={btnStyle}
         >
-        {(!acceptIcon && !rejectIcon) && <Text className="text-white text-lg" bold>{text}</Text>}
+        {(!acceptIcon && !rejectIcon) && <Text className={`${textClassName} text-lg`} bold>{text}</Text>}
         {rejectIcon && <Ionicons name="close" size={28} color={iconColor} />}
         {acceptIcon && <FontAwesome6 name="check" size={24} color={iconColor} />}
     </TouchableOpacity>

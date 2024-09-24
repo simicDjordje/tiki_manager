@@ -1,6 +1,6 @@
 import LottieView from 'lottie-react-native'
 
-const LootieSuccess = ({d}) => {
+const LootieSuccess = ({d, white}) => {
   return (
     <LottieView
             autoPlay
@@ -11,7 +11,7 @@ const LootieSuccess = ({d}) => {
             marginLeft: 'auto',
             marginRight: 'auto',
             }}
-        source={require('../../assets/LootieAnimations/SuccessAnimation.json')}
+        source={white ? require('../../assets/LootieAnimations/LootieSuccessWhite.json') : require('../../assets/LootieAnimations/SuccessAnimation.json')}
     />
   )
 }

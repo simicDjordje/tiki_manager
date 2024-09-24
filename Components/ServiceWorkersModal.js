@@ -109,7 +109,7 @@ const ServiceWorkersModal = ({isModalVisible, setIsModalVisible, workers, setWor
                                                 >
                                                 <Image
                                                     className="w-16 h-16 rounded-full"
-                                                    source={`http://192.168.0.72:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
+                                                    source={`http://192.168.1.5:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
                                                     placeholder={{ blurhash }}
                                                     contentFit="cover"
                                                     transition={1000}

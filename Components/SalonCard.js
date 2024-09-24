@@ -33,7 +33,7 @@ const SalonCard = forwardRef(({salonData, isJustCreated}, ref) => {
                 <View className="flex flex-row justify-between items-center px-2 pt-2">
                     <Image
                         className={`w-8 h-8 rounded-full border-2 ${salonData?.isActive ? 'bg-appColorDark' : 'bg-textMid'}`}
-                        source={`http://192.168.0.72:5000/photos/salon-logo_${salonData?.logoId}.png`}
+                        source={`http://192.168.1.5:5000/photos/salon-logo_${salonData?.logoId}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}
@@ -55,7 +55,7 @@ const SalonCard = forwardRef(({salonData, isJustCreated}, ref) => {
                         <Image
                             key={index}
                             className={`w-8 h-8 rounded-full border-2 ${index % 2 === 0 ? 'border-appColorDark' : 'border-appColor'} ${index > 0 && '-ml-2'}`}
-                            source={`http://192.168.0.72:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
+                            source={`http://192.168.1.5:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
                             placeholder={{ blurhash }}
                             contentFit="cover"
                             transition={1000}

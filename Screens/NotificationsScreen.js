@@ -86,6 +86,11 @@ const NotifcationCard = ({item, setNotificationDetails, timeAgo}) => {
                 smallTitle = 'Rezervacija prihvaćena'
                 textColorClass = 'text-appColor'
                 imageBorderClass = 'border-2 border-appColor'
+
+                const sender = reservationFromNotification?.sender
+                if(sender && !sender.hasProfilePhoto){
+                    avatarText = `${sender?.first_name[0]} ${sender?.last_name[0]}`
+                }
             }
 
             
@@ -132,7 +137,7 @@ const NotifcationCard = ({item, setNotificationDetails, timeAgo}) => {
                 {item?.reservationId && item?.reservationId?.sender && item?.reservationId?.sender?.hasProfilePhoto &&
                     <Image
                         className={`w-10 h-10 rounded-full ${imageBorderClass}`}
-                        source={`http://192.168.0.72:5000/photos/profile-photo${item?.reservationId?.sender?._id}.png`}
+                        source={`http://192.168.1.5:5000/photos/profile-photo${item?.reservationId?.sender?._id}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}
@@ -573,7 +578,7 @@ const NotificationDetailsToJoinSalonPending = ({
                 <Image
                     className={`w-20 h-20 rounded-full mr-3`}
                     // style={{borderWidth: 0.5}}
-                    source={`http://192.168.0.72:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
+                    source={`http://192.168.1.5:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
                     placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}
@@ -586,7 +591,7 @@ const NotificationDetailsToJoinSalonPending = ({
                                     <Image
                                         key={index}
                                         className={`w-8 h-8 rounded-full ${index > 0 && '-ml-2'} border-textPrimary`}
-                                        source={`http://192.168.0.72:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
+                                        source={`http://192.168.1.5:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
@@ -679,7 +684,7 @@ const NotificationDetailsToJoinSalonRejected = ({notificationDetails}) => {
                 <Image
                     className={`w-20 h-20 rounded-full -mr-2`}
                     // style={{borderWidth: 0.5}}
-                    source={`http://192.168.0.72:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
+                    source={`http://192.168.1.5:5000/photos/salon-logo_${requestDetails?.salonId?.logoId}.png`}
                     placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}
@@ -687,7 +692,7 @@ const NotificationDetailsToJoinSalonRejected = ({notificationDetails}) => {
                 <Image
                     className={`w-20 h-20 rounded-full`}
                     // style={{borderWidth: 0.5}}
-                    source={`http://192.168.0.72:5000/photos/profile-photo${requestDetails?.recipient}.png`}
+                    source={`http://192.168.1.5:5000/photos/profile-photo${requestDetails?.recipient}.png`}
                     placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}
@@ -720,7 +725,7 @@ const NotificationDetailsToJoinSalonAccepted = ({notificationDetails}) => {
                 <Image
                     className={`w-24 h-24 rounded-full`}
                     // style={{borderWidth: 0.5}}
-                    source={`http://192.168.0.72:5000/photos/profile-photo${requestDetails?.recipient}.png`}
+                    source={`http://192.168.1.5:5000/photos/profile-photo${requestDetails?.recipient}.png`}
                     placeholder={{ blurhash }}
                     contentFit="cover"
                     transition={1000}
@@ -773,9 +778,10 @@ const NotificationDetailsToReservationService = ({
 
     useEffect(()=>{
         const dateSplited = reservationDetails?.date.split('-')
-        setDateText(`${dateSplited[0]}.${dateSplited[1]}.${dateSplited[2]}.`)
+        setDateText(`${dateSplited[0]}.${Number(dateSplited[1]) + 1}.${dateSplited[2]}.`)
 
-        const date = new Date(reservationDetails?.formattedDate);
+        //const date = new Date(reservationDetails?.formattedDate);
+        const date = new Date(dateSplited[2], Number(dateSplited[1]), dateSplited[0])
         const today = new Date();
 
         // Create a new date for tomorrow by adding 1 day to today
@@ -793,6 +799,7 @@ const NotificationDetailsToReservationService = ({
             setSmallDateText('Sutra');
         }else{
             const dayNum = date.getDay()
+            
             const dayName = daysObj[dayNum]
             //console.log(dayNum)
             setSmallDateText(dayName)
@@ -830,7 +837,7 @@ const NotificationDetailsToReservationService = ({
                     <Image
                         className={`w-16 h-16 rounded-full mr-3`}
                         // style={{borderWidth: 0.5}}
-                        source={`http://192.168.0.72:5000/photos/profile-photo${reservationDetails?.sender?._id}.png`}
+                        source={`http://192.168.1.5:5000/photos/profile-photo${reservationDetails?.sender?._id}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}
