@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, Platform } from 'react-native'
+import { View, TouchableOpacity, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
@@ -11,12 +11,13 @@ import AddSalonStepFour from '../Components/AddSalonStepFour'
 import Entypo from '@expo/vector-icons/Entypo'
 import * as ImagePicker from 'expo-image-picker'
 import AddSalonLastStep from '../Components/AddSalonLastStep'
-import Animated, { FadeIn, SequencedTransition } from 'react-native-reanimated'
+import Animated, { FadeIn, FadeInUp, SequencedTransition } from 'react-native-reanimated'
 import LootieSuccess from '../Components/LootieAnimations/Success'
 import Text from '../Components/CustomComponents/CustomText'
 import UnsavedChangesModal from '../Components/UnsavedChangesModal'
 import { useCreateSalonMutation } from '../redux/apiCore'
 import CustomButton from '../Components/CustomComponents/CustomButton'
+import DismissKeyboardWrapper from '../Components/DismissKeyboardWrapper'
 
 const AnimatedComponentView = Animated.createAnimatedComponent(View)
 
@@ -48,6 +49,9 @@ const AddSalonScreen = () => {
 
   //api
   const [createSalon, {isLoading}] = useCreateSalonMutation()
+
+  //test states
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   const handleConfirm = () => {
     setShouldLeaveOnScreen(true)
@@ -221,22 +225,43 @@ const AddSalonScreen = () => {
     }
   }
 
+
+
+  useEffect(() => {
+    // Event listener for keyboard open
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardVisible(true);
+    });
+
+    // Event listener for keyboard hide
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false);
+    });
+
+    // Clean up the listeners on component unmount
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
   return (
     <SafeAreaView className="bg-bgPrimary h-full">
+          <DismissKeyboardWrapper>
           <View className="min-h-screen">
-              {!isSuccess && 
-                <View className="w-full mt-4 flex flex-row justify-between px-4">
+              {!isSuccess && !isKeyboardVisible &&
+                <AnimatedComponentView entering={FadeInUp.delay(500)} layout={SequencedTransition} className="w-full mt-4 flex flex-row justify-between px-4">
                     <TouchableOpacity onPress={handleBack}>
                         <MaterialIcons name="arrow-back-ios-new" size={24} color="black" />
                     </TouchableOpacity>
                     <Text className="text-textPrimary text-3xl" bold>tiki <Text className="text-2xl text-textSecondary" semi>manager</Text></Text>
-                </View>
+                </AnimatedComponentView>
               }
 
               {!isSuccess && 
-                <View className="mt-10 px-4">
+                <AnimatedComponentView layout={SequencedTransition} className="mt-10 px-4">
                   <ProgressBarComponent stepsCount={5} currentStep={step} />
-                </View>
+                </AnimatedComponentView>
               }
 
               <AnimatedComponentView layout={SequencedTransition} className={`mt-${!isSuccess ? '10' : '4'} px-4 bg-bgSecondary h-full`} style={{borderTopLeftRadius: 50, borderTopRightRadius: 50}}>
@@ -281,7 +306,7 @@ const AddSalonScreen = () => {
                 
 
                 <View className="bg-textSecondary w-full h-0.5 mt-4"></View>
-
+                
                 {!isSuccess && 
                   <View className="h-96 pt-10">
                     {step === 1 && 
@@ -314,16 +339,22 @@ const AddSalonScreen = () => {
                     {step === 5 && 
                     <AddSalonLastStep
                       name={name}
+                      description={description}
                       address={location?.description}
+                      logo={logo}
                     />}
-                  </View>}
+                  </View>
+                  }
 
                   {!isSuccess && step !== 5 && 
-                      <TouchableOpacity 
-                        onPress={handleNext}
-                        className="bg-appColorDark rounded-xl p-4 flex flex-row justify-center items-center mt-10">
-                        <Text className="text-white text-lg" bold>{'Dalje'}</Text>
-                      </TouchableOpacity>
+                      
+                      <View className="mt-10">
+                          <CustomButton 
+                            onPress={handleNext}
+                            text={'Dalje'}
+                            variant={'dark'}
+                          />
+                      </View>
                   }
 
                   <View className="h-5 flex flex-row justify-center items-center -mt-5 mb-10">
@@ -336,6 +367,7 @@ const AddSalonScreen = () => {
                       isError={!!errorMessage}
                       errorMessage={errorMessage}
                       isLoading={isLoading}
+                      variant={'dark'}
                     />
                   }
 
@@ -350,12 +382,12 @@ const AddSalonScreen = () => {
 
                        <View className="h-32 w-full">
                         {showFinishButton && 
-                        <AnimatedComponentView entering={FadeIn}>
-                            <TouchableOpacity 
-                                onPress={handleFinish}
-                                className="bg-appColorDark rounded-xl p-4 flex flex-row justify-center items-center mt-10 w-full">
-                                <Text className="text-white text-lg" bold>Nazad na početnu</Text>
-                            </TouchableOpacity> 
+                        <AnimatedComponentView entering={FadeIn} className="mt-20">
+                            <CustomButton 
+                              text={'Nazad na početnu'}
+                              onPress={handleFinish}
+                              variant={'dark'}
+                            />
                           </AnimatedComponentView> 
                         }
                        </View>
@@ -365,12 +397,13 @@ const AddSalonScreen = () => {
               </AnimatedComponentView>
 
           </View>
-
+          </DismissKeyboardWrapper>
           <UnsavedChangesModal 
             isModalVisible={isUnsavedChangesModalVisible}
             setIsModalVisible={setIsUnsavedChangesModalVisible}
             handleConfirm={handleConfirm}
           />
+          
     </SafeAreaView>
   )
 }

@@ -9,7 +9,7 @@ import { timeSlotsConstants } from '../constants'
 import CustomButton from '../Components/CustomComponents/CustomButton'
 import { useFocusEffect } from '@react-navigation/native'
 import AntDesign from '@expo/vector-icons/AntDesign'
-import { useCheckPendingReservationsByDateTimeMutation, useCheckReservationMutation, useGetMyUserDataMutation, useRejectReservationMutation, useUpdateUserMutation } from '../redux/apiCore'
+import { useCheckPendingReservationsByDateTimeMutation, useCheckReservationMutation, useGetMyUserDataMutation, useRejectMultipleReservationMutation, useRejectReservationMutation, useUpdateUserMutation } from '../redux/apiCore'
 import Animated, { BounceInRight, FadeInDown, FadeInLeft, FadeInUp } from 'react-native-reanimated'
 import { useSelector } from 'react-redux'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
@@ -41,6 +41,9 @@ const WorkerScreen = ({navigation}) => {
     const [isTimeSlotHasPendingReservationsVisible, setIsTimeSlotHasPendingReservationsVisible] = useState(false)
 
     const [existingPendingReservations, setExistingPendingReservations] = useState([])
+    const [rejectingMultipleCustomLoading, setRejectingMultipleCustomLoading] = useState(false)
+    const [multipleReservationsRejected, setMultipleReservationsRejected] = useState(false)
+    const [multipleRejectionError, setMultipleRejectionError] = useState(false)
 
     //api
     const [updateUser, {isLoading: isUpdateUserLoading}] = useUpdateUserMutation()
@@ -48,6 +51,79 @@ const WorkerScreen = ({navigation}) => {
     const [checkReservation, {isLoading: isCheckReservationLoading}] = useCheckReservationMutation()
     const [rejectReservation, {isLoading: isRejectingReservation}] = useRejectReservationMutation()
     const [checkPendingReservationsByDateTime, {isLoading: isCheckPendingReservations}] = useCheckPendingReservationsByDateTimeMutation()
+    const [rejectMultipleReservation, {isLoading: isRejectingMultipleReservation}] = useRejectMultipleReservationMutation()
+
+    const handleConfirm_MultipleRejections = async () => {
+        setRejectingMultipleCustomLoading(true)
+
+        try{
+            const areRejected = await handleRejectMultiple()
+
+            if(!areRejected) return
+
+            const markedDateIndex = markedDates.findIndex(date => {
+                return date.getDate() === selectedStartDate.getDate() && 
+                date.getMonth() === selectedStartDate.getMonth() && 
+                date.getFullYear() === selectedStartDate.getFullYear()
+            })
+
+            const reservationDate = existingPendingReservations[0]?.date
+            const reservationTime = existingPendingReservations[0]?.time
+
+            const foundArray = selectedTimeSlots[reservationDate] ? [...selectedTimeSlots[reservationDate]] : null
+            const timeSlotIndex = foundArray.findIndex(slot => slot.label === reservationTime)
+            if (timeSlotIndex > -1) {
+                foundArray.splice(timeSlotIndex, 1)
+                if(foundArray.length === 0){
+                    if(markedDateIndex > -1){
+                        const updatedMarkedDates = [...markedDates]
+                        updatedMarkedDates.splice(markedDateIndex, 1)
+
+                        setMarkedDates(updatedMarkedDates)
+                    }
+                }
+
+                setSelectedTimeSlots({
+                    ...selectedTimeSlots,
+                    [reservationDate]: foundArray
+                })
+                setTimeout(()=>{
+                    setIsTimeSlotHasPendingReservationsVisible(false)
+                }, 1200)
+            }
+
+        }catch(error){
+            console.log(error)
+        }finally{
+            setRejectingMultipleCustomLoading(false)
+        }
+    }
+
+
+    const handleRejectMultiple = async () => {
+        try{
+            const reservationIds = existingPendingReservations.map(i => i?._id)
+
+            const {error, data} = await rejectMultipleReservation({reservationIds})
+    
+            if(error){
+                setMultipleReservationsRejected(false)
+                setMultipleRejectionError(true)
+                return false
+            }
+            
+            if(data && data.success){
+                if(data.message === 'Reservations rejected successfully'){
+                    setMultipleReservationsRejected(true)
+                    setMultipleRejectionError(false)
+                    return true
+                }
+            }
+
+        }catch(error){
+            console.log(error)
+        }
+    }
 
     const handleConfirm = async () => {
         setCustomRejectionLoading(true)
@@ -489,13 +565,13 @@ const WorkerScreen = ({navigation}) => {
                                     onPress={() => {handleSelectTimeSlot(timeSlot)}}
                                     key={index} 
                                     className={`w-24 h-14 ${isSelected ? 'bg-appColor' : 'bg-bgPrimary'} ml-2 rounded-xl flex flex-row justify-center items-center ${lastItem && 'mr-20'} relative`}>
-                                    {hasAcceptedReservation && 
+                                    {hasAcceptedReservation && isSelected &&
                                         <View className="absolute z-10 rounded-full top-1 right-1">
                                             <FontAwesome6 name="clock" size={16} color="white" />
                                         </View>
                                     }
 
-                                    {!hasAcceptedReservation && hasPendingReservations &&
+                                    {!hasAcceptedReservation && hasPendingReservations && isSelected &&
                                         <View className={`absolute z-10 rounded-full -top-1 -right-1 ${numberOfPendingReservations > 999 ? 'p-1' : 'w-5 h-5'} flex flex-row justify-center items-center bg-appColorDark`}>
                                             <Text className="text-xs text-white" bold>{numberOfPendingReservations}</Text>
                                         </View>
@@ -546,6 +622,9 @@ const WorkerScreen = ({navigation}) => {
             setIsModalVisible={setIsTimeSlotHasPendingReservationsVisible}
             existingReservations={existingPendingReservations}
             isLoading={isCheckPendingReservations}
+            isRejecting={isRejectingMultipleReservation || rejectingMultipleCustomLoading}
+            handleConfirm={handleConfirm_MultipleRejections}
+            isSuccess={multipleReservationsRejected}
         />
 
     </SafeAreaView>

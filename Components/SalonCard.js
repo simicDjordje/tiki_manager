@@ -32,7 +32,7 @@ const SalonCard = forwardRef(({salonData, isJustCreated}, ref) => {
             <View>
                 <View className="flex flex-row justify-between items-center px-2 pt-2">
                     <Image
-                        className={`w-8 h-8 rounded-full border-2 ${salonData?.isActive ? 'bg-appColorDark' : 'bg-textMid'}`}
+                        className={`w-8 h-8 rounded-full ${salonData?.isActive ? 'bg-appColorDark' : 'bg-textMid'}`}
                         source={`http://192.168.1.5:5000/photos/salon-logo_${salonData?.logoId}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"

@@ -19,12 +19,13 @@ const AddSalonStepOne = ({name, setName, description, setDescription, validation
             label={'Opis salona ili usluga'}
             placeholder={'Unesi kratak opis salona ili usluga'}
             multiline={true}
-            numberOfLines={3}
+            numberOfLines={2}
             classNameCustom='mt-4'
             value={description}
             onChangeText={(text) => setDescription(text)}
             isError={validation1 && !description}
             errorMessage={'obavezno'}
+            maxLength={100}
         />
     </View>
   )

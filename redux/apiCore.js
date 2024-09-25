@@ -288,6 +288,15 @@ export const apiCore = createApi({
 				}
 			}
 		}),
+		rejectMultipleReservation: builder.mutation({
+			query: (data) => {
+				return {
+					url: `/reservations/reject-multiple`,
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
 		//end reservations
 	})
 })
@@ -320,5 +329,6 @@ export const {
 	useRejectReservationMutation,
 	useAcceptReservationMutation,
 	useCheckReservationMutation,
-	useCheckPendingReservationsByDateTimeMutation
+	useCheckPendingReservationsByDateTimeMutation,
+	useRejectMultipleReservationMutation
 } = apiCore;

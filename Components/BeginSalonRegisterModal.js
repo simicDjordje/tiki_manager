@@ -4,6 +4,7 @@ import Modal from 'react-native-modal'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useNavigation } from '@react-navigation/native'
 import Text from './CustomComponents/CustomText'
+import CustomButton from './CustomComponents/CustomButton'
 
 
 const BeginSalonRegisterModal = ({isModalVisible, setIsModalVisible}) => {
@@ -56,11 +57,11 @@ const BeginSalonRegisterModal = ({isModalVisible, setIsModalVisible}) => {
                         </View>
 
                         <View className="flex flex-col justify-center items-center mt-44">
-                            <TouchableOpacity 
+                            <CustomButton 
                                 onPress={beginSalonRegister}
-                                className="bg-appColorDark rounded-xl p-4 flex flex-row justify-center items-center w-full">
-                                <Text className="text-white text-lg" bold>Započni</Text>
-                            </TouchableOpacity>
+                                text={'Započni'}
+                                variant={'dark'}
+                            />
                         </View>
                     </View>
                 </View>

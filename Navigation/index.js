@@ -9,6 +9,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { setNotifications, setUser } from "../redux/generalSlice"
 import { useSocket } from "../Context/SocketContext"
 import { useGetMyUserDataMutation, useGetNotificationsMutation } from "../redux/apiCore"
+import { Pressable } from "react-native"
 // import { usePushNotifications } from "../usePushNotifications"
 
 
@@ -61,10 +62,11 @@ const StackNavigator = () => {
   }, [userData])
 
   return (
-    <Stack.Navigator 
+      <Stack.Navigator 
             screenOptions={{
                 headerShown: false
             }}>
+            
             <Stack.Screen name="AuthTabScreens" component={AuthTab} />
             <Stack.Screen name="MainTabScreens" component={MainTab} />
             <Stack.Screen name="StackTabScreens" component={StackTab} />

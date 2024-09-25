@@ -91,6 +91,8 @@ const CreateServicesCategoryModal = ({
                                 isSuccess={isSuccess}
                                 isLoading={isLoading}
                                 isError={!!errorMessage}
+                                variant={'dark'}
+
                             />
                         </View>
                     </View>

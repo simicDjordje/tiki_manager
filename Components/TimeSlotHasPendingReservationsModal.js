@@ -24,7 +24,15 @@ const blurhash =
 
   
 
-const TimeSlotHasPendingReservationsModal = ({isModalVisible, setIsModalVisible, existingReservations, isLoading}) => {
+const TimeSlotHasPendingReservationsModal = ({
+    isModalVisible, 
+    setIsModalVisible, 
+    existingReservations, 
+    isLoading,
+    isRejecting,
+    handleConfirm,
+    isSuccess
+}) => {
     const [errorMessage, setErrorMessage] = useState('')
 
 
@@ -50,7 +58,7 @@ const TimeSlotHasPendingReservationsModal = ({isModalVisible, setIsModalVisible,
           <View className="flex-1 flex flex-col justify-end items-center w-full">
               <View className={`h-5/6 w-full`}>
                 <View 
-                    className="h-full w-full bg-bgSecondary px-4"
+                    className="h-full w-full bg-bgPrimary px-4"
                     style={{borderTopRightRadius: 50, borderTopLeftRadius: 50}}
                 >
                     <View className="flex flex-row justify-between items-center w-full mt-6">
@@ -64,7 +72,7 @@ const TimeSlotHasPendingReservationsModal = ({isModalVisible, setIsModalVisible,
 
                     <View className="bg-textSecondary w-full h-0.5 mt-4"></View>
                     
-                    <View className="h-full">
+                    <View className="h-full w-full">
                         
                     
                         {isLoading &&
@@ -75,7 +83,7 @@ const TimeSlotHasPendingReservationsModal = ({isModalVisible, setIsModalVisible,
 
 
                         {!isLoading && 
-                            <View className="h-[75%] relative px-2">
+                            <View className="h-[75%] px-2">
                                 
                                 <FlatList
                                     data={[{_id: 'index_0_to_create_view_at_top'}, ...existingReservations]}
@@ -104,11 +112,6 @@ const TimeSlotHasPendingReservationsModal = ({isModalVisible, setIsModalVisible,
                                         )
                                     }}
                                 /> 
-                                <LinearGradient
-                                    className="w-full h-12 absolute bottom-0 z-10"
-                                    colors={['transparent', 'white']}
-                                >
-                                </LinearGradient>
                             </View>
                         }
 
@@ -119,11 +122,19 @@ const TimeSlotHasPendingReservationsModal = ({isModalVisible, setIsModalVisible,
                                     <CustomButton 
                                         variant={'dark'}
                                         text={'Ukloni termin'}
+                                        isLoading={isRejecting}
+                                        isSuccess={isSuccess}
+                                        onPress={handleConfirm}
                                     />
                                 </View>
                             </View>
                         }
                     
+                    {/* <LinearGradient
+                        className="w-full h-56 absolute bottom-20 -z-10"
+                        colors={['transparent', 'white']}
+                    >
+                    </LinearGradient> */}
                     </View>
                 </View>
               </View>

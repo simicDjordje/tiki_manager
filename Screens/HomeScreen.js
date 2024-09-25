@@ -101,6 +101,8 @@ const HomeScreen = ({route, navigation}) => {
     navigation.navigate('StackTabScreens', {screen: 'NotificationsScreen'})
   }
 
+
+
   return (
     <SafeAreaView className="bg-bgPrimary h-full relative">
         <StatusBar />
@@ -134,7 +136,7 @@ const HomeScreen = ({route, navigation}) => {
                         <View className="flex flex-col justify-between items-start">
                             <Text className="text-textPrimary text-2xl" bold>{userData?.first_name} {userData?.last_name}</Text>
                             {userData?.worksInSalon && 
-                                <View className="bg-appColor rounded-2xl mt-2 px-2 py-1">
+                                <View className="bg-textPrimary rounded-2xl mt-2 px-2 py-1">
                                     <Text className="text-white" bold>{userData?.worksInSalon?.name}</Text>
                                 </View>
                             }
@@ -243,3 +245,20 @@ const HomeScreen = ({route, navigation}) => {
 }
 
 export default HomeScreen
+
+
+
+
+
+
+
+
+//ICON REVIEW
+//   return (
+//     <View className="h-full bg-green-400 flex flex-col justify-center items-center">
+//         <View className="w-48 h-48 bg-appColor flex flex-col justify-center items-center">
+//             <Text className={`text-white text-7xl`} bold>tiki</Text>
+//             {/* <Text className="text-appColorDark text-3xl" semi>manager</Text> */}
+//         </View>
+//     </View>
+//   )

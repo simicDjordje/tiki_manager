@@ -55,7 +55,7 @@ const AddSalonStepThree = ({logo, setLogo, validation3}) => {
                         <Ionicons name="close" size={20} color="white" />
                     </TouchableOpacity>
                     <Image
-                        className="w-44 h-44 rounded-full border-4 border-appColor"
+                        className="w-44 h-44 rounded-full"
                         source={logo.uri}
                         placeholder={{ blurhash }}
                         contentFit="cover"

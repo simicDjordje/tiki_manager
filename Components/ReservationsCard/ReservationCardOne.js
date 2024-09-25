@@ -5,6 +5,8 @@ import Animated, { FadeInDown } from 'react-native-reanimated'
 import { Image } from 'expo-image'
 import CustomAvatar from '../CustomAvatar';
 import CustomButton from '../CustomComponents/CustomButton';
+import { formatDistanceToNow } from 'date-fns'
+import { srLatn } from 'date-fns/locale'
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
@@ -19,10 +21,18 @@ const daysObj = {
     0: 'Nedelja'
 }
 
+const timeAgoInSerbian = (dateString) => {
+    const date = new Date(dateString);
+
+    return formatDistanceToNow(date, { addSuffix: true, locale: srLatn });
+}
+
 const ReservationCardOne = ({reservationDetails}) => {
     const [dateText, setDateText] = useState('')
     const [smallDateText, setSmallDateText] = useState('')
     let avatarText = ''
+    const timeAgo = timeAgoInSerbian(reservationDetails?.createdAt) || ''
+
 
     if(reservationDetails?.sender){
         avatarText = `${reservationDetails?.sender?.first_name[0]} ${reservationDetails?.sender?.last_name[0]}`
@@ -61,8 +71,10 @@ const ReservationCardOne = ({reservationDetails}) => {
     }, [reservationDetails])
 
   return (
-    <Animated.View entering={FadeInDown} className="w-full p-4 mt-8 rounded-3xl border-textSecondary" style={{borderWidth: 0.5}}>
-
+    <Animated.View entering={FadeInDown} className="w-full p-4 mt-8 rounded-3xl border-textSecondary bg-bgSecondary" style={{borderWidth: 0.5}}>
+            <View className="flex flex-row justify-end">
+                <Text className="text-xs text-textSecondary">{timeAgo}</Text>
+            </View>
             <View className="w-full flex flex-row justify-between">
                 {reservationDetails?.sender && reservationDetails?.sender?.hasProfilePhoto && 
                     <Image

@@ -17,26 +17,28 @@ const WorkerCard = forwardRef(({userData, setIsMessageModalVisible, setTitle, se
 
   const handleToWorkerScreen = () => {
 
-    // if(!userData?.worksInSalon){
-    //   setTitle('Nisi član salona')
-    //   setMessage('Moraš biti član salona i imati dodeljene usluge')
-    //   setIsMessageModalVisible(true)
-    //   return
-    // }
+    if(!userData?.worksInSalon){
+      setTitle('Nisi član salona')
+      setMessage('Moraš biti član salona i imati dodeljene usluge')
+      setIsMessageModalVisible(true)
+      return
+    }
 
-    // if(!userData?.worksInSalon?.isActive){
-    //   setTitle(`${userData?.worksInSalon?.name || 'Salon'} je neaktivan`)
-    //   setMessage('Nakon aktivacije salona, moći ćeš da upravljaš terminima')
-    //   setIsMessageModalVisible(true)
-    //   return
-    // }
+    if(!userData?.worksInSalon?.isActive){
+      setTitle(`${userData?.worksInSalon?.name || 'Salon'} je neaktivan`)
+      setMessage('Nakon aktivacije salona, moći ćeš da upravljaš terminima')
+      setIsMessageModalVisible(true)
+      return
+    }
 
-    // if(userData?.services.length === 0){
-    //   setTitle(`Nije ti dodeljena nijedna usluga`)
-    //   setMessage('Nakon dodeljene usluge moći ćeš da upravljaš terminima')
-    //   setIsMessageModalVisible(true)
-    //   return
-    // }
+    if(userData?.services.length === 0){
+      setTitle(`Nije ti dodeljena nijedna usluga`)
+      setMessage('Nakon dodeljene usluge moći ćeš da upravljaš terminima')
+      setIsMessageModalVisible(true)
+      return
+    }
+
+    
     navigation.navigate('StackTabScreens', {screen: 'WorkerScreen'})
   }
 

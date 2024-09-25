@@ -471,7 +471,8 @@ const NotificationsScreen = ({navigation}) => {
             </View>
           }
 
-          {!notificationDetails && <View className="flex-1 flex flex-col justify-start items-center">
+          {!notificationDetails && 
+          <View className="flex-1 flex flex-col justify-start items-center w-full">
             {/* {isNotificationsLoading && 
                 <View className="h-5/6 flex flex-col justify-center items-center">
                     <LootieLoader dark={true} d={70} />
@@ -479,7 +480,7 @@ const NotificationsScreen = ({navigation}) => {
             } */}
 
             {notifications.all.length === 0 && 
-                <View className="flex flex-col justify-start items-center mt-10">
+                <View className="flex flex-col justify-start items-center mt-10 w-full">
                     <Text className="text-lg text-center" bold>Trenutno nemaš obaveštenja</Text>
                 </View>
             }
@@ -491,31 +492,33 @@ const NotificationsScreen = ({navigation}) => {
             
 
             {sortedNotifications.length > 0 && 
-                <FlatList
-                    data={sortedNotifications}
-                    keyExtractor={(item, index) => item.type === 'header' ? `header-${index}` : item.item?._id.toString()}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ paddingBottom: 100 }}
-                    renderItem={({ item }) => {
-                    if (item.type === 'header') {
-                        return (
-                        <View className="w-full mt-4">
-                            <Text className="text-textPrimary text-md mb-4" bold>{item.label}</Text>
-                        </View>
-                        );
-                    } else if (item.type === 'notification') {
-                        const timeAgo = timeAgoInSerbian(item.item.createdAt)
+                <View className="w-full">
+                    <FlatList
+                        data={sortedNotifications}
+                        keyExtractor={(item, index) => item.type === 'header' ? `header-${index}` : item.item?._id.toString()}
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{ paddingBottom: 100 }}
+                        renderItem={({ item }) => {
+                        if (item.type === 'header') {
+                            return (
+                            <View className="w-full mt-4">
+                                <Text className="text-textPrimary text-md mb-4" bold>{item.label}</Text>
+                            </View>
+                            );
+                        } else if (item.type === 'notification') {
+                            const timeAgo = timeAgoInSerbian(item.item.createdAt)
 
-                        return (
-                        <NotifcationCard 
-                            item={item.item} 
-                            setNotificationDetails={setNotificationDetails} 
-                            timeAgo={timeAgo}
-                        />
-                        );
-                    }
-                    }}
-                />
+                            return (
+                            <NotifcationCard 
+                                item={item.item} 
+                                setNotificationDetails={setNotificationDetails} 
+                                timeAgo={timeAgo}
+                            />
+                            );
+                        }
+                        }}
+                    />
+                </View>
             }
 
           </View>}
