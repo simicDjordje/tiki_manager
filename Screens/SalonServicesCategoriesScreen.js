@@ -138,7 +138,7 @@ const SalonServicesCategoriesScreen = ({navigation}) => {
                             return (
                                 <TouchableOpacity key={index} onPress={() => {handleToServices(category)}} className="bg-bgPrimary w-full h-28 mt-4 rounded-xl p-4 flex flex-col justify-between">
                                     <View className="flex flex-row justify-between items-center">
-                                        <Text className="text-textPrimary text-xl" bold>{category?.name}</Text>
+                                        <Text className="text-textPrimary text-xl" bold>{category?.name && category.name.length > 24 ? `${category?.name.slice(0, 24)}...` : category?.name}</Text>
                                         <MaterialIcons name="arrow-forward-ios" size={20} color="#232323" />
                                     </View>
                                     <View className="bg-textSecondary mt-3 w-full" style={{height: 0.5}}></View>

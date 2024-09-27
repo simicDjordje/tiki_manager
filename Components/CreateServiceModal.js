@@ -10,6 +10,7 @@ import CustomButton from './CustomComponents/CustomButton'
 import { useSelector } from 'react-redux'
 import { useCreateServiceMutation, useGetSalonByIdMutation } from '../redux/apiCore'
 import AntDesign from '@expo/vector-icons/AntDesign';
+import DismissKeyboardWrapper from './DismissKeyboardWrapper'
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
@@ -91,7 +92,8 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
               })
             setErrorMessage('')
           }}
-      >
+      > 
+          <DismissKeyboardWrapper>
           <View className="flex-1 flex flex-col justify-end items-center w-full">
               <View className="w-full" style={{height: '92%'}}>
                 <View 
@@ -120,13 +122,14 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                             />
 
                             <CustomInput 
-                                label={'Opis usluge'}
+                                label={'Kratak opis usluge'}
                                 placeholder={'Unesi kratak opis usluge'}
                                 classNameCustom='mt-3'
                                 value={inputsData.description}
                                 onChangeText={text => setInptsData({...inputsData, description: text})}
                                 isError={validation && !inputsData.description}
                                 errorMessage={'obavezno'}
+                                maxLength={60}
                             />
 
                             <CustomInput 
@@ -153,7 +156,7 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                         <Text className={`mb-1 text-md text-textMid`} semi>ili kasnije u podešavanjima usluge</Text>
                                     </View>
 
-                                    <View className="w-7 h-7 rounded-full bg-appColor flex flex-row justify-center items-center">
+                                    <View className="w-7 h-7 rounded-full bg-textPrimary flex flex-row justify-center items-center">
                                         <Text className="text-white" semi>{workers.length}</Text>
                                     </View>
                                 </View>
@@ -179,7 +182,7 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                             }
                                             <Image
                                                 className={`rounded-full border-4 ${workers.includes(worker?._id) ? 'border-appColor' : 'border-transparent'}`}
-                                                source={`http://192.168.1.5:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
+                                                source={`http://192.168.1.27:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
                                                 placeholder={{ blurhash }}
                                                 contentFit="cover"
                                                 transition={1000}
@@ -206,12 +209,14 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                 isSuccess={isSuccess}
                                 isLoading={isLoading}
                                 isError={!!errorMessage}
+                                variant={'dark'}
                             />
                         </View>
                     </View>
                 </View>
               </View>
           </View>
+          </DismissKeyboardWrapper>
       </Modal>
     )
   }

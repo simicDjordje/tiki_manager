@@ -117,7 +117,7 @@ const SalonScreen = ({navigation}) => {
                         <View className="flex flex-row justify-center items-center w-full flex-1">
                             <Image
                                 className="w-20 h-20 rounded-full mb-2"
-                                source={`http://192.168.1.5:5000/photos/salon-logo_${salonData?.logoId}.png`}
+                                source={`http://192.168.1.27:5000/photos/salon-logo_${salonData?.logoId}.png`}
                                 placeholder={{ blurhash }}
                                 contentFit="cover"
                                 transition={1000}
@@ -140,10 +140,10 @@ const SalonScreen = ({navigation}) => {
                             {salonData?.salonImageIds?.map((imageId, index) => {
                                 return (
                                     <Image
-                                        key={imageId}
+                                        key={imageId + index}
                                         className="w-9 h-9 rounded-lg mx-1 my-0.5"
                                         // style={{borderWidth: 0.5}}
-                                        source={`http://192.168.1.5:5000/photos/salon-photo_${imageId}.png`}
+                                        source={`http://192.168.1.27:5000/photos/salon-photo_${imageId}.png`}
                                         placeholder={{ blurhash }}
                                         contentFit="cover"
                                         transition={1000}
@@ -225,12 +225,12 @@ const SalonScreen = ({navigation}) => {
                         {salonData?.workers?.length > 0 && 
                             <View className="flex flex-row justify-start items-center p-1 bg-bgPrimary rounded-2xl">
                                 {salonData?.workers.length > 0 && salonData?.workers.slice(0, 9).map((worker, index) => {
-                                    
+                                    const keyString = worker?._id ? worker?._id : worker
                                     return (
                                         <Image
-                                            key={worker?._id}
+                                            key={keyString + index}
                                             className="w-8 h-8 rounded-full border-2 border-appColorDark -ml-2"
-                                            source={`http://192.168.1.5:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
+                                            source={`http://192.168.1.27:5000/photos/profile-photo${worker?._id ? worker?._id : worker}.png`}
                                             placeholder={{ blurhash }}
                                             contentFit="cover"
                                             transition={1000}

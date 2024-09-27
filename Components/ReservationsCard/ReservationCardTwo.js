@@ -32,7 +32,7 @@ const timeAgoInSerbian = (dateString) => {
     return timeString
 }
 
-const ReservationCardOne = ({reservationDetails}) => {
+const ReservationCardTwo = ({reservationDetails}) => {
     const [dateText, setDateText] = useState('')
     const [smallDateText, setSmallDateText] = useState('')
     let avatarText = ''
@@ -99,8 +99,8 @@ const ReservationCardOne = ({reservationDetails}) => {
                 }
                 <View className="flex flex-col justify-start items-start w-full">
                     <Text className="text-textPrimary text-lg" bold>{reservationDetails?.sender && `${reservationDetails?.sender?.first_name} ${reservationDetails?.sender?.last_name}`}</Text>
-                    {reservationDetails?.status === 'pending' && <Text className="text-textPrimary">Želi da rezerviše termin?</Text>}
-                    {reservationDetails?.status === 'accepted' && <Text className="text-appColorDark">Rezervacija je prihvaćena</Text>}
+                    {reservationDetails?.status === 'pending' && <Text className="text-textPrimary" semi>Želi da rezerviše termin?</Text>}
+                    {reservationDetails?.status === 'accepted' && <Text className="text-appColorDark" semi>Rezervacija je prihvaćena</Text>}
 
                 </View>
             </View>
@@ -123,10 +123,36 @@ const ReservationCardOne = ({reservationDetails}) => {
             
             <View className="bg-textSecondary w-full my-4" style={{height: 0.5}}></View>
 
+            <View className="w-full flex flex-row justify-between">
+                {reservationDetails?.recipient  && 
+                    <Image
+                        className={`w-12 h-12 rounded-full mr-3`}
+                        // style={{borderWidth: 0.5}}
+                        source={`http://192.168.1.27:5000/photos/profile-photo${reservationDetails?.recipient?._id}.png`}
+                        placeholder={{ blurhash }}
+                        contentFit="cover"
+                        transition={1000}
+                    />
+                }
+
+                
+                <View className="flex flex-col justify-start items-start w-full">
+                    {reservationDetails?.status === 'accepted' && <Text className="text-textPrimary">Rezervacija je kod: </Text>}
+
+                    <Text className="text-textPrimary" bold>{reservationDetails?.recipient && `${reservationDetails?.recipient?.first_name} ${reservationDetails?.recipient?.last_name}`}</Text>
+
+                </View>
+            </View>
+
+            <View className="bg-textSecondary w-full my-4" style={{height: 0.5}}></View>
+
+
             <View className="flex flex-col justify-start items-start">
                 <Text className="text-textPrimary" bold>Datum: <Text semi>{dateText}<Text className="text-textMid"> ({smallDateText})</Text></Text></Text>
                 <Text className="text-textPrimary" bold>Vreme: <Text semi>{reservationDetails?.time}h</Text></Text>
             </View>
+
+
 
 
             {/* <View className="h-6 mt-5 flex flex-row justify-center items-center">
@@ -169,4 +195,4 @@ const ReservationCardOne = ({reservationDetails}) => {
   )
 }
 
-export default ReservationCardOne
+export default ReservationCardTwo

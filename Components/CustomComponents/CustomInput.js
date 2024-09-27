@@ -41,7 +41,7 @@ const CustomInput = (props) => {
             {IconComponent && iconSide === 'right' && <IconComponent />}
         </View>
         {maxLength && 
-          <View className="flex flex-row justify-end mt-0.5 mr-2">
+          <View className="flex flex-row justify-end mt-0.5 mr-2 -mb-4">
               <Text className="text-xs text-textMid">{value.length}/{maxLength}</Text>
           </View>
         }

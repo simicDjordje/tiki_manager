@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { act, useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
@@ -13,10 +13,12 @@ import CreateServiceModal from '../Components/CreateServiceModal'
 import CustomInput from '../Components/CustomComponents/CustomInput'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
-import { useCreateServiceMutation } from '../redux/apiCore'
+import { useCreateServiceMutation, useDeleteCategoryMutation, useGetSalonByIdMutation, useRejectMultipleReservationMutation } from '../redux/apiCore'
 import LootieLoader from '../Components/LootieAnimations/Loader'
 import { setActiveService } from '../redux/generalSlice'
-
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import ConfirmActionModal from '../Components/ConfirmActionModal'
+import DeleteCategoryServicesHasReservationsModal from '../Components/DeleteCategoryServicesHasReservationsModal'
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
@@ -28,7 +30,159 @@ const SalonServicesScreen = ({navigation}) => {
   const [servicesFiltered, setServicesFiltered] = useState(activeCategory?.services || [])
   const [searchText, setSearchText] = useState('')
   const dispatch = useDispatch()
+  const [confirmModal, setConfirmModal] = useState(false)
+  const [deleteCategory, {isLoading: isDeleteCategoryLoading}] = useDeleteCategoryMutation()
+  const [errorMessage, setErrorMessage] = useState('')
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [getSalonById] = useGetSalonByIdMutation()
+  const [hasReservations, setHasReservation] = useState([])
+  const [hasReservationsModal, setHasReservationsModal] = useState(false)
+  const [multipleReservationsRejected, setMultipleReservationsRejected] = useState(false)
+  const [multipleRejectionError, setMultipleRejectionError] = useState(false)
+  const [rejectMultipleReservation, {isLoading: isRejectingMultipleReservation}] = useRejectMultipleReservationMutation()
+  const [allReservations, setAllReservations] = useState({})
 
+  const handleRejectMultiple = async (reservationsAttr) => {
+    try{
+        let reservationIds 
+
+        if(!reservationsAttr){
+            reservationIds = hasReservations.map(i => i?._id)
+        }
+
+        if(reservationsAttr){
+            reservationIds = reservationsAttr.map(i => i?._id)
+        }
+
+        const {error, data} = await rejectMultipleReservation({reservationIds})
+
+        if(error){
+            setMultipleReservationsRejected(false)
+            setMultipleRejectionError(true)
+            return false
+        }
+        
+        if(data && data.success){
+            if(data.message === 'Reservations rejected successfully'){
+                setMultipleReservationsRejected(true)
+                setMultipleRejectionError(false)
+                return true
+            }
+        }
+
+    }catch(error){
+        console.log(error)
+    }
+}
+
+  const handleDeleteCategory = async () => {
+    if(!activeCategory?._id) return
+
+    try{
+        const {error, data} = await deleteCategory({categoryId: activeCategory?._id})
+
+        if(error){
+            console.log(error)
+            setErrorMessage('Došlo je do greške')
+            setIsSuccess(false)
+            return
+        }
+
+        if(data && data.success){
+            setErrorMessage('')
+
+            if(data.message === 'Category deleted because it had no services.'){
+                setIsSuccess(true)
+                getSalonById({salonId: salonData?._id})
+
+                setTimeout(() => {
+                    setIsSuccess(false)
+                    setConfirmModal(false)
+                    navigation.navigate('StackTabScreens', {screen: 'SalonServicesCategoriesScreen'})
+                }, 2000)
+                return
+            }
+
+            if(data.message === 'Category and its services deleted successfully.'){
+                //This means that only pending reservations are left and we will reject them
+                const rejectedOnlyPending = await handleRejectMultiple(data?.result)
+
+                if(rejectedOnlyPending){
+                    setIsSuccess(true)
+                    getSalonById({salonId: salonData?._id})
+
+                    setTimeout(() => {
+                        setIsSuccess(false)
+                        setConfirmModal(false)
+                        navigation.navigate('StackTabScreens', {screen: 'SalonServicesCategoriesScreen'})
+                    }, 1500)
+                }
+                
+                return
+            }
+
+            if(data.message === 'Category has related reservations with status accepted.'){
+                setIsSuccess(false)
+                setErrorMessage('')
+
+                setConfirmModal(false)
+                setAllReservations(data?.result)
+                setHasReservation(data?.result.accepted)
+                setHasReservationsModal(true)
+                return
+            }
+
+            
+        }
+
+    }catch(error){
+        console.log(error)
+    }
+  }
+
+
+  const handleConfirm = async () => {
+    if(!activeCategory?._id) return
+
+    try{
+
+        const customArray = [...allReservations.accepted, ...allReservations.pending]
+
+        const rejectedAll = await handleRejectMultiple(customArray)
+
+        if(!rejectedAll) return
+
+        const {error, data} = await deleteCategory({categoryId: activeCategory?._id})
+
+        if(error){
+            console.log(error)
+            setErrorMessage('Došlo je do greške')
+            setIsSuccess(false)
+            return
+        }
+
+        if(data && data.success){
+            setErrorMessage('')
+            setIsSuccess(true)
+
+
+
+            getSalonById({salonId: salonData?._id})
+
+            setTimeout(() => {
+                setIsSuccess(false)
+                setConfirmModal(false)
+                setHasReservationsModal(false)
+
+                navigation.navigate('StackTabScreens', {screen: 'SalonServicesCategoriesScreen'})
+            }, 1500)
+            return            
+        }
+
+    }catch(error){
+        console.log(error)
+    }
+  }
   const handleBack = () => {
     navigation.navigate('StackTabScreens', {screen: 'SalonServicesCategoriesScreen'})
   }
@@ -36,6 +190,12 @@ const SalonServicesScreen = ({navigation}) => {
   const handleToService = (service) => {
     dispatch(setActiveService(service))
     navigation.navigate('StackTabScreens', {screen: 'ServiceScreen'})
+  }
+
+  const beginDeleteCategory = () => {
+    console.log("####")
+    console.log(activeCategory)
+    setConfirmModal(true)
   }
 
   const beginAddService = () => {
@@ -64,11 +224,16 @@ const SalonServicesScreen = ({navigation}) => {
           <View className="flex-1 flex flex-col justify-start items-center">
             <View className="w-full flex flex-row justify-between items-center mt-6">
                 <View>
-                  <Text className="text-2xl" bold>{activeCategory?.name || ''}</Text>
+                  <Text className="text-2xl" bold>{activeCategory?.name && activeCategory?.name.length > 15 ? `${activeCategory?.name.slice(0, 10)}...` : activeCategory?.name}</Text>
                 </View>
-                <TouchableOpacity onPress={beginAddService} className="p-3 bg-textPrimary rounded-full">
-                    <Entypo name="plus" size={24} color="white" />
-                </TouchableOpacity>
+                <View className="flex flex-row justify-between items-center">
+                    <TouchableOpacity onPress={beginAddService} className="w-12 h-12 bg-textPrimary rounded-full flex flex-row justify-center items-center">
+                        <Entypo name="plus" size={24} color="white" />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={beginDeleteCategory} className="w-12 h-12 bg-bgPrimary rounded-full flex flex-row justify-center items-center ml-2">
+                        <FontAwesome5 name="trash" size={24} color="black" />
+                    </TouchableOpacity>
+                </View>
             </View>
             <View className="bg-textSecondary mt-8 w-full mb-5" style={{height: 0.5}}></View>
             
@@ -158,7 +323,7 @@ const SalonServicesScreen = ({navigation}) => {
                                                     <Image
                                                         key={user?._id}
                                                         className="w-10 h-10 rounded-full border-2 border-appColorDark -ml-2"
-                                                        source={`http://192.168.1.5:5000/photos/profile-photo${user?._id ? user?._id : user}.png`}
+                                                        source={`http://192.168.1.27:5000/photos/profile-photo${user?._id ? user?._id : user}.png`}
                                                         placeholder={{ blurhash }}
                                                         contentFit="cover"
                                                         transition={1000}
@@ -191,6 +356,33 @@ const SalonServicesScreen = ({navigation}) => {
             isModalVisible={isCreateServiceModalVisible}
             setIsModalVisible={setIsCreateServiceModalVisible}
         />
+
+        <ConfirmActionModal 
+            isModalVisible={confirmModal}
+            setIsModalVisible={setConfirmModal}
+            title={'Brisanje kategorije'}
+            question={activeCategory?.services && activeCategory?.services.length > 0  ? 
+                `Obriši kategoriju ${activeCategory?.name} zajedno sa svim uslugama u njoj?`
+                : 
+                `Obriši kategoriju ${activeCategory?.name}?`
+            }
+            handleConfirm={handleDeleteCategory}
+            isSuccess={isSuccess}
+            isLoading={isDeleteCategoryLoading}
+            isError={!!errorMessage}
+            setIsError={setErrorMessage}
+            setIsSuccess={setIsSuccess}
+        />
+
+        <DeleteCategoryServicesHasReservationsModal 
+            isModalVisible={hasReservationsModal}
+            setIsModalVisible={setHasReservationsModal}
+            existingReservations={hasReservations}
+            isRejecting={isRejectingMultipleReservation || isDeleteCategoryLoading}
+            isSuccess={isSuccess}
+            handleConfirm={handleConfirm}
+        />
+        
     </SafeAreaView>
   )
 }

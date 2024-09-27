@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const apiCore = createApi({
 	reducerPath: 'apiCore',
 	baseQuery: fetchBaseQuery({
-		baseUrl: 'http://192.168.1.5:5000/api/v1',
+		baseUrl: 'http://192.168.1.27:5000/api/v1',
 		prepareHeaders: async (headers) => {
 			let user = await AsyncStorage.getItem('@userData')
 			user = JSON.parse(user)
@@ -126,6 +126,15 @@ export const apiCore = createApi({
 			query: (data) => {
 				return {
 					url: `/salons/update`,
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
+		deleteCategory: builder.mutation({
+			query: (data) => {
+				return {
+					url: `/salons/delete-category`,
 					method: 'POST',
 					body: data
 				}
@@ -330,5 +339,6 @@ export const {
 	useAcceptReservationMutation,
 	useCheckReservationMutation,
 	useCheckPendingReservationsByDateTimeMutation,
-	useRejectMultipleReservationMutation
+	useRejectMultipleReservationMutation,
+	useDeleteCategoryMutation,
 } = apiCore;
