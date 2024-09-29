@@ -28,9 +28,8 @@ const StackNavigator = () => {
     if(!socket) return
 
     socket.on('notificationsChange', () => {
-      console.log(131231231212321313221132123123)
       getNotifications()
-      getMyUserData()
+      //getMyUserData()
     })
 
     return () => socket.off('notificationsChange')

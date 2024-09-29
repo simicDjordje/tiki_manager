@@ -24,12 +24,12 @@ const WorkerCard = forwardRef(({userData, setIsMessageModalVisible, setTitle, se
       return
     }
 
-    if(!userData?.worksInSalon?.isActive){
-      setTitle(`${userData?.worksInSalon?.name || 'Salon'} je neaktivan`)
-      setMessage('Nakon aktivacije salona, moći ćeš da upravljaš terminima')
-      setIsMessageModalVisible(true)
-      return
-    }
+    // if(!userData?.worksInSalon?.isActive){
+    //   setTitle(`${userData?.worksInSalon?.name || 'Salon'} je neaktivan`)
+    //   setMessage('Nakon aktivacije salona, moći ćeš da upravljaš terminima')
+    //   setIsMessageModalVisible(true)
+    //   return
+    // }
 
     if(userData?.services.length === 0){
       setTitle(`Nije ti dodeljena nijedna usluga`)

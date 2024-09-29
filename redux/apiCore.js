@@ -140,6 +140,15 @@ export const apiCore = createApi({
 				}
 			}
 		}),
+		deleteService: builder.mutation({
+			query: (data) => {
+				return {
+					url: `/salons/delete-service`,
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
 		//end salons
 
 		//services
@@ -306,6 +315,15 @@ export const apiCore = createApi({
 				}
 			}
 		}),
+		getMyReservations: builder.mutation({
+			query: (data) => {
+				return {
+					url: `/reservations/get-my-categorized-reservations`,
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
 		//end reservations
 	})
 })
@@ -341,4 +359,6 @@ export const {
 	useCheckPendingReservationsByDateTimeMutation,
 	useRejectMultipleReservationMutation,
 	useDeleteCategoryMutation,
+	useDeleteServiceMutation,
+	useGetMyReservationsMutation
 } = apiCore;

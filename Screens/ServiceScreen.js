@@ -10,9 +10,13 @@ import Entypo from '@expo/vector-icons/Entypo'
 import { Image } from 'expo-image'
 import ServiceWorkersModal from '../Components/ServiceWorkersModal'
 import { useSelector } from 'react-redux'
-import { useGetSalonByIdMutation, useUpdateServiceMutation } from '../redux/apiCore'
+import { useDeleteServiceMutation, useGetSalonByIdMutation, useRejectMultipleReservationMutation, useUpdateServiceMutation } from '../redux/apiCore'
 import CustomButton from '../Components/CustomComponents/CustomButton'
 import UnsavedChangesModal from '../Components/UnsavedChangesModal'
+import DismissKeyboardWrapper from '../Components/DismissKeyboardWrapper'
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import ConfirmActionModal from '../Components/ConfirmActionModal'
+import DeleteCategoryServicesHasReservationsModal from '../Components/DeleteCategoryServicesHasReservationsModal'
 
 
 const blurhash =
@@ -35,7 +39,6 @@ const ServiceScreen = () => {
     price: activeService?.price || ''
   })
   const [workers, setWorkers] = useState(activeService?.users || [])
-  console.log('kurac: ', activeService?.users)
   const [originalWorkers, setOriginalWorkers] = useState(activeService?.users || [])
   const [validation, setValidation] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
@@ -43,6 +46,99 @@ const ServiceScreen = () => {
   const [shouldLeaveOnScreen, setShouldLeaveOnScreen] = useState(true)
   const [isUnsavedChangesModalVisible, setIsUnsavedChangesModalVisible] = useState(false)
   const navigation = useNavigation()
+
+  const [confirmModal, setConfirmModal] = useState(false)
+  const [deleteService, {isLoading: isDeletingService}] = useDeleteServiceMutation()
+  const [rejectMultipleReservation, {isLoading: isRejectingMultipleReservation}] = useRejectMultipleReservationMutation()
+  const [deletingErrorMessage, setDeletingErrorMessage] = useState('')
+  const [deletingSuccess, setDeletingSuccess] = useState(false)
+  const [hasReservations, setHasReservation] = useState([])
+  const [hasReservationsModal, setHasReservationsModal] = useState(false)
+  const [allReservations, setAllReservations] = useState({})
+
+
+  const beginDeleteService = () => {
+    setConfirmModal(true)
+  }
+
+  const handleRejectMultiple = async (reservationsAttr) => {
+    if(!reservationsAttr.length) return true
+
+    try{
+        let reservationIds 
+
+        if(reservationsAttr){
+            reservationIds = reservationsAttr.map(i => i?._id)
+        }
+
+        const {error, data} = await rejectMultipleReservation({reservationIds})
+
+        if(error){
+            return false
+        }
+        
+        if(data && data.success){
+            if(data.message === 'Reservations rejected successfully'){
+                return true
+            }
+        }
+
+    }catch(error){
+        console.log(error)
+    }
+}
+
+  const handleDeleteService = async () => {
+    if(!activeCategory?._id) return
+
+    try{
+        const {error, data} = await deleteService({serviceId: activeService?._id})
+
+        if(error){
+            console.log(error)
+            setDeletingErrorMessage('Došlo je do greške')
+            setDeletingSuccess(false)
+            return
+        }
+
+        if(data && data.success){
+            setDeletingErrorMessage('')
+
+            if(data.message === 'Service deleted successfully.'){
+                const rejectedOnlyPending = await handleRejectMultiple(data.result)
+
+                if(rejectedOnlyPending){
+                  setDeletingSuccess(true)
+                  getSalonById({salonId: salonData?._id})
+
+                  setTimeout(() => {
+                      setDeletingSuccess(false)
+                      setConfirmModal(false)
+                      navigation.navigate('StackTabScreens', {screen: 'SalonServicesScreen'})
+                  }, 2000)
+                }
+                return
+            }
+
+
+            if(data.message === 'Service has related reservations with status accepted.'){
+                setDeletingSuccess(false)
+                setDeletingErrorMessage('')
+
+                setConfirmModal(false)
+                setAllReservations(data?.result)
+                setHasReservation(data?.result.accepted)
+                setHasReservationsModal(true)
+                return
+            }
+
+            
+        }
+
+    }catch(error){
+        console.log(error)
+    }
+  }
 
   const compareWorkerArrays = useCallback(() => {
     // Check if the lengths are different
@@ -96,21 +192,21 @@ const ServiceScreen = () => {
 
   }, [shouldLeaveOnScreen, isUnsavedChangesModalVisible])
 
-  useEffect(() => navigation.addListener('beforeRemove', (e) => {
-    console.log(shouldLeaveOnScreen)
-    if (shouldLeaveOnScreen || isSuccess) {
-      // If we don't have unsaved changes, then we don't need to do anything
-      return;
-    }
+//   useEffect(() => navigation.addListener('beforeRemove', (e) => {
+//     console.log(shouldLeaveOnScreen)
+//     if (shouldLeaveOnScreen || isSuccess) {
+//       // If we don't have unsaved changes, then we don't need to do anything
+//       return;
+//     }
 
-    // Prevent default behavior of leaving the screen
-    e.preventDefault();
+//     // Prevent default behavior of leaving the screen
+//     e.preventDefault();
 
-    // Prompt the user before leaving the screen
-    setIsUnsavedChangesModalVisible(true)
-  }),
-[navigation, shouldLeaveOnScreen, isSuccess]
-);
+//     // Prompt the user before leaving the screen
+//     setIsUnsavedChangesModalVisible(true)
+//   }),
+// [navigation, shouldLeaveOnScreen, isSuccess]
+// );
 
   const handleBack = () => {
     if(!shouldLeaveOnScreen && !isSuccess){
@@ -150,8 +246,51 @@ const ServiceScreen = () => {
     }
   }
 
+
+  const handleConfirm = async () => {
+    if(!activeService?._id) return
+
+    try{
+
+        const customArray = [...allReservations.accepted, ...allReservations.pending]
+
+        const rejectedAll = await handleRejectMultiple(customArray)
+
+        if(!rejectedAll) return
+
+        const {error, data} = await deleteService({serviceId: activeService?._id})
+
+        if(error){
+            setDeletingErrorMessage('Došlo je do greške')
+            setDeletingSuccess(false)
+            return
+        }
+
+        if(data && data.success){
+            setDeletingErrorMessage('')
+            setDeletingSuccess(true)
+
+
+
+            getSalonById({salonId: salonData?._id})
+
+            setTimeout(() => {
+                setDeletingSuccess(false)
+                setConfirmModal(false)
+                setHasReservationsModal(false)
+
+                navigation.navigate('StackTabScreens', {screen: 'SalonServicesScreen'})
+            }, 1500)
+            return            
+        }
+
+    }catch(error){
+        console.log(error)
+    }
+  }
   
   return (
+    <DismissKeyboardWrapper>
     <SafeAreaView className="bg-bgSecondary h-full">
         <StatusBar style={'dark'} />
         <View className="flex flex-row justify-between items-center pt-20 pb-4 -mt-16 px-4 bg-bgSecondary">
@@ -162,11 +301,14 @@ const ServiceScreen = () => {
         </View>
         <View className="h-full flex flex-col justify-between px-4">
           <View className="flex-1 flex flex-col justify-start items-center">
-            <View className="flex flex-row justify-start items-center mt-6 w-full">
+            <View className="flex flex-row justify-between items-center mt-6 w-full">
                 <View>
                     <Text className="text-2xl" bold>{activeService?.name}</Text>
                     <Text semi>{activeCategory?.name}</Text>
                 </View>
+                <TouchableOpacity onPress={beginDeleteService} className="w-12 h-12 bg-bgPrimary rounded-full flex flex-row justify-center items-center ml-2">
+                    <FontAwesome5 name="trash" size={24} color="black" />
+                </TouchableOpacity>
             </View>
             <View className="bg-textSecondary mt-8 w-full mb-4" style={{height: 0.5}}></View>
 
@@ -188,6 +330,7 @@ const ServiceScreen = () => {
                         classNameCustom='mt-4'
                         value={inputsData?.description}
                         onChangeText={text => setInputsData({...inputsData, description: text})}
+                        maxLength={60}
                     />
 
                     <CustomInput 
@@ -251,7 +394,7 @@ const ServiceScreen = () => {
                             isLoading={isLoading}
                             isError={!!errorMessage}
                             isSuccess={isSuccess}
-                            
+                            variant={'dark'}
                         />
                     </View>
                 </View>
@@ -271,10 +414,34 @@ const ServiceScreen = () => {
             handleConfirm={() => {
               navigation.navigate('StackTabScreens', {screen: 'SalonServicesScreen'})
             }}
-          />   
+          />  
+
+        <ConfirmActionModal 
+            isModalVisible={confirmModal}
+            setIsModalVisible={setConfirmModal}
+            title={'Brisanje usluge'}
+            question={`Da li sigurno želiš da obrišeš ovu uslugu?`}
+            handleConfirm={handleDeleteService}
+            isSuccess={deletingSuccess}
+            isLoading={isDeletingService}
+            isError={!!deletingErrorMessage}
+            setIsError={setDeletingErrorMessage}
+            setIsSuccess={setDeletingSuccess}
+        />
+
+        <DeleteCategoryServicesHasReservationsModal 
+            isModalVisible={hasReservationsModal}
+            setIsModalVisible={setHasReservationsModal}
+            existingReservations={hasReservations}
+            isRejecting={isRejectingMultipleReservation || isDeletingService}
+            isSuccess={deletingSuccess}
+            handleConfirm={handleConfirm}
+            isService
+        />
           </View>
         </View>
     </SafeAreaView>
+    </DismissKeyboardWrapper>
   )
 }
 

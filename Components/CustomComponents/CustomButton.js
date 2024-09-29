@@ -14,6 +14,7 @@ const CustomButton = ({onPress, text, isLoading, isSuccess, isError, variant, ac
     let iconColor = 'black'
     let textClassName = 'text-white'
     let isWhiteSuccess = false
+    let isLoadingDark = false
 
     if(!variant){
         btnClassName = 'bg-appColorDark rounded-xl h-14 flex flex-row justify-center items-center w-full'
@@ -29,12 +30,15 @@ const CustomButton = ({onPress, text, isLoading, isSuccess, isError, variant, ac
     if(variant === 'light'){
         btnClassName = 'bg-bgSecondary rounded-xl h-14 flex flex-row justify-center items-center w-full'
         textClassName = 'text-black'
+        isLoadingDark = true
     }
 
     if(variant === 'transparent'){
         btnClassName = 'rounded-xl h-14 flex flex-row justify-center items-center w-full border-textSecondary'
         btnStyle.borderWidth = 0.5
         iconColor = 'black'
+        isLoadingDark = true
+        isWhiteSuccess = true
     }
 
     useEffect(() => {
@@ -66,7 +70,7 @@ const CustomButton = ({onPress, text, isLoading, isSuccess, isError, variant, ac
             className={btnClassName}
             style={btnStyle}
             >
-            <LootieLoader d={40} />
+            <LootieLoader d={40} dark={isLoadingDark} />
         </TouchableOpacity>
     )
 

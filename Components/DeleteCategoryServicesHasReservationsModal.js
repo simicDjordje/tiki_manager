@@ -30,7 +30,8 @@ const DeleteCategoryServicesHasReservationsModal = ({
     existingReservations, 
     isRejecting,
     handleConfirm,
-    isSuccess
+    isSuccess,
+    isService
 }) => {
     const [errorMessage, setErrorMessage] = useState('')
 
@@ -89,9 +90,9 @@ const DeleteCategoryServicesHasReservationsModal = ({
                                         if(index === 0){
                                             return (
                                                 <View className="w-full flex flex-col justify-center items-center mt-5">
-                                                    {existingReservations.length === 1 &&  <Text className="text-center text-textPrimary text-lg" bold>Postoji {existingReservations?.length} aktivna rezervacija u ovoj kategoriji</Text>}
-                                                    {existingReservations.length > 1 &&  <Text className="text-center text-textPrimary text-lg" bold>Postoje {existingReservations?.length} aktivne rezervacije u ovoj kategoriji</Text>}
-                                                    <Text className="text-textPrimary text-xs mt-4 text-center" bold>Ukoliko obrišeš kategoriju, obavestićemo da {existingReservations.length > 1 ? 'su rezervacije otkazane' : 'je rezervacija otkazana'}</Text>
+                                                    {existingReservations.length === 1 &&  <Text className="text-center text-textPrimary text-lg" bold>Postoji {existingReservations?.length} aktivna rezervacija {isService ? 'za ovu uslugu' : 'u ovoj kategoriji'}</Text>}
+                                                    {existingReservations.length > 1 &&  <Text className="text-center text-textPrimary text-lg" bold>Postoje {existingReservations?.length} aktivne rezervacije {isService ? 'za ovu uslugu' : 'u ovoj kategoriji'}</Text>}
+                                                    <Text className="text-textPrimary text-xs mt-4 text-center" bold>Ukoliko obrišeš {isService ? 'uslugu' : 'kategoriju'}, obavestićemo da {existingReservations.length > 1 ? 'su rezervacije otkazane' : 'je rezervacija otkazana'}</Text>
                                                     <View className="w-full bg-textSecondary mt-4" style={{height: 0.5}}></View>
                                                 </View>
                                             )
@@ -114,7 +115,7 @@ const DeleteCategoryServicesHasReservationsModal = ({
                                 <View>
                                     <CustomButton 
                                         variant={'dark'}
-                                        text={'Obriši kategoriju'}
+                                        text={isService ? 'Obriši uslugu' : 'Obriši kategoriju'}
                                         isLoading={isRejecting}
                                         isSuccess={isSuccess}
                                         onPress={handleConfirm}

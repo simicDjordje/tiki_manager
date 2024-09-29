@@ -271,7 +271,7 @@ const NotificationsScreen = ({navigation}) => {
                 setIsError(false)
                 setTimeout(()=>{
                     setIsConfirmModalVisible(false)
-                    setNotificationDetails(null)
+                    //setNotificationDetails(null)
                     getNotifications()
                 }, 2700)
             }
@@ -300,7 +300,7 @@ const NotificationsScreen = ({navigation}) => {
                 setIsError(false)
                 setTimeout(()=>{
                     setIsConfirmModalVisible(false)
-                    setNotificationDetails(null)
+                    //setNotificationDetails(null)
                     getNotifications()
                 }, 2700)
             }

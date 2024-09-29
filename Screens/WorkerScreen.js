@@ -16,6 +16,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import ReservationExistsModal from '../Components/ReservationExistsModal'
 import LootieLoader from '../Components/LootieAnimations/Loader'
 import TimeSlotHasPendingReservationsModal from '../Components/TimeSlotHasPendingReservationsModal'
+import UnsavedChangesModal from '../Components/UnsavedChangesModal'
 
 // new Date(2024, 7, 23),
 
@@ -45,6 +46,11 @@ const WorkerScreen = ({navigation}) => {
     const [multipleReservationsRejected, setMultipleReservationsRejected] = useState(false)
     const [multipleRejectionError, setMultipleRejectionError] = useState(false)
 
+    const [changesCount, setChangesCount] = useState(0)
+
+    const [isUnsavedChangesModalVisible, setIsUnsavedChangesModalVisible] = useState(false)
+
+
     //api
     const [updateUser, {isLoading: isUpdateUserLoading}] = useUpdateUserMutation()
     const [getMyUserData] = useGetMyUserDataMutation()
@@ -52,6 +58,33 @@ const WorkerScreen = ({navigation}) => {
     const [rejectReservation, {isLoading: isRejectingReservation}] = useRejectReservationMutation()
     const [checkPendingReservationsByDateTime, {isLoading: isCheckPendingReservations}] = useCheckPendingReservationsByDateTimeMutation()
     const [rejectMultipleReservation, {isLoading: isRejectingMultipleReservation}] = useRejectMultipleReservationMutation()
+
+    useEffect(()=>{
+        if(changesCount == -1){
+            navigation.navigate('MainTabScreens', {screen: 'HomeScreen'})
+        }
+    }, [changesCount])
+
+    useEffect(() => navigation.addListener('beforeRemove', (e) => {
+        console.log(changesCount)
+        if (changesCount < 3 || isSuccess) {
+          // If we don't have unsaved changes, then we don't need to do anything
+          return;
+        }
+
+        // Prevent default behavior of leaving the screen
+        e.preventDefault();
+
+        // Prompt the user before leaving the screen
+        setIsUnsavedChangesModalVisible(true)
+        
+      }),
+    [navigation, changesCount, isSuccess]
+  );
+
+    useEffect(()=>{
+        setChangesCount(prev => prev + 1)
+    }, [selectedTimeSlots])
 
     const handleConfirm_MultipleRejections = async () => {
         setRejectingMultipleCustomLoading(true)
@@ -160,6 +193,8 @@ const WorkerScreen = ({navigation}) => {
                 })
                 setTimeout(()=>{
                     setIsReservationExistsModalVisible(false)
+
+                    
                 }, 1200)
             }
 
@@ -230,11 +265,13 @@ const WorkerScreen = ({navigation}) => {
                 setIsSuccess(false)
                 return
             }
+            
 
             if(data && data.success){
                 setIsSuccess(true)
                 setErrorMessage('')
                 getMyUserData()
+                
             }
 
         }catch(error){
@@ -248,7 +285,6 @@ const WorkerScreen = ({navigation}) => {
 
         setToday(todayDate)
 
-
         if(userData && userData.timeSlots){
             // const copy_userTimeSlots = {}
 
@@ -260,6 +296,8 @@ const WorkerScreen = ({navigation}) => {
                 //     copy_userTimeSlots[updatedDateStringKey] = userData.timeSlots[dateStringKey]
                 // }
             //*
+            // console.log('asdasd')
+            // console.log(userData.timeSlots)
             setSelectedTimeSlots(userData.timeSlots)
             //
 
@@ -342,7 +380,8 @@ const WorkerScreen = ({navigation}) => {
         
         setIsTodaySelected(isToday)
         setSelectedStartDate(date)
-        
+        console.log(date)
+        console.log(today)
     }
 
     const handleSelectTimeSlot = async (timeSlot) => {
@@ -627,6 +666,14 @@ const WorkerScreen = ({navigation}) => {
             isSuccess={multipleReservationsRejected}
         />
 
+
+        <UnsavedChangesModal 
+            isModalVisible={isUnsavedChangesModalVisible}
+            setIsModalVisible={setIsUnsavedChangesModalVisible}
+            handleConfirm={() => {
+                setChangesCount(-1)
+            }}
+          />
     </SafeAreaView>
   )
 }
