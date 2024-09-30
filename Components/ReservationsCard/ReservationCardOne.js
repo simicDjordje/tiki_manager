@@ -85,7 +85,7 @@ const ReservationCardOne = ({reservationDetails}) => {
                     <Image
                         className={`w-16 h-16 rounded-full mr-3`}
                         // style={{borderWidth: 0.5}}
-                        source={`http://192.168.1.27:5000/photos/profile-photo${reservationDetails?.sender?._id}.png`}
+                        source={`http://192.168.1.14:5000/photos/profile-photo${reservationDetails?.sender?._id}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}

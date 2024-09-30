@@ -1,12 +1,13 @@
 import { View } from 'react-native'
 import Text from '../CustomComponents/CustomText'
 import React, { useEffect, useState } from 'react'
-import Animated, { BounceInLeft, FadeInDown, FadeOutDown, FadeOutLeft, FadeOutRight } from 'react-native-reanimated'
+import Animated, { BounceIn, BounceInDown, BounceInLeft, BounceOutRight, FadeIn, FadeInDown, FadeOut, FadeOutDown, FadeOutLeft, FadeOutRight, SequencedTransition } from 'react-native-reanimated'
 import { Image } from 'expo-image'
 import CustomAvatar from '../CustomAvatar';
 import CustomButton from '../CustomComponents/CustomButton';
 import { formatDistanceToNow } from 'date-fns'
 import { srLatn } from 'date-fns/locale'
+import { useAcceptReservationMutation, useRejectReservationMutation } from '../../redux/apiCore'
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
@@ -33,25 +34,192 @@ const timeAgoInSerbian = (dateString) => {
 }
 
 const ReservationCardThree = ({
-    reservationDetails, 
-    handleReject, 
-    handleAccept, 
-    isRejectingReservation, 
-    isAcceptingReservation, 
-    rejectingError, 
-    rejectingSuccess,
-    acceptingError,
-    acceptingSuccess
+    reservationDetails,
+    setPendingReservations,
+    setAcceptedReservations,
+    setPlainPendingReservations,
+    setAvailableDatesAccepted,
+    setAvailableDatesPending,
+    selectedDate,  
+    availableDatesAccepted
 }) => {
+    
     const [dateText, setDateText] = useState('')
     const [smallDateText, setSmallDateText] = useState('')
     let avatarText = ''
     const timeAgo = timeAgoInSerbian(reservationDetails?.createdAt) || ''
+    const reservationAcceptedTime = timeAgoInSerbian(reservationDetails?.updatedAt) || ''
 
+    const [acceptReservation, {isLoading: isAcceptingReservation}] = useAcceptReservationMutation()
+    const [rejectReservation, {isLoading: isRejectingReservation}] = useRejectReservationMutation()
+    const [rejectingError, setRejectingError] = useState(false)
+    const [rejectingSuccess, setRejectingSuccess] = useState(false)
+    const [acceptingError, setAcceptingError] = useState(false)
+    const [acceptingSuccess, setAcceptingSuccess] = useState(false)
+
+    const [canceling, setCanceling] = useState(false)
 
     if(reservationDetails?.sender){
         avatarText = `${reservationDetails?.sender?.first_name[0]} ${reservationDetails?.sender?.last_name[0]}`
     }
+
+
+
+    // ACCEPT
+    //Accept Reservation
+  const handleAccept = async () => {
+    const id = reservationDetails?._id
+
+    try{
+
+        const {error, data} = await acceptReservation({
+            reservationId: id
+        })
+
+        if(error){
+            setAcceptingError(true)
+            return
+        }
+        
+        if(data && data.success){
+            if(data.message === 'Reservation accepted successfully'){
+                setAcceptingSuccess(true)
+                setAcceptingError(false)
+                setTimeout(()=>{
+                  
+                  const reservationFromResponse = data.result
+                  console.log(reservationFromResponse)
+
+                  setPendingReservations(prev => {
+                    const filteredPrevForDate = prev[selectedDate].filter(i => i._id != id)
+
+                    if (filteredPrevForDate.length === 0) {
+                      // Remove the selectedDate from availableDatesPending if no reservations left for this date
+                      setAvailableDatesPending(prevDates => prevDates.filter(date => date !== selectedDate));
+                    }
+
+                    setPlainPendingReservations(prev => prev - 1)
+                    return {...prev, [selectedDate]: filteredPrevForDate}
+                  })
+
+                  
+
+                  setAcceptedReservations(prev => {
+                    let prevArray
+
+                    if(!prev){
+                      prevArray = []
+                    }else{
+                      prevArray = prev[selectedDate]
+                    }
+
+                    if(availableDatesAccepted !== null){
+                      if (!availableDatesAccepted.includes(selectedDate)) {
+                          const newDates = [...availableDatesAccepted, selectedDate];
+                        
+                          // Sort the array by comparing date strings as actual dates
+                          newDates.sort((a, b) => {
+                            // Split the date strings and compare as real Date objects
+                            const [dayA, monthA, yearA] = a.split('-');
+                            const [dayB, monthB, yearB] = b.split('-');
+                        
+                            const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
+                            const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
+                        
+                            return dateA - dateB; // Ascending order
+                          });
+                        
+                          setAvailableDatesAccepted(prev => {
+                            if(!prev){
+                              return [newDates]
+                            }
+
+                            return newDates
+                          }); // Set the sorted array
+                      }
+                    }else{
+                      setAvailableDatesAccepted([selectedDate])
+                    }
+
+                    return {
+                      ...prev,
+                      [selectedDate]: [reservationFromResponse, ...prevArray]
+                    }
+                  })
+
+                  setAcceptingSuccess(false)
+                }, 1500)
+            }
+        }
+    }catch(error){
+        console.log(error)
+    }
+  }
+
+    // END ACCEPT
+
+
+
+    //REJECT
+    //Reject reservation
+  const handleReject = async () => {
+    const id = reservationDetails?._id
+
+    try{
+
+        const {error, data} = await rejectReservation({
+            reservationId: id
+        })
+
+        if(error){
+            setRejectingError(true)
+            return
+        }
+        
+        if(data && data.success){
+            if(data.message === 'Reservation rejected successfully'){
+                setRejectingSuccess(true)
+                setRejectingError(false)
+                setTimeout(()=>{
+
+                  if(reservationDetails.status === 'pending'){
+                    setPendingReservations(prev => {
+                        const filteredPrevForDate = prev[selectedDate].filter(i => i._id != id)
+    
+                        if (filteredPrevForDate.length === 0) {
+                          // Remove the selectedDate from availableDatesPending if no reservations left for this date
+                          setAvailableDatesPending(prevDates => prevDates.filter(date => date !== selectedDate));
+                        }
+    
+                        setPlainPendingReservations(prev => prev - 1)
+    
+                        return {...prev, [selectedDate]: filteredPrevForDate}
+                      })
+                  }
+
+
+                  if(reservationDetails.status === 'accepted'){
+                    setAcceptedReservations(prev => {
+                        const filteredPrevForDate = prev[selectedDate].filter(i => i._id != id)
+
+                        if (filteredPrevForDate.length === 0) {
+                            // Remove the selectedDate from availableDatesPending if no reservations left for this date
+                            setAvailableDatesAccepted(prevDates => prevDates.filter(date => date !== selectedDate));
+                        }
+
+                        return {...prev, [selectedDate]: filteredPrevForDate}
+                    })
+                  }
+
+                  setRejectingSuccess(false)
+                }, 1500)
+            }
+        }
+    }catch(error){
+        console.log(error)
+    }
+  }
+    //END REJECT
 
 
     useEffect(()=>{
@@ -86,7 +254,8 @@ const ReservationCardThree = ({
     }, [reservationDetails])
 
   return (
-    <Animated.View exiting={FadeOutDown} entering={FadeInDown} className="w-full p-4 mt-8 rounded-3xl border-textSecondary bg-bgSecondary" style={{borderWidth: 0.5}}>
+    // exiting={BounceOutRight} entering={BounceInDown.delay(300)}
+    <Animated.View layout={SequencedTransition} entering={FadeInDown} className="w-full p-4 mt-8 rounded-3xl border-textSecondary bg-bgSecondary" style={{borderWidth: 0.5}}>
             <View className="flex flex-row justify-end">
                 <Text className="text-xs text-textSecondary">{timeAgo}</Text>
             </View>
@@ -95,7 +264,7 @@ const ReservationCardThree = ({
                     <Image
                         className={`w-16 h-16 rounded-full mr-3`}
                         // style={{borderWidth: 0.5}}
-                        source={`http://192.168.1.27:5000/photos/profile-photo${reservationDetails?.sender?._id}.png`}
+                        source={`http://192.168.1.14:5000/photos/profile-photo${reservationDetails?.sender?._id}.png`}
                         placeholder={{ blurhash }}
                         contentFit="cover"
                         transition={1000}
@@ -111,7 +280,6 @@ const ReservationCardThree = ({
                     <Text className="text-textPrimary text-lg" bold>{reservationDetails?.sender && `${reservationDetails?.sender?.first_name} ${reservationDetails?.sender?.last_name}`}</Text>
                     {reservationDetails?.status === 'pending' && <Text className="text-textPrimary">Želi da rezerviše termin?</Text>}
                     {reservationDetails?.status === 'accepted' && <Text className="text-appColorDark">Rezervacija je prihvaćena</Text>}
-
                 </View>
             </View>
 
@@ -138,15 +306,51 @@ const ReservationCardThree = ({
                 <Text className="text-textPrimary" bold>Vreme: <Text semi>{reservationDetails?.time}h</Text></Text>
             </View>
 
-
-            {/* <View className="h-6 mt-5 flex flex-row justify-center items-center">
-            {reservationDetails?.status === 'accepted' && 
-                <View className="w-full">
-                    <View className="bg-textSecondary w-full my-4" style={{height: 0.5}}></View>
-                    <Text className="text-textPrimary text-center" bold>Rezervacija je prihvaćena</Text>
-                </View>
+            {reservationDetails?.status === 'accepted' && canceling && 
+                <Animated.View entering={FadeIn.delay(300)} className="w-full">
+                    <Text className="text-center mt-4" bold>Sigurno želiš da otkažeš rezervaciju?</Text>
+                </Animated.View>
             }
-            </View> */}
+
+            {reservationDetails?.status === 'accepted' && canceling && 
+                <Animated.View entering={FadeIn.delay(300)} className="flex flex-row justify-between items-center mt-4">
+                    
+                    <View className="w-[48%]">
+                        <CustomButton 
+                            text={'Odbij'}
+                            variant={'transparent'}
+                            isIcon
+                            rejectIcon
+                            onPress={() => setCanceling(false)}
+                        />
+                    </View>
+                    <View className="w-[48%]">
+                        <CustomButton 
+                            text={'Prihvati'}
+                            isIcon
+                            variant={'dark'}
+                            acceptIcon
+                            onPress={handleReject}
+                            isLoading={isRejectingReservation}
+                            isError={rejectingError}
+                            isSuccess={rejectingSuccess}
+
+                        />
+                    </View>
+                </Animated.View>
+            }
+
+            {reservationDetails?.status === 'accepted' && !canceling && 
+                <Animated.View entering={FadeIn} exiting={FadeOut.duration(250)} className="flex flex-row justify-between items-center mt-8">
+                    <View className="w-full">
+                        <CustomButton 
+                            text={'Otkaži'}
+                            variant={'dark'}
+                            onPress={() => setCanceling(true)}
+                        />
+                    </View>
+                </Animated.View>
+            }
             
 
             {reservationDetails?.status === 'pending' &&
@@ -157,9 +361,7 @@ const ReservationCardThree = ({
                             variant={'transparent'}
                             isIcon
                             rejectIcon
-                            onPress={() => {
-                                handleReject(reservationDetails?._id)
-                            }}
+                            onPress={handleReject}
                             isLoading={isRejectingReservation}
                             isError={rejectingError}
                             isSuccess={rejectingSuccess}
@@ -171,9 +373,7 @@ const ReservationCardThree = ({
                             isIcon
                             variant={'dark'}
                             acceptIcon
-                            onPress={() => {
-                                handleAccept(reservationDetails?._id)
-                            }}
+                            onPress={handleAccept}
                             isLoading={isAcceptingReservation}
                             isError={acceptingError}
                             isSuccess={acceptingSuccess}

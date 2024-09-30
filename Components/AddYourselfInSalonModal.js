@@ -80,7 +80,7 @@ const AddYourselfInSalonModal = ({isModalVisible, setIsModalVisible, }) => {
                     <View className="flex flex-col justify-center items-center mt-8">
                         <Image
                             className="w-28 h-28 rounded-full border-2 border-appColorDark"
-                            source={`http://192.168.1.27:5000/photos/profile-photo${userData?._id}.png`}
+                            source={`http://192.168.1.14:5000/photos/profile-photo${userData?._id}.png`}
                             placeholder={{ blurhash }}
                             contentFit="cover"
                             transition={1000}

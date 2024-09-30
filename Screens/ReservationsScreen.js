@@ -5,7 +5,7 @@ import Text from '../Components/CustomComponents/CustomText'
 import LootieLoader from '../Components/LootieAnimations/Loader'
 import { useAcceptReservationMutation, useGetMyReservationsMutation, useRejectReservationMutation } from '../redux/apiCore'
 import { useFocusEffect } from '@react-navigation/native'
-import Animated, { BounceIn, BounceInRight, FadeInDown } from 'react-native-reanimated'
+import Animated, { BounceIn, BounceInRight, FadeIn, FadeInDown } from 'react-native-reanimated'
 import ReservationCardThree from '../Components/ReservationsCard/ReservationCardThree'
 
 const monthObject = {
@@ -23,7 +23,7 @@ const monthObject = {
   11: 'Decembar',
 }
 
-const ReservationsScreen = () => {
+const ReservationsScreen = ({navigation}) => {
   const [selectedSection, setSelectedSection] = useState('accepted')
   const [selectedDate, setSelectedDate] = useState(null)
   const [availableDatesAccepted, setAvailableDatesAccepted] = useState([])
@@ -33,19 +33,32 @@ const ReservationsScreen = () => {
   const [getMyReservations, {isLoading: isGetingMyReservations}] = useGetMyReservationsMutation()
   
   const [error, setError] = useState(false)
-  const [acceptReservation, {isLoading: isAcceptingReservation}] = useAcceptReservationMutation()
-  const [rejectReservation, {isLoading: isRejectingReservation}] = useRejectReservationMutation()
-  const [rejectingError, setRejectingError] = useState(false)
-  const [rejectingSuccess, setRejectingSuccess] = useState(false)
-  const [acceptingError, setAcceptingError] = useState(false)
-  const [acceptingSuccess, setAcceptingSuccess] = useState(false)
   const [acceptedReservations, setAcceptedReservations] = useState(null)
   const [pendingReservations, setPendingReservations] = useState(null)
   const [customLoading, setCustomLoading] = useState(false)
   const [plainPendingReservations, setPlainPendingReservations] = useState(0)
-  // const [showPendingReservations, setShowPendingReservations] = useState(true)
+
+  const [showReservationsScroll, setShowReservationsScroll] = useState(false)
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('blur', () => {
+      // Actions to perform when the screen is exited (blurred)
+      setAvailableDatesAccepted([]);
+      setAvailableDatesPending([]);
+      setAcceptedReservations(null);
+      setPendingReservations(null);
+    })
+
+    // Cleanup function to unsubscribe when the component unmounts
+    return unsubscribe;
+  }, [navigation]);
 
   useFocusEffect(useCallback(()=>{
+    setAvailableDatesAccepted([])
+    setAvailableDatesPending([])
+    setAcceptedReservations(null)
+    setPendingReservations(null)
+
     handleFetchReservations()
   }, []))
 
@@ -53,6 +66,12 @@ const ReservationsScreen = () => {
     setSelectedDate(null)
     setSelectedSection(section)
   }
+
+  useEffect(()=>{
+    setShowReservationsScroll(false)
+
+    setTimeout(()=>{setShowReservationsScroll(true)}, 500)
+  }, [selectedDate])
 
   useEffect(()=>{
     if(selectedSection === 'accepted'){
@@ -140,136 +159,7 @@ const ReservationsScreen = () => {
       setCustomLoading(false)
     }
   }
-
-
-  //Accept Reservation
-  const handleAcceptReservation = async (id) => {
-    try{
-
-        const {error, data} = await acceptReservation({
-            reservationId: id
-        })
-
-        if(error){
-            setAcceptingError(true)
-            return
-        }
-        
-        if(data && data.success){
-            if(data.message === 'Reservation accepted successfully'){
-                setAcceptingSuccess(true)
-                setAcceptingError(false)
-                setTimeout(()=>{
-                  
-                  const reservationFromResponse = data.result
-                  console.log(reservationFromResponse)
-
-                  setPendingReservations(prev => {
-                    const filteredPrevForDate = prev[selectedDate].filter(i => i._id != id)
-
-                    if (filteredPrevForDate.length === 0) {
-                      // Remove the selectedDate from availableDatesPending if no reservations left for this date
-                      setAvailableDatesPending(prevDates => prevDates.filter(date => date !== selectedDate));
-                    }
-
-                    setPlainPendingReservations(prev => prev - 1)
-                    return {...prev, [selectedDate]: filteredPrevForDate}
-                  })
-
-                  
-
-                  setAcceptedReservations(prev => {
-                    let prevArray
-
-                    if(prev === null){
-                      prevArray = []
-                    }else{
-                      prevArray = prev[selectedDate]
-                    }
-
-                    if(availableDatesAccepted !== null){
-                      if (!availableDatesAccepted.includes(selectedDate)) {
-                          const newDates = [...availableDatesAccepted, selectedDate];
-                        
-                          // Sort the array by comparing date strings as actual dates
-                          newDates.sort((a, b) => {
-                            // Split the date strings and compare as real Date objects
-                            const [dayA, monthA, yearA] = a.split('-');
-                            const [dayB, monthB, yearB] = b.split('-');
-                        
-                            const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
-                            const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
-                        
-                            return dateA - dateB; // Ascending order
-                          });
-                        
-                          setAvailableDatesAccepted(prev => {
-                            if(prev === null){
-                              return [newDates]
-                            }
-
-                            return newDates
-                          }); // Set the sorted array
-                      }
-                    }else{
-                      setAvailableDatesAccepted([selectedDate])
-                    }
-
-                    return {
-                      ...prev,
-                      [selectedDate]: [reservationFromResponse, prevArray]
-                    }
-                  })
-
-                  setAcceptingSuccess(false)
-                }, 1500)
-            }
-        }
-    }catch(error){
-        console.log(error)
-    }
-  }
-
-  //Reject reservation
-  const handleRejectReservation = async (id) => {
-    try{
-
-        const {error, data} = await rejectReservation({
-            reservationId: id
-        })
-
-        if(error){
-            setRejectingError(true)
-            return
-        }
-        
-        if(data && data.success){
-            if(data.message === 'Reservation rejected successfully'){
-                setRejectingSuccess(true)
-                setRejectingError(false)
-                setTimeout(()=>{
-
-                  setPendingReservations(prev => {
-                    const filteredPrevForDate = prev[selectedDate].filter(i => i._id != id)
-
-                    if (filteredPrevForDate.length === 0) {
-                      // Remove the selectedDate from availableDatesPending if no reservations left for this date
-                      setAvailableDatesPending(prevDates => prevDates.filter(date => date !== selectedDate));
-                    }
-
-                    setPlainPendingReservations(prev => prev - 1)
-
-                    return {...prev, [selectedDate]: filteredPrevForDate}
-                  })
-
-                  setRejectingSuccess(false)
-                }, 1500)
-            }
-        }
-    }catch(error){
-        console.log(error)
-    }
-  }
+  
 
   return (
     <SafeAreaView className="bg-bgPrimary h-full">
@@ -307,19 +197,19 @@ const ReservationsScreen = () => {
       }
 
       {!isGetingMyReservations && !customLoading && selectedSection === 'accepted' && availableDatesAccepted.length === 0 &&
-        <View className="h-2/6 flex flex-col justify-center items-center">
+        <Animated.View entering={FadeIn.delay(500)} className="h-2/6 flex flex-col justify-center items-center">
           <Text className="text-lg text-textPrimary" bold>
             {selectedSection === 'accepted' && 'Trenutno nema aktivnih rezervacija'}
           </Text>
-        </View>
+        </Animated.View>
       }
 
       {!isGetingMyReservations && !customLoading && selectedSection === 'pending' && availableDatesPending.length === 0 &&
-        <View className="h-2/6 flex flex-col justify-center items-center">
+        <Animated.View entering={FadeIn.delay(500)} className="h-2/6 flex flex-col justify-center items-center">
           <Text className="text-lg text-textPrimary" bold>
             {selectedSection === 'pending' && 'Trenutno nema rezervacija na čekanju'}
           </Text>
-        </View>
+        </Animated.View>
       }
 
       {selectedSection === 'accepted' && availableDatesAccepted.length > 0 &&
@@ -331,7 +221,7 @@ const ReservationsScreen = () => {
         </Animated.View>
       }
 
-      {selectedSection === 'accepted' && acceptedReservations && acceptReservation.length > 0 && 
+      {selectedSection === 'accepted' && acceptedReservations && availableDatesAccepted.length > 0 &&
         <Animated.View entering={BounceInRight} className="-mr-4">
           <ScrollView
               horizontal
@@ -457,40 +347,46 @@ const ReservationsScreen = () => {
       </Animated.View>
       }
         
-        {selectedDate && acceptedReservations && selectedSection === 'accepted' && 
-          acceptedReservations[selectedDate].map((reservation, index) => {
+        { showReservationsScroll
+        && selectedDate 
+        && acceptedReservations 
+        && acceptedReservations[selectedDate] 
+        && selectedSection === 'accepted' 
+        && acceptedReservations[selectedDate].map((reservation, index) => {
             return (
               <ReservationCardThree 
                 key={reservation?._id || index} 
                 reservationDetails={reservation}
-                handleReject={handleRejectReservation}
-                handleAccept={handleAcceptReservation}
-                isRejectingReservation={isRejectingReservation}
-                isAcceptingReservation={isAcceptingReservation}
-                rejectingError={rejectingError}
-                rejectingSuccess={rejectingSuccess}
-                acceptingError={acceptingError}
-                acceptingSuccess={acceptingSuccess}
+                setPendingReservations={setPendingReservations}
+                setAcceptedReservations={setAcceptedReservations}
+                setPlainPendingReservations={setPlainPendingReservations}
+                setAvailableDatesAccepted={setAvailableDatesAccepted}
+                setAvailableDatesPending={setAvailableDatesPending}
+                selectedDate={selectedDate}
+                availableDatesAccepted={availableDatesAccepted}
               />
             )
           })
 
           }
 
-    {selectedDate && pendingReservations &&  selectedSection === 'pending' && 
-      pendingReservations[selectedDate].map((reservation, index) => {
+    {showReservationsScroll
+    && selectedDate 
+    && pendingReservations 
+    && pendingReservations[selectedDate] 
+    && selectedSection === 'pending' 
+    && pendingReservations[selectedDate].map((reservation, index) => {
         return (
           <ReservationCardThree 
             key={reservation?._id || index} 
             reservationDetails={reservation}
-            handleReject={handleRejectReservation}
-            handleAccept={handleAcceptReservation}
-            isRejectingReservation={isRejectingReservation}
-            isAcceptingReservation={isAcceptingReservation}
-            rejectingError={rejectingError}
-            rejectingSuccess={rejectingSuccess}
-            acceptingError={acceptingError}
-            acceptingSuccess={acceptingSuccess}
+            setPendingReservations={setPendingReservations}
+            setAcceptedReservations={setAcceptedReservations}
+            setPlainPendingReservations={setPlainPendingReservations}
+            setAvailableDatesAccepted={setAvailableDatesAccepted}
+            setAvailableDatesPending={setAvailableDatesPending}
+            selectedDate={selectedDate}
+            availableDatesAccepted={availableDatesAccepted}
           />
         )
       })

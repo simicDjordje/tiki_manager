@@ -143,7 +143,7 @@ const SalonWorkersScreen = ({navigation}) => {
                             {userData.haveWorkerAccount &&
                                 <Image
                                     className="w-20 h-20 rounded-full border-2 border-appColorDark"
-                                    source={`http://192.168.1.27:5000/photos/profile-photo${userData?._id}.png`}
+                                    source={`http://192.168.1.14:5000/photos/profile-photo${userData?._id}.png`}
                                     placeholder={{ blurhash }}
                                     contentFit="cover"
                                     transition={1000}
@@ -179,7 +179,7 @@ const SalonWorkersScreen = ({navigation}) => {
                                     <View className="flex flex-row justify-between items-center pb-2">
                                         <Image
                                             className="w-16 h-16 rounded-full"
-                                            source={`http://192.168.1.27:5000/photos/profile-photo${worker?._id}.png`}
+                                            source={`http://192.168.1.14:5000/photos/profile-photo${worker?._id}.png`}
                                             placeholder={{ blurhash }}
                                             contentFit="cover"
                                             transition={1000}

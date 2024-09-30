@@ -10,7 +10,7 @@ export const SocketContextProvider = ({children}) => {
     const {userData} = useSelector(state => state.general)
 
     useEffect(()=>{
-        const socket = io('http://192.168.1.27:5000', {
+        const socket = io('http://192.168.1.14:5000', {
             query: {
                 userId: userData?._id
             }
