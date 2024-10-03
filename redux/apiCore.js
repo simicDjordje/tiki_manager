@@ -149,6 +149,15 @@ export const apiCore = createApi({
 				}
 			}
 		}),
+		getSalonStatistics: builder.mutation({
+			query: (data) => {
+				return {
+					url: `/salons/statistics`,
+					method: 'POST',
+					body: data
+				}
+			}
+		}),
 		//end salons
 
 		//services
@@ -360,5 +369,6 @@ export const {
 	useRejectMultipleReservationMutation,
 	useDeleteCategoryMutation,
 	useDeleteServiceMutation,
-	useGetMyReservationsMutation
+	useGetMyReservationsMutation,
+	useGetSalonStatisticsMutation,
 } = apiCore;
