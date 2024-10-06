@@ -107,6 +107,7 @@ const LoginComponent = ({setAuthType}) => {
                 text={'Dalje'}
                 isLoading={isLoading}
                 isError={!!errorMessage}
+                variant={'dark'}
             />
         </View>
 

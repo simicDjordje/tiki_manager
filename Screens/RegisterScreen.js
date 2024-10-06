@@ -162,6 +162,7 @@ const RegisterScreen = ({navigation}) => {
                                  text={'Potvrdi'}
                                  isLoading={isLoading || isLoadingCustom}
                                  isError={!!errorMessage}
+                                 variant={'dark'}
                             />
                         </View>
                     </View>

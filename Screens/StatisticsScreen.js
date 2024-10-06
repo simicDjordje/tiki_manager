@@ -2,7 +2,7 @@ import { ScrollView, View } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import Text from '../Components/CustomComponents/CustomText'
 import { TouchableOpacity } from 'react-native'
-import Animated, { BounceIn, BounceInRight, FadeInDown } from 'react-native-reanimated'
+import Animated, { BounceIn, BounceInDown, BounceInRight, FadeInDown } from 'react-native-reanimated'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useSelector } from 'react-redux'
 import LootieLoader from '../Components/LootieAnimations/Loader'
@@ -13,14 +13,36 @@ import BarChartComponent from '../Components/Charts/BarChart'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
+import AntDesign from '@expo/vector-icons/AntDesign';
 
+const formatNumber = (num) => {
+  return num.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
+const monthsObject = {
+  0: 'Januar',
+  1: 'Februar',
+  2: 'Mart',
+  3: 'April',
+  4: 'Maj',
+  5: 'Jun',
+  6: 'Jul',
+  7: 'Avgust',
+  8: 'Septembar',
+  9: 'Oktobar',
+  10: 'Novembar',
+  11: 'Decembar'
+}
 
 const blurhash =
   '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
 const StatisticsScreen = () => {
-  const {userSalons} = useSelector(state => state.general)
+  const {userData, userSalons} = useSelector(state => state.general)
 
   return (
     <SafeAreaView className="bg-bgPrimary h-full">
@@ -33,6 +55,39 @@ const StatisticsScreen = () => {
           {userSalons.salonsInactive.length > 0 && 
             <SalonOwnerStatistics />
           }
+
+          {userSalons.salonsInactive.length == 0 && !userData.haveWorkerAccount &&
+            <View className="h-4/6 flex flex-col justify-center items-center">
+              <Text className="text-center text-textPrimary text-lg" bold>
+                Rezultati će biti dostupni po završetku usluge
+              </Text>
+
+              <Text className="text-center text-textPrimary mt-3 mb-3">
+                Moći ćeš da pratiš prihode salona ili pojedinačne prihode članova salona
+              </Text>
+
+              <Animated.View entering={FadeInDown} className="mt-10">
+                <AntDesign name="barschart" size={144} color="black" />
+              </Animated.View>
+            </View>
+          }
+
+        {userSalons.salonsInactive.length == 0 && userData.haveWorkerAccount &&
+            <View className="h-4/6 flex flex-col justify-center items-center">
+              <Text className="text-center text-textPrimary text-lg" bold>
+                Rezultati će biti dostupni po završetku usluge
+              </Text>
+
+              <Text className="text-center text-textPrimary mt-3 mb-3">
+                Moći ćeš da pratiš svoje prihode
+              </Text>
+
+              <Animated.View entering={FadeInDown} className="mt-10">
+                <AntDesign name="barschart" size={144} color="black" />
+              </Animated.View>
+            </View>
+          }
+
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -53,24 +108,46 @@ const SalonOwnerStatistics = () => {
   const [getSalonStatistics, {isLoading: isGetingSalonStatistics}] = useGetSalonStatisticsMutation()
   const [statistics, setStatistics] = useState(null)
   const [currentState, setCurrentState] = useState(null)
+  const [chartDataParent, setChartDataParent] = useState(null)
+  const [typeOfError, setTypeOfError] = useState(null)
 
   useEffect(()=>{
+    if(!selectedWorker || !statistics) return
+    
+    if(selectedWorker === 'all'){
+      setChartDataParent(statistics?.all_workers)
+      return
+    }
+
+    if(statistics[selectedWorker?._id]){
+      setChartDataParent(statistics[selectedWorker?._id])
+    }else{
+      setChartDataParent(null)
+    }
+    
+  }, [selectedWorker, statistics])
+
+  useEffect(()=>{
+   
     if(isGettingSalonData || customLoader){
       setCurrentState('loading')
       return
     }
 
-    if(!isGettingSalonData && !customLoader && selectedSalon && selectedSalon.workers.length > 0 && salonData && statistics){
+    if(!isGettingSalonData && !customLoader && selectedSalon && selectedSalon.workers.length > 0 && salonData && statistics && !typeOfError){
       setCurrentState('show')
       return
     }
 
-  }, [isGettingSalonData, customLoader, selectedSalon, salonData, statistics])
-
-
+    if(typeOfError){
+      setCurrentState(typeOfError)
+    }
+    
+  }, [isGettingSalonData, customLoader, selectedSalon, salonData, statistics, typeOfError])
+  
   useFocusEffect(useCallback(()=>{
     if(userSalons && userSalons.salonsInactive && userSalons.salonsInactive.length > 0){
-      setSelectedSalon(userSalons.salonsInactive[1])
+      setSelectedSalon(userSalons.salonsInactive[0])
     }
   }, []))
 
@@ -83,13 +160,20 @@ const SalonOwnerStatistics = () => {
         getSalonById({salonId: selectedSalon?._id})
 
         const {error, data} = await getSalonStatistics({salonId: selectedSalon?._id})
-        
+        console.log(error)
+
+        console.log(data)
         if(error){
-          setCurrentState('error')
+          if(error.data && error.data.message == 'No data'){
+            setTypeOfError('no_data')
+          }else{
+            setTypeOfError('error')
+          }
           return
         }
 
         if(data && data.success){
+          setTypeOfError(null)
           setStatistics(data.result)
         }
 
@@ -100,7 +184,6 @@ const SalonOwnerStatistics = () => {
       }
     })()
     
-    // setTimeout(()=>{setCustomLoader(false)}, 1000)
   }, [selectedSalon])
 
   useEffect(()=>{
@@ -139,6 +222,7 @@ const SalonOwnerStatistics = () => {
         })}
       </View>
 
+
       {currentState === 'loading' && 
         <View className="h-4/6 flex flex-col justify-center items-center">
           <LootieLoader dark={true} d={70} />
@@ -148,6 +232,12 @@ const SalonOwnerStatistics = () => {
       {currentState === 'error' && 
         <View className="h-4/6 flex flex-col justify-center items-center">
           <Text className="text-center text-red-700" bold>Došlo je do greške</Text>
+        </View>
+      }
+
+      {currentState === 'no_data' && 
+        <View className="h-3/6 flex flex-col justify-center items-center">
+          <Text className="text-center text-textPrimary" bold>Salon nema dovoljno podataka...</Text>
         </View>
       }
 
@@ -171,7 +261,7 @@ const SalonOwnerStatistics = () => {
           >   
             {(() => {
               // Move the worker with userData?._id to index 1
-              const workers = [...salonData.workers];
+              let workers = [...salonData.workers];
               const userWorkerIndex = workers.findIndex(worker => worker._id === userData?._id);
               
               if (userWorkerIndex !== -1) {
@@ -182,12 +272,16 @@ const SalonOwnerStatistics = () => {
 
               // Get the first 6 workers or all workers if less than 6
               const workersForImages = workers.slice(0, 6);
+              
+              if(workers.length > 1){
+                workers = ['0_index_to_create_all_btn', ...workers]
+              }
 
-              return ['0_index_to_create_all_btn', ...workers].map((worker, index) => {
+              return workers.map((worker, index) => {
                 const lastItem = index === salonData.workers.length;
 
                 // Special case for index 0 - display small images of the first 6 workers
-                if (index === 0 && salonData.workers.length > 1) {
+                if (index === 0 && workers.length > 1) {
                   const isSelected = selectedWorker === 'all'
 
                   return (
@@ -254,9 +348,9 @@ const SalonOwnerStatistics = () => {
         </Animated.View>
       }
 
-            {currentState === 'show' && 
+            {currentState === 'show' && chartDataParent &&
               <BarChartWrapperOne 
-                data={statistics?.all_workers}
+                data={chartDataParent}
                 setCurrentState={setCurrentState}
               />
             }
@@ -265,6 +359,19 @@ const SalonOwnerStatistics = () => {
   )
 }
 
+// const data = [
+//   {value: 15, }, 
+//   {value: 150, }, 
+//   {value: 39, }, 
+//   {value: 111, }, 
+//   {value: 89, }, 
+//   {value: 66, }, 
+//   {value: 69, }, 
+//   {value: 158, }, 
+//   {value: 10, }, 
+//   {value: 8, }, 
+//   {value: 49, }, 
+//   {value: 77, }];
 
 const BarChartWrapperOne = ({data, setCurrentState}) => {
   const [availableYears, setAvailableYears] = useState([])
@@ -272,12 +379,89 @@ const BarChartWrapperOne = ({data, setCurrentState}) => {
   const [type, setType] = useState('income')
   const chartRef = useRef(null)
   const [chartData, setChartData] = useState([])
+  const [selectedMonth, setSelectedMonth] = useState(0)
+  const [maxValue, setMaxValue] = useState(0)
+  const [topTitle, setTopTitle] = useState('')
+  const [showChart, setShowChart] = useState(true)
+
+  useEffect(()=>{
+    if(!chartData || !selectedMonth || !chartData[selectedMonth]) return
+
+    const monthlyData = chartData[selectedMonth]
+
+    setTopTitle(monthlyData.valueToShow)
+  }, [chartData, selectedMonth])
+
+
+  useEffect(() => {
+    if (!data || !selectedYear) return;
+    
+    const inputData = type === 'income' ? data[selectedYear]?.earnings : data[selectedYear]?.services_provided
+    const totalItems = 12; // Array with 12 items
+    let maxValueCount = 0;
+  
+  
+    // Create an array of 12 items with default value 0 and proper colors
+    const result = Array.from({ length: totalItems }, (_, index) => {
+      const value = inputData[index] || 0;
+  
+      // Set front color based on condition
+      let frontColor = value ? '#babbb6' : '#986868';
+      if (selectedMonth === index) frontColor = '#232323';
+  
+      // Update maxValueCount
+      if (value > maxValueCount) {
+        maxValueCount = value;
+      }
+  
+      return {
+        value: value,
+        frontColor: frontColor,
+        valueToShow: type === 'income' ? `${formatNumber(value) || '0.00'} RSD` : `${value} usluga`,
+      };
+    });
+    
+    // Pre-calculate max value part once
+    console.log('MAX: ', maxValueCount)
+    const maxValuePart = maxValueCount / 8;
+
+    // Update values if they're less than `maxValuePart`
+    const updatedChartData = result.map((item) => {
+      const updatedItem = { ...item };
+  
+      if (!item.value) {
+        updatedItem.value = maxValuePart; // For zero-value bars
+      } else if (item.value < maxValuePart) {
+        updatedItem.value += maxValuePart; // Add min size for small values
+      }
+  
+      return updatedItem;
+    });
+  
+    // Update state
+    setMaxValue(maxValueCount);
+    setChartData(updatedChartData);
+    
+  }, [data, selectedMonth, type]);
+
+  useEffect(()=>{
+    if(!selectedYear) return
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = today.getMonth()
+
+    if(year == selectedYear){
+      setSelectedMonth(month)
+    }else{
+      setSelectedMonth(0)
+    }
+  }, [selectedYear])
 
   useEffect(()=>{
     if(!data) return
 
     const yearsArray = Object.keys(data).sort((a, b) => b - a)
-    setAvailableYears([...yearsArray, '2023', '2022', '2021', '2020', '2019', '2018', '2017'])
+    setAvailableYears([...yearsArray])
     
     if(yearsArray.length){
       setSelectedYear(yearsArray[0])
@@ -287,12 +471,15 @@ const BarChartWrapperOne = ({data, setCurrentState}) => {
 
   }, [data])
 
-  const handleScrollRef = () => {
+  // const handleScrollRef = () => {
     
-    if(chartRef.current !== null){
-        chartRef.current.scrollToEnd()
-    }
-  }
+  //   if(chartRef.current !== null){
+  //       chartRef.current.scrollToEnd()
+  //   }
+  // }
+  if(!data) return (
+    <Text>Kurac</Text>
+  )
 
   return (
     <View className="w-full mt-4">
@@ -312,7 +499,7 @@ const BarChartWrapperOne = ({data, setCurrentState}) => {
                   <TouchableOpacity 
                     key={y}
                     onPress={onPressCustom} className={`${customClassBG} rounded-xl h-14 ml-2 flex flex-row justify-center items-center mr-2`}>
-                      <Text className={`${customClassText}`} bold>{y}</Text>
+                      <Text className={`${customClassText}`} semi>{y}</Text>
                   </TouchableOpacity>
                 )
               })}
@@ -323,29 +510,45 @@ const BarChartWrapperOne = ({data, setCurrentState}) => {
           <Animated.View entering={FadeInDown} className="rounded-2xl bg-bgSecondary flex flex-row justify-between mt-4 h-14 px-3">
             <TouchableOpacity onPress={() => setType('income')} className="flex flex-row justify-between items-center">
               <FontAwesome6 name="money-bills"  size={16} color={type === 'services_provided' ? '#babbb6' : 'black'} />
-              <Text className={`${type === 'services_provided' ? 'text-textSecondary' : 'text-textPrimary'} ml-1`} bold>Prihod</Text>
+              <Text className={`${type === 'services_provided' ? 'text-textSecondary' : 'text-textPrimary'} ml-1`} semi>Ukupan prihod</Text>
             </TouchableOpacity>
           </Animated.View>
 
           <Animated.View entering={FadeInDown} className="rounded-2xl bg-bgSecondary flex flex-row justify-between mt-4 h-14 px-3">
             <TouchableOpacity onPress={() => setType('services_provided')} className="flex flex-row justify-between items-center">
               <MaterialCommunityIcons name="account-group" size={24} color={type === 'income' ? '#babbb6' : 'black'} />
-              <Text className={`${type === 'income' ? 'text-textSecondary' : 'text-textPrimary'} ml-1`} bold>Broj pruženih usluga</Text>
+              <Text className={`${type === 'income' ? 'text-textSecondary' : 'text-textPrimary'} ml-1`} semi>Broj pruženih usluga</Text>
             </TouchableOpacity>
           </Animated.View>
 
-          <Animated.View entering={FadeInDown} className="rounded-2xl bg-bgSecondary flex flex-row justify-between mt-4 h-14 px-3">
+          {/* <Animated.View entering={FadeInDown} className="rounded-2xl bg-bgSecondary flex flex-row justify-between mt-4 h-14 px-3">
             <TouchableOpacity onPress={handleScrollRef} className="flex flex-row justify-between items-center">
               <MaterialIcons name="arrow-forward-ios" size={20} color="black" />
             </TouchableOpacity>
-          </Animated.View>
+          </Animated.View> */}
         </View>
+        
 
-        <View className="w-full h-60 mt-5">
-          <BarChartComponent 
-            chartData={chartData}
-            ref={chartRef}
-          />
+        {/* <View className="w-full bg-textSecondary mt-4" style={{height: 0.5}}></View> */}
+
+
+        <View className="w-full flex flex-col justify-between h-72 mt-5 bg-bgSecondary rounded-2xl">
+          <View className="w-full rounded-2xl px-3 py-2 flex flex-row justify-between">
+             <View>
+              <Text className="text-textMid" semi>{monthsObject[selectedMonth]}</Text>
+              <Text className="text-textPrimary text-lg" bold>{topTitle}</Text>
+             </View>
+
+             <Text className="text-textMid" semi>2024</Text>
+          </View>
+          {showChart && 
+            <BarChartComponent 
+              chartData={chartData}
+              setSelectedMonth={setSelectedMonth}
+              maxValue={maxValue}
+              ref={chartRef}
+            />
+          }
         </View>
     </View>
   )

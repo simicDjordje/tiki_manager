@@ -189,7 +189,7 @@ const CreateServiceModal = ({isModalVisible, setIsModalVisible}) => {
                                                 style={{width: 68, height: 68}}
                                             />
 
-                                            <Text className="text-xs mt-2 text-appColorDark" semi>{worker?.first_name}</Text>
+                                            <Text className="text-xs mt-2 text-textPrimary" semi>{worker?.first_name}</Text>
                                         </TouchableOpacity>
                                     )
                                 })}

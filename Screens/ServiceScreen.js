@@ -239,7 +239,10 @@ const ServiceScreen = () => {
             setIsSuccess(true)
             getSalonById({salonId: salonData?._id})
 
-            setTimeout(()=>{setIsSuccess(false)}, 4000)
+            setTimeout(()=>{
+              //setIsSuccess(false)
+              navigation.navigate('StackTabScreens', {screen: 'SalonServicesScreen'})
+            }, 1000)
         }
     }catch(error){
         console.log(error)

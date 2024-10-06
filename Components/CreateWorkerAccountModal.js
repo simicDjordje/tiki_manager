@@ -202,6 +202,7 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible, addingYour
                                 isLoading={isLoading || isLoadingCustom}
                                 isSuccess={isSuccess}
                                 isError={!!errorMessage}
+                                variant={'dark'}
                             />
                         </View>
                     </View>
@@ -232,6 +233,7 @@ const CreateWorkerAccountModal = ({isModalVisible, setIsModalVisible, addingYour
                                             setIsModalVisible(false)
                                         }}
                                         text={'Nazad na početnu'}
+                                        variant={'dark'}
                                     />
                                 </View>
                             </View>

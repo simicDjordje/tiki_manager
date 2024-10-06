@@ -105,18 +105,25 @@ const ReservationCardThree = ({
                   
 
                   setAcceptedReservations(prev => {
+                    console.log(1)
+                    console.log(selectedDate)
                     let prevArray
 
                     if(!prev){
+                        console.log(1.1)
                       prevArray = []
                     }else{
+                        console.log(1.2)
                       prevArray = prev[selectedDate]
                     }
+                    console.log(2)
 
                     if(availableDatesAccepted !== null){
+                        console.log(2.1)
                       if (!availableDatesAccepted.includes(selectedDate)) {
+                        console.log(2.3)
                           const newDates = [...availableDatesAccepted, selectedDate];
-                        
+                          console.log(2.4)
                           // Sort the array by comparing date strings as actual dates
                           newDates.sort((a, b) => {
                             // Split the date strings and compare as real Date objects
@@ -128,16 +135,22 @@ const ReservationCardThree = ({
                         
                             return dateA - dateB; // Ascending order
                           });
-                        
+                          console.log(2.5)
                           setAvailableDatesAccepted(prev => {
+                            console.log(2.6)
+                            console.log(prev)
+                            console.log(newDates)
+                            console.log('2.6.1')
                             if(!prev){
+                                console.log(2.7)
                               return [newDates]
                             }
-
+                            console.log(2.8)
                             return newDates
                           }); // Set the sorted array
                       }
                     }else{
+                        console.log(999)
                       setAvailableDatesAccepted([selectedDate])
                     }
 

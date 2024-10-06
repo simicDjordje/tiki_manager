@@ -31,11 +31,6 @@
     "plugins": [
       "expo-font"
     ],
-    "extra": {
-      "eas": {
-        "projectId": "003395d2-1c6a-4996-9c67-f988af61a3c3"
-      }
-    },
     "runtimeVersion": {
       "policy": "appVersion"
     },
@@ -44,3 +39,5 @@
     }
   }
 }
+
+
